@@ -40,9 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ISearchRequest.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="Search.cs" />
-    <Compile Include="SearchRequest.cs" />
+    <Compile Include="SearchRequestFilesystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -14,22 +14,22 @@ namespace RummageCore
         /// <summary>
         /// Search Request to action.
         /// </summary>
-        public SearchRequest Request {get; set;}
+        public SearchRequestFilesystem RequestFilesystem {get; set;}
 
         /// <summary>
         /// Collection of matches from this search
         /// </summary>
-        public List<Match> Matches {public get; private set; }
+        public List<Match> Matches {get; private set; }
 
         #endregion
 
         /// <summary>
         /// Creates a new Search
         /// </summary>
-        /// <param name="searchRequest"></param>
-        public Search(SearchRequest searchRequest)
+        /// <param name="searchRequestFilesystem"></param>
+        public Search(SearchRequestFilesystem searchRequestFilesystem)
         {
-            Request = searchRequest;
+            RequestFilesystem = searchRequestFilesystem;
             Matches = new List<Match>();
         }
     }
