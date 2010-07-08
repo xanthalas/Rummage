@@ -1,0 +1,4 @@
+bin/
+obj/
+_ReSharper.Rummage
+*.suo
