@@ -51,6 +51,11 @@ namespace RummageCore
         private bool _isSearchReady = false;
 
         /// <summary>
+        /// Has the Prepare method been called on this Search yet?
+        /// </summary>
+        private bool _prepareCalled = false;
+
+        /// <summary>
         /// This list holds all the URLs (in this provider these are filenames (including paths)) to search
         /// </summary>
         private List<String> _urlToSearch;
@@ -92,6 +97,8 @@ namespace RummageCore
                     enumerateThisDirectory(directory);
                 }
             }
+
+            _prepareCalled = true;
 
             return true;
         }
@@ -139,22 +146,19 @@ namespace RummageCore
 
             if (IncludeFileStrings.Count > 0)
             {
+                var result = IncludeFileStrings.Select(inclString => Regex.Match(filename, inclString)).Where(m => m.Success);
+                
 
-                foreach (string inclString in IncludeFileStrings)
+                foreach (System.Text.RegularExpressions.Match m in
+                    IncludeFileStrings.Select(inclString => Regex.Match(filename, inclString)).Where(m => m.Success))
                 {
-                    System.Text.RegularExpressions.Match m = Regex.Match(filename, inclString);
-
-                    if (m.Success)
-                    {
-                        includeFound = true;
-                    }
+                    includeFound = true;
                 }
-
+                
                 if (!includeFound)
                 {
                     return false;
                 }
-
             }
 
             if (ExcludeFileStrings.Count > 0)
@@ -170,6 +174,22 @@ namespace RummageCore
                         return false;       //This file matches an exclude regex so we won't include it.
                     }
                 }
+
+                return ExcludeFileStrings.Select(exclString => Regex.Match(filename, exclString))
+                    .All(match => !match.Success);
+
+                /*    Below is the original non-LINQ version of the clause above.
+                                foreach (string exclString in ExcludeFileStrings)
+                                {
+                                    System.Text.RegularExpressions.Match m = Regex.Match(filename, exclString);
+
+                                    if (m.Success)
+                                    {
+                                        return false;       //This file matches an exclude regex so we won't include it.
+                                    }
+                                }
+                */
+
             }
 
             return true;
@@ -187,6 +207,12 @@ namespace RummageCore
                 return true;
             }
 
+            return ExcludeDirectoryStrings.Select(
+                excludeDirectoryString => Regex.Match(folder, excludeDirectoryString))
+                .All(match => !match.Success);
+
+            /*    Below is the original non-LINQ version of the clause above.
+             
             foreach (string excludeDirectoryString in ExcludeDirectoryStrings)
             {
                 System.Text.RegularExpressions.Match match = Regex.Match(folder, excludeDirectoryString);
@@ -195,8 +221,8 @@ namespace RummageCore
                     return false;       //This directory matches an exclude regex so we won't include it.
                 }
             }
-
-            return true;
+             * 
+             */
         }
 
 
@@ -216,38 +242,23 @@ namespace RummageCore
         }
 
         /// <summary>
-        /// Returns the list of URLs which will be searched
+        /// Returns the list of URLs which will be searched. If the Prepare() method has not been called first 
+        /// then this will return null.
         /// </summary>
         public List<string> URL
         {
             get
             {
-                return _urlToSearch;
+                if (_prepareCalled)
+                {
+                    return _urlToSearch;
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
 
-        #region Enumerator methods
-
-        public System.Collections.IEnumerator GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        public object Current
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public bool MoveNext()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }

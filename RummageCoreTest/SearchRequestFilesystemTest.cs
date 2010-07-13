@@ -76,8 +76,9 @@ namespace RummageCoreTest
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
-            Assert.AreEqual(5, srf.URL.Count);
+            Assert.AreEqual(6, srf.URL.Count);
             Assert.AreEqual(@"D:\code\Rummage\testdata\testfile1", srf.URL[1]);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.URL[3]);
 
         }
 
@@ -94,7 +95,7 @@ namespace RummageCoreTest
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
-            Assert.AreEqual(3, srf.URL.Count);
+            Assert.AreEqual(4, srf.URL.Count);
             Assert.AreEqual(@"D:\code\Rummage\testdata\testfile2", srf.URL[2]);
 
         }
@@ -157,13 +158,42 @@ namespace RummageCoreTest
         }
 
         /// <summary>
-        ///A test for SearchRequestFilesystem Constructor
+        ///Find the Simpsons file only.
         ///</summary>
         [TestMethod()]
-        public void SearchRequestFilesystemConstructorTest()
+        public void PrepareTestFindSimpsonsFile()
         {
-            SearchRequestFilesystem target = new SearchRequestFilesystem();
-            Assert.Inconclusive("TODO: Implement code to verify target");
+            SearchRequestFilesystem srf = new SearchRequestFilesystem();
+            srf.SearchDirectories.Add(@"D:\code\Rummage\testdata");
+            srf.SearchStrings.Add("a");
+            srf.IncludeFileStrings.Add(@"simp.*\.txt");
+
+
+            bool actual = srf.Prepare();
+            Assert.AreEqual(true, actual);
+            Assert.AreEqual(1, srf.URL.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.URL[0]);
         }
+
+        /// <summary>
+        ///Find the Simpsons file only.
+        ///</summary>
+        [TestMethod()]
+        public void PrepareTestFindSimpsonsAndFileEndingIn3()
+        {
+            SearchRequestFilesystem srf = new SearchRequestFilesystem();
+            srf.SearchDirectories.Add(@"D:\code\Rummage\testdata");
+            srf.SearchStrings.Add("a");
+            srf.IncludeFileStrings.Add(@"simp.*\.txt");
+            srf.IncludeFileStrings.Add(@"3$");
+
+
+            bool actual = srf.Prepare();
+            Assert.AreEqual(true, actual);
+            Assert.AreEqual(2, srf.URL.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.URL[0]);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.URL[1]);
+        }
+
     }
 }

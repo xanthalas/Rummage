@@ -9,7 +9,7 @@ namespace RummageCore
     /// <summary>
     /// Specifies all the information required to conduct a search
     /// </summary>
-    interface ISearchRequest: IEnumerable, IEnumerator
+    interface ISearchRequest
     {
         /// <summary>
         /// Prepares this Search Request. This must be called prior to initiating any search using this request.
