@@ -1,77 +1,25 @@
 ﻿using RummageCore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using NUnit.Framework;
 
-namespace RummageCoreTest
+namespace RummageTest
 {
-    
-    
     /// <summary>
     ///This is a test class for SearchRequestFilesystemTest and is intended
     ///to contain all SearchRequestFilesystemTest Unit Tests
     ///</summary>
-    [TestClass()]
+    [TestFixture]
     public class SearchRequestFilesystemTest
     {
-
-
-        private TestContext testContextInstance;
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext
-        {
-            get
-            {
-                return testContextInstance;
-            }
-            set
-            {
-                testContextInstance = value;
-            }
-        }
-
-        #region Additional test attributes
-        // 
-        //You can use the following additional attributes as you write your tests:
-        //
-        //Use ClassInitialize to run code before running the first test in the class
-        //[ClassInitialize()]
-        //public static void MyClassInitialize(TestContext testContext)
-        //{
-        //}
-        //
-        //Use ClassCleanup to run code after all tests in a class have run
-        //[ClassCleanup()]
-        //public static void MyClassCleanup()
-        //{
-        //}
-        //
-        //Use TestInitialize to run code before running each test
-        //[TestInitialize()]
-        //public void MyTestInitialize()
-        //{
-        //}
-        //
-        //Use TestCleanup to run code after each test has run
-        //[TestCleanup()]
-        //public void MyTestCleanup()
-        //{
-        //}
-        //
-        #endregion
-
 
         /// <summary>
         ///A test for Prepare
         ///</summary>
-        [TestMethod()]
+        [Test]
         public void PrepareTestNoParms()
         {
-            SearchRequestFilesystem srf = new SearchRequestFilesystem();
-            srf.SearchDirectories.Add(@"D:\code\Rummage\testdata");
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
 
             bool actual = srf.Prepare();
@@ -85,13 +33,13 @@ namespace RummageCoreTest
         /// <summary>
         ///A test for Prepare with a directory exclusion spec
         ///</summary>
-        [TestMethod()]
+        [Test]
         public void PrepareTestDirectoryExclude()
         {
-            SearchRequestFilesystem srf = new SearchRequestFilesystem();
-            srf.SearchDirectories.Add(@"D:\code\Rummage\testdata");
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
-            srf.ExcludeDirectoryStrings.Add("sub.*");
+            srf.ExcludeContainerStrings.Add("sub.*");
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
@@ -103,13 +51,13 @@ namespace RummageCoreTest
         /// <summary>
         ///A test for Prepare with an include file spec
         ///</summary>
-        [TestMethod()]
+        [Test]
         public void PrepareTestFileInclude()
         {
-            SearchRequestFilesystem srf = new SearchRequestFilesystem();
-            srf.SearchDirectories.Add(@"D:\code\Rummage\testdata");
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
-            srf.IncludeFileStrings.Add(".*test.*");
+            srf.IncludeItemStrings.Add(".*test.*");
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
@@ -121,14 +69,14 @@ namespace RummageCoreTest
         /// <summary>
         ///A test for Prepare with a file include and a file exclude spec
         ///</summary>
-        [TestMethod()]
+        [Test]
         public void PrepareTestFileIncludeAndExclude()
         {
-            SearchRequestFilesystem srf = new SearchRequestFilesystem();
-            srf.SearchDirectories.Add(@"D:\code\Rummage\testdata");
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
-            srf.IncludeFileStrings.Add(".*test.*");
-            srf.ExcludeFileStrings.Add("2$");
+            srf.IncludeItemStrings.Add(".*test.*");
+            srf.ExcludeItemStrings.Add("2$");
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
@@ -142,14 +90,14 @@ namespace RummageCoreTest
         /// <summary>
         ///Another test for Prepare with a file include and a file exclude spec.
         ///</summary>
-        [TestMethod()]
+        [Test]
         public void PrepareTestFileIncludeAndExclude2()
         {
-            SearchRequestFilesystem srf = new SearchRequestFilesystem();
-            srf.SearchDirectories.Add(@"D:\code\Rummage\testdata");
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
-            srf.IncludeFileStrings.Add(".*test.*");
-            srf.ExcludeFileStrings.Add(@"\d$");
+            srf.IncludeItemStrings.Add(".*test.*");
+            srf.ExcludeItemStrings.Add(@"\d$");
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
@@ -160,13 +108,13 @@ namespace RummageCoreTest
         /// <summary>
         ///Find the Simpsons file only.
         ///</summary>
-        [TestMethod()]
+        [Test]
         public void PrepareTestFindSimpsonsFile()
         {
-            SearchRequestFilesystem srf = new SearchRequestFilesystem();
-            srf.SearchDirectories.Add(@"D:\code\Rummage\testdata");
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
-            srf.IncludeFileStrings.Add(@"simp.*\.txt");
+            srf.IncludeItemStrings.Add(@"simp.*\.txt");
 
 
             bool actual = srf.Prepare();
@@ -178,14 +126,14 @@ namespace RummageCoreTest
         /// <summary>
         ///Find the Simpsons file only.
         ///</summary>
-        [TestMethod()]
+        [Test]
         public void PrepareTestFindSimpsonsAndFileEndingIn3()
         {
-            SearchRequestFilesystem srf = new SearchRequestFilesystem();
-            srf.SearchDirectories.Add(@"D:\code\Rummage\testdata");
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
-            srf.IncludeFileStrings.Add(@"simp.*\.txt");
-            srf.IncludeFileStrings.Add(@"3$");
+            srf.IncludeItemStrings.Add(@"simp.*\.txt");
+            srf.IncludeItemStrings.Add(@"3$");
 
 
             bool actual = srf.Prepare();

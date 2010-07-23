@@ -8,18 +8,18 @@ namespace RummageCore
     /// <summary>
     /// Performs a search
     /// </summary>
-    class Search
+    class Search: ISearch
     {
         #region Member variables
         /// <summary>
         /// Search Request to action.
         /// </summary>
-        public SearchRequestFilesystem RequestFilesystem {get; set;}
+        public ISearchRequest SearchRequest {get; set;}
 
         /// <summary>
         /// Collection of matches from this search
         /// </summary>
-        public List<Match> Matches {get; private set; }
+        public List<IMatch> Matches {get; set; }
 
         #endregion
 
@@ -27,10 +27,11 @@ namespace RummageCore
         /// Creates a new Search
         /// </summary>
         /// <param name="searchRequestFilesystem"></param>
-        public Search(SearchRequestFilesystem searchRequestFilesystem)
+        public Search(ISearchRequest searchRequestFilesystem)
         {
-            RequestFilesystem = searchRequestFilesystem;
-            Matches = new List<Match>();
+            SearchRequest = searchRequestFilesystem;
+            Matches = new List<IMatch>();
         }
     }
+
 }

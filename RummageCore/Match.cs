@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace RummageCore
+﻿namespace RummageCore
 {
     /// <summary>
     /// Holds the result of a single match.
     /// </summary>
-    public class Match
+    public class Match : IMatch
     {
         #region Member variables
         /// <summary>
@@ -27,9 +22,9 @@ namespace RummageCore
         public int MatchLineNumber {get; set;}
 
         /// <summary>
-        /// File in which the match was found
+        /// The Item in which the match was found.
         /// </summary>
-        public string MatchFile {get; set;}
+        public string MatchItem {get; set;}
 
         #endregion
 
@@ -45,7 +40,7 @@ namespace RummageCore
             MatchString = matchString;
             MatchLine = matchLine;
             MatchLineNumber = lineNumber;
-            MatchFile = file;
+            MatchItem = file;
         }
     }
 }

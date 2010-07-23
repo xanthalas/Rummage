@@ -3,4 +3,4 @@ obj/
 TestResults/
 _ReSharper.Rummage
 *.suo
-Rummage.5.0.ReSharper.user
+*.ReSharper.user

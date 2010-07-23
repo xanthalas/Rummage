@@ -12,8 +12,8 @@ namespace RummageCore
     public class SearchRequestFilesystem : ISearchRequest
     {
         #region Member variables
-        // Holds the directories to search.
-        public List<string> SearchDirectories { get; set; }
+        // Holds details of the containers to search. For the filesystem these containers are directories.
+        public List<string> SearchContainers { get; set; }
 
         /// <summary>
         /// Holds the strings to search for.
@@ -21,19 +21,19 @@ namespace RummageCore
         public List<string> SearchStrings { get; set; }
 
         /// <summary>
-        /// Holds the strings used to match against filenames to include those files.
+        /// Holds the strings used to match against item names to include those items in the search. For the filesystem these items are files.
         /// </summary>
-        public List<string> IncludeFileStrings { get; set; }
+        public List<string> IncludeItemStrings { get; set; }
 
         /// <summary>
-        /// Holds thee strings used to match against filenames to exclude those files.
+        /// Holds the strings used to match against item names to exclude those items. For the filesystem these items are files.
         /// </summary>
-        public List<string> ExcludeFileStrings { get; set; }
+        public List<string> ExcludeItemStrings { get; set; }
 
         /// <summary>
-        /// Holds the strings used to match against directory names to exclude those directories.
+        /// Holds the strings used to match against container names to exclude those containers. For the filesystem these containers are directories.
         /// </summary>
-        public List<string> ExcludeDirectoryStrings { get; set; }
+        public List<string> ExcludeContainerStrings { get; set; }
 
         /// <summary>
         /// Indicates whether the search should be case sensitive.
@@ -67,11 +67,11 @@ namespace RummageCore
         /// </summary>
         public SearchRequestFilesystem()
         {
-            SearchDirectories = new List<string>();
+            SearchContainers = new List<string>();
             SearchStrings = new List<string>();
-            IncludeFileStrings = new List<string>();
-            ExcludeFileStrings = new List<string>();
-            ExcludeDirectoryStrings = new List<string>();
+            IncludeItemStrings = new List<string>();
+            ExcludeItemStrings = new List<string>();
+            ExcludeContainerStrings = new List<string>();
             CaseSensitive = false;
             SearchHidden = false;
 
@@ -84,13 +84,13 @@ namespace RummageCore
         /// <returns>True if prepare is successful, otherwise false</returns>
         public bool Prepare()
         {
-           if (SearchDirectories.Count == 0 || SearchStrings.Count == 0)
+           if (SearchContainers.Count == 0 || SearchStrings.Count == 0)
            {
                return false;
            }
 
             //Now we must build up the list of files to search. This will then be handed off to the search routine via the enumerator
-            foreach (string directory in SearchDirectories)
+            foreach (string directory in SearchContainers)
             {
                 if (includeThisDirectory(directory))
                 {
@@ -144,13 +144,13 @@ namespace RummageCore
             //out anything which should be excluded.
             bool includeFound = false;
 
-            if (IncludeFileStrings.Count > 0)
+            if (IncludeItemStrings.Count > 0)
             {
-                var result = IncludeFileStrings.Select(inclString => Regex.Match(filename, inclString)).Where(m => m.Success);
+                var result = IncludeItemStrings.Select(inclString => Regex.Match(filename, inclString)).Where(m => m.Success);
                 
 
                 foreach (System.Text.RegularExpressions.Match m in
-                    IncludeFileStrings.Select(inclString => Regex.Match(filename, inclString)).Where(m => m.Success))
+                    IncludeItemStrings.Select(inclString => Regex.Match(filename, inclString)).Where(m => m.Success))
                 {
                     includeFound = true;
                 }
@@ -161,11 +161,11 @@ namespace RummageCore
                 }
             }
 
-            if (ExcludeFileStrings.Count > 0)
+            if (ExcludeItemStrings.Count > 0)
             {
                 bool excludeFound = false;
 
-                foreach (string exclString in ExcludeFileStrings)
+                foreach (string exclString in ExcludeItemStrings)
                 {
                     System.Text.RegularExpressions.Match m = Regex.Match(filename, exclString);
 
@@ -175,11 +175,11 @@ namespace RummageCore
                     }
                 }
 
-                return ExcludeFileStrings.Select(exclString => Regex.Match(filename, exclString))
+                return ExcludeItemStrings.Select(exclString => Regex.Match(filename, exclString))
                     .All(match => !match.Success);
 
                 /*    Below is the original non-LINQ version of the clause above.
-                                foreach (string exclString in ExcludeFileStrings)
+                                foreach (string exclString in ExcludeItemStrings)
                                 {
                                     System.Text.RegularExpressions.Match m = Regex.Match(filename, exclString);
 
@@ -202,18 +202,18 @@ namespace RummageCore
         /// <returns>true if this directory should be included in the search, otherwise false</returns>
         private bool includeThisDirectory(string folder)
         {
-            if (ExcludeDirectoryStrings.Count == 0)
+            if (ExcludeContainerStrings.Count == 0)
             {
                 return true;
             }
 
-            return ExcludeDirectoryStrings.Select(
+            return ExcludeContainerStrings.Select(
                 excludeDirectoryString => Regex.Match(folder, excludeDirectoryString))
                 .All(match => !match.Success);
 
             /*    Below is the original non-LINQ version of the clause above.
              
-            foreach (string excludeDirectoryString in ExcludeDirectoryStrings)
+            foreach (string excludeDirectoryString in ExcludeContainerStrings)
             {
                 System.Text.RegularExpressions.Match match = Regex.Match(folder, excludeDirectoryString);
                 if (match.Success)

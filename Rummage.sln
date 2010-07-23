@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RummageFilesystem", "RummageFilesystem\RummageFilesystem.csproj", "{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RummageFilesystemTest", "RummageFilesystemTest\RummageFilesystemTest.csproj", "{D8766E90-769D-4E63-AD33-E0A2456CECBF}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Rummage.vsmdi
@@ -57,6 +61,26 @@ Global
 		{6DC54CF8-9D82-4403-8BA8-727DCB84061C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6DC54CF8-9D82-4403-8BA8-727DCB84061C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6DC54CF8-9D82-4403-8BA8-727DCB84061C}.Release|x86.ActiveCfg = Release|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D7F5E3B1-6E78-4EF9-BC2A-D0080F0EC78D}.Release|x86.ActiveCfg = Release|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
