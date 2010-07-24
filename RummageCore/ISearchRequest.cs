@@ -45,6 +45,11 @@ namespace RummageCore
         /// </summary>
         bool SearchHidden { get; set; }
 
+        /// <summary>
+        /// Indicates whether this search request has been prepared. Until it is prepared it cannot be used in a search.
+        /// </summary>
+        bool IsPrepared { get; }
+
         #endregion
 
         /// <summary>

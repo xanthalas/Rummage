@@ -1,4 +1,5 @@
 ﻿using RummageCore;
+using RummageFilesystem;
 using System;
 using NUnit.Framework;
 
@@ -143,5 +144,66 @@ namespace RummageTest
             Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.URL[1]);
         }
 
+
+        /// <summary>
+        ///Perform a simple search
+        ///</summary>
+        [Test]
+        public void SimpleSearch()
+        {
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
+            srf.SearchStrings.Add("Bart");
+            srf.IncludeItemStrings.Add(@"simp.*\.txt");
+            srf.Prepare();
+
+            ISearch search = new SearchFilesystem();
+            search.SearchRequest = srf;
+            search.Search();
+            Assert.AreEqual(1, search.Matches.Count);
+        }
+
+        /// <summary>
+        ///Perform a simple search
+        ///</summary>
+        [Test]
+        public void SearchMultipleFilesForTwoRegexes()
+        {
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
+            srf.SearchStrings.Add("Krusty");
+            srf.SearchStrings.Add("^T");
+            srf.Prepare();
+
+            ISearch search = new SearchFilesystem();
+            search.SearchRequest = srf;
+            search.Search();
+            Assert.AreEqual(3, search.Matches.Count);
+        }
+
+        /// <summary>
+        ///Perform a simple search
+        ///</summary>
+        [Test]
+        public void SearchMultipleFilesCaseSensitive()
+        {
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
+            srf.SearchStrings.Add("brown");
+            srf.CaseSensitive = true;
+            srf.Prepare();
+
+            ISearch search = new SearchFilesystem();
+            search.SearchRequest = srf;
+            search.Search();
+            Assert.AreEqual(2, search.Matches.Count);
+
+            //Now let's redo the search but case insensitive
+            srf.CaseSensitive = false;
+            search.SearchRequest = srf;
+            search.Search();
+            Assert.AreEqual(3, search.Matches.Count);
+
+        }
     }
 }

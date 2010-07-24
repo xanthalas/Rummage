@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
+using RummageCore;
 
-namespace RummageCore
+namespace RummageFilesystem
 {
     /// <summary>
     /// Encapsulates all the information required to perform a search of the filesystem
@@ -51,14 +52,14 @@ namespace RummageCore
         private bool _isSearchReady = false;
 
         /// <summary>
-        /// Has the Prepare method been called on this Search yet?
-        /// </summary>
-        private bool _prepareCalled = false;
-
-        /// <summary>
         /// This list holds all the URLs (in this provider these are filenames (including paths)) to search
         /// </summary>
         private List<String> _urlToSearch;
+
+        /// <summary>
+        /// Indicates whether this search has been prepared - and can be used - or not.
+        /// </summary>
+        private bool _isPrepared = false;
 
         #endregion
 
@@ -76,6 +77,14 @@ namespace RummageCore
             SearchHidden = false;
 
             _urlToSearch = new List<string>();
+        }
+
+        /// <summary>
+        /// Indicates whether this search request has been prepared. Until it is prepared it cannot be used in a search.
+        /// </summary>
+        public bool IsPrepared
+        {
+            get { return _isPrepared; }
         }
 
         /// <summary>
@@ -98,7 +107,7 @@ namespace RummageCore
                 }
             }
 
-            _prepareCalled = true;
+            _isPrepared = true;
 
             return true;
         }
@@ -249,7 +258,7 @@ namespace RummageCore
         {
             get
             {
-                if (_prepareCalled)
+                if (_isPrepared)
                 {
                     return _urlToSearch;
                 }

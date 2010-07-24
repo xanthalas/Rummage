@@ -9,13 +9,6 @@ namespace RummageTest
     [TestFixture]
     public class MatchTest
     {
-        public MatchTest()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
-
         [Test]
         public void TestConstructor()
         {
