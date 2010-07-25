@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RummageFilesystem", "Rummag
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RummageFilesystemTest", "RummageFilesystemTest\RummageFilesystemTest.csproj", "{D8766E90-769D-4E63-AD33-E0A2456CECBF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rmg", "rmg\rmg.csproj", "{C287ED48-5664-470E-974F-2D2282442962}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Rummage.vsmdi
@@ -81,6 +83,16 @@ Global
 		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D8766E90-769D-4E63-AD33-E0A2456CECBF}.Release|x86.ActiveCfg = Release|Any CPU
+		{C287ED48-5664-470E-974F-2D2282442962}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{C287ED48-5664-470E-974F-2D2282442962}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{C287ED48-5664-470E-974F-2D2282442962}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{C287ED48-5664-470E-974F-2D2282442962}.Debug|x86.ActiveCfg = Debug|x86
+		{C287ED48-5664-470E-974F-2D2282442962}.Debug|x86.Build.0 = Debug|x86
+		{C287ED48-5664-470E-974F-2D2282442962}.Release|Any CPU.ActiveCfg = Release|x86
+		{C287ED48-5664-470E-974F-2D2282442962}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{C287ED48-5664-470E-974F-2D2282442962}.Release|Mixed Platforms.Build.0 = Release|x86
+		{C287ED48-5664-470E-974F-2D2282442962}.Release|x86.ActiveCfg = Release|x86
+		{C287ED48-5664-470E-974F-2D2282442962}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
