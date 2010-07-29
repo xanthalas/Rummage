@@ -23,7 +23,7 @@ namespace rmg
             searchRequest.Prepare();
             if (searchRequest.IsPrepared)
             {
-                if (_verbose) { Console.WriteLine("{0} files will be searched", searchRequest.URL.Count); }
+                if (_verbose) { Console.WriteLine("{0} files will be searched", searchRequest.Urls.Count); }
                 ISearch search = new SearchFilesystem();
                 search.Search(searchRequest);
                 
@@ -83,6 +83,7 @@ namespace rmg
 
                 searchRequest.CaseSensitive = options.CaseSensitive;
                 _verbose = options.Verbose;
+                searchRequest.SearchBinaries = options.SearchBinaries;
             }
         }
     }

@@ -41,14 +41,30 @@ namespace RummageCore
         bool CaseSensitive { get; set; }
 
         /// <summary>
-        /// Indicates whether to seach hidden items.
+        /// Indicates whether to search hidden items.
         /// </summary>
         bool SearchHidden { get; set; }
+
+        /// <summary>
+        /// Indicates whether to search binary items.
+        /// </summary>
+        bool SearchBinaries { get; set; }
+
+        /// <summary>
+        /// Indicates whether to descend into subdirectories.
+        /// </summary>
+        bool NoRecurse { get; set; }
+
 
         /// <summary>
         /// Indicates whether this search request has been prepared. Until it is prepared it cannot be used in a search.
         /// </summary>
         bool IsPrepared { get; }
+
+        /// <summary>
+        /// Returns a list of all the URLs which are eligible to search
+        /// </summary>
+        List<string> Urls { get; }
 
         #endregion
 
@@ -58,15 +74,5 @@ namespace RummageCore
         /// <returns>True if prepare is successful, otherwise false</returns>
         bool Prepare();
 
-
-        /// <summary>
-        /// Contains a list of strings or Regexes to search for
-        /// </summary>
-        List<String> SearchString { get; set; }
-
-        /// <summary>
-        /// Returns a list of all the URLs which are eligible to search
-        /// </summary>
-        List<string> URL { get; }
     }
 }

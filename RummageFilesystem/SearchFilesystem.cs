@@ -49,7 +49,7 @@ namespace RummageFilesystem
                 regexes.AddRange(searchRequestFilesystem.SearchStrings.Select(searchString => new RE.Regex(searchString, RegexOptions.IgnoreCase)));                
             }
 
-            foreach (string url in searchRequestFilesystem.URL)
+            foreach (string url in searchRequestFilesystem.Urls)
             {
                 if (File.Exists(url))
                 {

@@ -22,12 +22,32 @@ namespace RummageTest
             ISearchRequest srf = new SearchRequestFilesystem();
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
+            srf.SearchBinaries = true;
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
-            Assert.AreEqual(6, srf.URL.Count);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\testfile1", srf.URL[1]);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.URL[3]);
+            Assert.AreEqual(6, srf.Urls.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\testfile1", srf.Urls[1]);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.Urls[3]);
+
+        }
+
+        /// <summary>
+        ///A test for Prepare
+        ///</summary>
+        [Test]
+        public void NoRecurseTest()
+        {
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
+            srf.SearchStrings.Add("a");
+            srf.SearchBinaries = true;
+            srf.NoRecurse = true;
+
+            bool actual = srf.Prepare();
+            Assert.AreEqual(true, actual);
+            Assert.AreEqual(3, srf.Urls.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\testfile1", srf.Urls[1]);
 
         }
 
@@ -41,11 +61,12 @@ namespace RummageTest
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
             srf.ExcludeContainerStrings.Add("sub.*");
+            srf.SearchBinaries = true;
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
-            Assert.AreEqual(4, srf.URL.Count);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\testfile2", srf.URL[2]);
+            Assert.AreEqual(4, srf.Urls.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\testfile2", srf.Urls[2]);
 
         }
 
@@ -62,8 +83,8 @@ namespace RummageTest
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
-            Assert.AreEqual(4, srf.URL.Count);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.URL[2]);
+            Assert.AreEqual(4, srf.Urls.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.Urls[2]);
 
         }
 
@@ -81,10 +102,10 @@ namespace RummageTest
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
-            Assert.AreEqual(3, srf.URL.Count);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\testfile1", srf.URL[0]);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.URL[1]);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile4", srf.URL[2]);
+            Assert.AreEqual(3, srf.Urls.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\testfile1", srf.Urls[0]);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.Urls[1]);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile4", srf.Urls[2]);
         }
 
 
@@ -102,7 +123,7 @@ namespace RummageTest
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
-            Assert.AreEqual(0, srf.URL.Count);
+            Assert.AreEqual(0, srf.Urls.Count);
 
         }
 
@@ -120,8 +141,8 @@ namespace RummageTest
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
-            Assert.AreEqual(1, srf.URL.Count);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.URL[0]);
+            Assert.AreEqual(1, srf.Urls.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.Urls[0]);
         }
 
         /// <summary>
@@ -139,9 +160,9 @@ namespace RummageTest
 
             bool actual = srf.Prepare();
             Assert.AreEqual(true, actual);
-            Assert.AreEqual(2, srf.URL.Count);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.URL[0]);
-            Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.URL[1]);
+            Assert.AreEqual(2, srf.Urls.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.Urls[0]);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.Urls[1]);
         }
 
 
@@ -204,6 +225,38 @@ namespace RummageTest
             search.Search();
             Assert.AreEqual(3, search.Matches.Count);
 
+        }
+
+
+        /// <summary>
+        ///Perform a simple search
+        ///</summary>
+        [Test]
+        public void BinaryTest()
+        {
+            //First perform a non-binaries search
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
+            srf.SearchStrings.Add("Microsoft");
+            srf.SearchBinaries = false;
+            srf.Prepare();
+
+            ISearch search = new SearchFilesystem();
+            search.SearchRequest = srf;
+            search.Search();
+            Assert.AreEqual(0, search.Matches.Count);
+
+            //Now include binaries in the search
+            ISearchRequest srf2 = new SearchRequestFilesystem();
+            srf2.SearchContainers.Add(@"D:\code\Rummage\testdata");
+            srf2.SearchStrings.Add("Microsoft");
+            srf2.SearchBinaries = true;
+            srf2.Prepare();
+
+            ISearch search2 = new SearchFilesystem();
+            search2.SearchRequest = srf2;
+            search2.Search();
+            Assert.AreEqual(1, search2.Matches.Count);
         }
     }
 }

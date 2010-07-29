@@ -12,6 +12,8 @@ namespace RummageFilesystem
     /// </summary>
     public class SearchRequestFilesystem : ISearchRequest
     {
+        private Regex BinaryTestRegex;
+
         #region Member variables
         // Holds details of the containers to search. For the filesystem these containers are directories.
         public List<string> SearchContainers { get; set; }
@@ -47,6 +49,16 @@ namespace RummageFilesystem
         public bool SearchHidden { get; set; }
 
         /// <summary>
+        /// Indicates whether to search binary items.
+        /// </summary>
+        public bool SearchBinaries { get; set; }
+
+        /// <summary>
+        /// Indicates whether to descend into subdirectories.
+        /// </summary>
+        public bool NoRecurse { get; set; }
+
+        /// <summary>
         /// Indicates whether this Search Request is ready for the search process to begin
         /// </summary>
         private bool _isSearchReady = false;
@@ -75,6 +87,7 @@ namespace RummageFilesystem
             ExcludeContainerStrings = new List<string>();
             CaseSensitive = false;
             SearchHidden = false;
+            NoRecurse = false;      //We will always recurse unless told not to
 
             _urlToSearch = new List<string>();
         }
@@ -122,32 +135,34 @@ namespace RummageFilesystem
             var files = from f in new DirectoryInfo(directory).GetFiles() select f;
             foreach (FileInfo fileInfo in files)
             {
-                if (includeThisFile(fileInfo.Name))
+                if (includeThisFile(fileInfo.Name, fileInfo.FullName))
                 {
                     _urlToSearch.Add(fileInfo.FullName);
                 }
             }
 
-            //Next get all the directories in this directory and then recurse through them
-            var dirs = from d in new DirectoryInfo(directory).GetDirectories() select d;
-
-            foreach (DirectoryInfo dir in dirs)
+            //Next get all the directories in this directory and then recurse through them - if recurse is on
+            if (!NoRecurse)
             {
-                if (includeThisDirectory(dir.Name))
+                var dirs = from d in new DirectoryInfo(directory).GetDirectories() select d;
+
+                foreach (DirectoryInfo dir in dirs)
                 {
-                    enumerateThisDirectory(dir.FullName);
+                    if (includeThisDirectory(dir.Name))
+                    {
+                        enumerateThisDirectory(dir.FullName);
+                    }
                 }
             }
-
-            
         }
 
         /// <summary>
         /// Checks the filename and other attributes to determine whether it should be included in the search list or not
         /// </summary>
         /// <param name="filename">The name of the file to check</param>
+        /// <param name="fullFilename">The path and filename of the file to check</param>
         /// <returns>True if the file should be included in the search, otherwise false</returns>
-        private bool includeThisFile(string filename)
+        private bool includeThisFile(string filename, string fullFilename)
         {
             //First check for includes. Excludes take priority so we'll work out what is included first and then drop
             //out anything which should be excluded.
@@ -186,19 +201,15 @@ namespace RummageFilesystem
 
                 return ExcludeItemStrings.Select(exclString => Regex.Match(filename, exclString))
                     .All(match => !match.Success);
+            }
 
-                /*    Below is the original non-LINQ version of the clause above.
-                                foreach (string exclString in ExcludeItemStrings)
-                                {
-                                    System.Text.RegularExpressions.Match m = Regex.Match(filename, exclString);
-
-                                    if (m.Success)
-                                    {
-                                        return false;       //This file matches an exclude regex so we won't include it.
-                                    }
-                                }
-                */
-
+            //See if we are searching binary files and if not, check whether this file is binary
+            if (!SearchBinaries)
+            {
+                if (isFileBinary(fullFilename))
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -219,42 +230,45 @@ namespace RummageFilesystem
             return ExcludeContainerStrings.Select(
                 excludeDirectoryString => Regex.Match(folder, excludeDirectoryString))
                 .All(match => !match.Success);
-
-            /*    Below is the original non-LINQ version of the clause above.
-             
-            foreach (string excludeDirectoryString in ExcludeContainerStrings)
-            {
-                System.Text.RegularExpressions.Match match = Regex.Match(folder, excludeDirectoryString);
-                if (match.Success)
-                {
-                    return false;       //This directory matches an exclude regex so we won't include it.
-                }
-            }
-             * 
-             */
         }
 
 
         /// <summary>
-        /// Gets/Sets the set of strings to search for
+        /// Determine if file contains binary data (i.e. a jpeg or mp3 file)
         /// </summary>
-        public List<string> SearchString
+        /// <remarks>This is pretty crude. It counts the number of null characters found in the first 64 bytes
+        /// and figures the file is binary if it finds more than 4.</remarks>
+        /// <param name="file">File to check</param>
+        private bool isFileBinary(string file)
         {
-            get
+            int nullCount = 0;
+
+            using (StreamReader reader = new StreamReader(file))
             {
-                return SearchStrings;
+                char[] buffer = new char[64];
+                int count = reader.ReadBlock(buffer, 0, 64);
+                for (int index = 0; index < count; index++)
+                {
+                    if (buffer[index] == (char)00)
+                    {
+                        nullCount++;
+                    }
+                }
             }
-            set
+            if (nullCount > 4)      //Arbitrary value. Might need to be adjusted
             {
-                SearchStrings = value;
+                return true;
             }
+
+            return false;
         }
+
 
         /// <summary>
         /// Returns the list of URLs which will be searched. If the Prepare() method has not been called first 
         /// then this will return null.
         /// </summary>
-        public List<string> URL
+        public List<string> Urls
         {
             get
             {

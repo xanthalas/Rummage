@@ -26,6 +26,12 @@ namespace rmg
         [Option("v", "verbose", Required = false, HelpText = "Show additional information during the search.")]
         public bool Verbose = false;
 
+        [Option("n", "norecurse", Required = false, HelpText = "Don't descend into sub-directories.")]
+        public bool NoRecurse = false;
+
+        [Option("b", "binaries", Required = false, HelpText = "Search in binary files as well as text files.")]
+        public bool SearchBinaries = false;
+
         /*
         [HelpOption("Display this help screen.", "help")]
         public string GetUsage()
