@@ -53,21 +53,31 @@ namespace RummageFilesystem
             {
                 if (File.Exists(url))
                 {
-                    using (StreamReader reader = new StreamReader(url))
+                    try
                     {
-                        int lineNumber = 0;
-
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
+                        using (StreamReader reader = new StreamReader(url))
                         {
-                            lineNumber++;
+                            int lineNumber = 0;
 
-                            var result = searchLine(line, regexes);
-                            if (result != null)
+                            string line;
+                            while ((line = reader.ReadLine()) != null)
                             {
-                                Matches.Add(new RummageCore.Match(result.ToString(), line, lineNumber, url));
+                                lineNumber++;
+
+                                var result = searchLine(line, regexes);
+                                if (result != null)
+                                {
+                                    Matches.Add(new RummageCore.Match(result.ToString(), line, lineNumber, url));
+                                }
                             }
                         }
+                    }
+                    catch (IOException ioe)
+                    {
+                        RummageCore.Match failedMatch = new RummageCore.Match("", "", 0, url);
+                        failedMatch.Successful = false;
+                        failedMatch.ErrorMessage = ioe.Message;
+                        Matches.Add(failedMatch);
                     }
                 }
             }

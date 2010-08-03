@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
+using System.Security.Permissions;
 using RummageCore;
 
 namespace RummageFilesystem
@@ -12,7 +13,8 @@ namespace RummageFilesystem
     /// </summary>
     public class SearchRequestFilesystem : ISearchRequest
     {
-        private Regex BinaryTestRegex;
+        //Declare the logger
+        private static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Member variables
         // Holds details of the containers to search. For the filesystem these containers are directories.
@@ -106,6 +108,30 @@ namespace RummageFilesystem
         /// <returns>True if prepare is successful, otherwise false</returns>
         public bool Prepare()
         {
+           if (log.IsDebugEnabled)
+           {
+               log.Debug("Searching for:");
+               foreach (string s in SearchStrings)
+               {
+                   log.Debug("    " + s);
+               }
+               log.Debug("Searching the following folders:");
+               foreach (string s in SearchContainers)
+               {
+                   log.Debug("    " + s);
+               }
+               log.Debug("Using the following include strings:");
+               foreach (string s in IncludeItemStrings)
+               {
+                   log.Debug("    " + s);
+               }
+               log.Debug("Using the following exclude strings:");
+               foreach (string s in ExcludeItemStrings)
+               {
+                   log.Debug("    " + s);
+               }
+           }
+
            if (SearchContainers.Count == 0 || SearchStrings.Count == 0)
            {
                return false;
@@ -132,27 +158,36 @@ namespace RummageFilesystem
         private void enumerateThisDirectory(string directory)
         {
             // First get all the files in this directory
-            var files = from f in new DirectoryInfo(directory).GetFiles() select f;
-            foreach (FileInfo fileInfo in files)
+            try
             {
-                if (includeThisFile(fileInfo.Name, fileInfo.FullName))
-                {
-                    _urlToSearch.Add(fileInfo.FullName);
-                }
-            }
+                var files = from f in new DirectoryInfo(directory).GetFiles() select f;
 
-            //Next get all the directories in this directory and then recurse through them - if recurse is on
-            if (!NoRecurse)
-            {
-                var dirs = from d in new DirectoryInfo(directory).GetDirectories() select d;
-
-                foreach (DirectoryInfo dir in dirs)
+                foreach (FileInfo fileInfo in files)
                 {
-                    if (includeThisDirectory(dir.Name))
+                    if (includeThisFile(fileInfo.Name, fileInfo.FullName))
                     {
-                        enumerateThisDirectory(dir.FullName);
+                        _urlToSearch.Add(fileInfo.FullName);
                     }
                 }
+
+                //Next get all the directories in this directory and then recurse through them - if recurse is on
+                if (!NoRecurse)
+                {
+                    var dirs = from d in new DirectoryInfo(directory).GetDirectories() select d;
+
+                    foreach (DirectoryInfo dir in dirs)
+                    {
+                        if (includeThisDirectory(dir.Name))
+                        {
+                            enumerateThisDirectory(dir.FullName);
+                        }
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                log.Debug("Unauthorized access exception on " + directory);
+                return;     //If we can't access this directory then we'll just ignore it
             }
         }
 
@@ -243,23 +278,31 @@ namespace RummageFilesystem
         {
             int nullCount = 0;
 
-            using (StreamReader reader = new StreamReader(file))
+            try
             {
-                char[] buffer = new char[64];
-                int count = reader.ReadBlock(buffer, 0, 64);
-                for (int index = 0; index < count; index++)
+                using (StreamReader reader = new StreamReader(file))
                 {
-                    if (buffer[index] == (char)00)
+                    char[] buffer = new char[64];
+                    int count = reader.ReadBlock(buffer, 0, 64);
+                    for (int index = 0; index < count; index++)
                     {
-                        nullCount++;
+                        if (buffer[index] == (char) 00)
+                        {
+                            nullCount++;
+                        }
                     }
                 }
+                if (nullCount > 4) //Arbitrary value. Might need to be adjusted
+                {
+                    return true;
+                }
             }
-            if (nullCount > 4)      //Arbitrary value. Might need to be adjusted
+            catch(IOException ioe)
             {
-                return true;
+                //This is a bit crude but we'll assume that if there is a problem reading the file then we 
+                //can't search it anyway so we'll set it to not-binary and let it fail during the main search
+                return false;
             }
-
             return false;
         }
 

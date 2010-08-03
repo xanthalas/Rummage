@@ -7,6 +7,11 @@
     {
         #region Member variables
         /// <summary>
+        /// Indicates whether this match was successful
+        /// </summary>
+        public bool Successful { get; set; }
+
+        /// <summary>
         /// String which matched.
         /// </summary>
         public string MatchString {get; set;}
@@ -26,6 +31,11 @@
         /// </summary>
         public string MatchItem {get; set;}
 
+        /// <summary>
+        /// If the match was not successful the reason will be held here
+        /// </summary>
+        public string ErrorMessage { get; set; }
+
         #endregion
 
         /// <summary>
@@ -41,6 +51,8 @@
             MatchLine = matchLine;
             MatchLineNumber = lineNumber;
             MatchItem = file;
+            Successful = true;
+            ErrorMessage = string.Empty;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace rmg
 {
     class Options
     {
-        [OptionArray("s", "search", Required = true, HelpText = "Regular Expression to search for.")]
+        [OptionArray("s", "search", Required = false, HelpText = "Regular Expression to search for.")]
         public string[] SearchStrings = null;
 
         [OptionArray("f", "folder", Required = false, HelpText = "The folder to search.")]
@@ -32,16 +32,7 @@ namespace rmg
         [Option("b", "binaries", Required = false, HelpText = "Search in binary files as well as text files.")]
         public bool SearchBinaries = false;
 
-        /*
-        [HelpOption("Display this help screen.", "help")]
-        public string GetUsage()
-        {
-            var usage = new StringBuilder();
-            usage.AppendLine("Rummage search tool v 0.1");
-            Console.WriteLine(usage.ToString());
-            return "";
-        }
-         * */
-
+        [Option("h", "help", Required = false, HelpText = "Show this help text.")]
+        public bool ShowHelp = false;
     }
 }

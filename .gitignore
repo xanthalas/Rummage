@@ -4,3 +4,4 @@ TestResults/
 _ReSharper.Rummage
 *.suo
 *.ReSharper.user
+*.csproj.user
