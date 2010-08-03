@@ -34,5 +34,9 @@ namespace rmg
 
         [Option("h", "help", Required = false, HelpText = "Show this help text.")]
         public bool ShowHelp = false;
+
+        [Option("o", "output", Required = false, HelpText = "Format of output.")]
+        public string OutputFormat = "{MatchItem}:{MatchLineNumber} {MatchLine}";
+
     }
 }

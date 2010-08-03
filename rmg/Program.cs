@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using CommandLine;
 using CommandLine.Text;
 using RummageCore;
@@ -17,6 +18,8 @@ namespace rmg
         private static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static bool _verbose = false;
+
+        private static string _outputFormat = string.Empty;
 
         static void Main(string[] args)
         {
@@ -54,11 +57,11 @@ namespace rmg
                 {
                     if (match.Successful)
                     {
-                        Console.WriteLine("{0}:{1} {2}", match.MatchItem, match.MatchLineNumber, match.MatchLine);
+                        Console.WriteLine(formatOutputLine(match));
                     }
                     else
                     {
-                        Console.WriteLine("Could search {0}:{1}", match.MatchItem, match.ErrorMessage);
+                        Console.WriteLine("Couldn't search {0}:{1}", match.MatchItem, match.ErrorMessage);
                     }
                 }
                 if (_verbose) { Console.WriteLine("Search complete. Found {0} matches.", search.Matches.Count); }
@@ -67,6 +70,23 @@ namespace rmg
             {
                 Console.WriteLine("Not enough information has been supplied to perform the search.");
             }
+        }
+
+        /// <summary>
+        /// Formats the output according to the output format given
+        /// </summary>
+        /// <param name="match">The match object to format</param>
+        /// <returns>Output line ready for writing to the display</returns>
+        private static string formatOutputLine(IMatch match)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append(_outputFormat);
+            builder.Replace("{MatchItem}", match.MatchItem);
+            builder.Replace("{MatchLineNumber}", match.MatchLineNumber.ToString());
+            builder.Replace("{MatchLine}", match.MatchLine);
+            builder.Replace("{MatchString}", match.MatchString);
+
+            return builder.ToString();
         }
 
         /// <summary>
@@ -128,7 +148,7 @@ namespace rmg
                 searchRequest.CaseSensitive = options.CaseSensitive;
                 _verbose = options.Verbose;
                 searchRequest.SearchBinaries = options.SearchBinaries;
-
+                _outputFormat = options.OutputFormat;
                 return true;
             }
 

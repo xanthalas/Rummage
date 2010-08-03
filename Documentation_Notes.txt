@@ -1,0 +1,6 @@
+Documentation Notes
+-------------------
+
+When specifying a different output format ensure that there is no space between the -o and the start of the string:
+
+-o-----{MatchLineNumber} ====== {MatchLine}
