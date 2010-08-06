@@ -21,6 +21,8 @@ namespace rmg
 
         private static string _outputFormat = string.Empty;
 
+        private static bool _confirmSearch = false;
+
         static void Main(string[] args)
         {
             ISearchRequest searchRequest = new SearchRequestFilesystem();
@@ -46,9 +48,35 @@ namespace rmg
 
             if (_verbose) {Console.WriteLine("Starting search.");}
 
-            searchRequest.Prepare();
-            if (searchRequest.IsPrepared)
+            int numberOfFilesToSearch = searchRequest.Prepare();
+
+            if (numberOfFilesToSearch == 0)
             {
+                Console.WriteLine("No files will be searched. Check your filter conditions.");
+                return;
+            }
+
+            if (searchRequest.IsPrepared && numberOfFilesToSearch > 0)
+            {
+                if (_confirmSearch)
+                {
+                    Console.WriteLine("{0} files will be searched. Continue (Y/n)", numberOfFilesToSearch);
+                    string response = Console.ReadLine();
+                    if (response.Length == 0)
+                    {
+                        response = "Y";
+                    }
+
+                    if (response.ToUpper().Substring(0, 1) != "Y")
+                    {
+                        Console.WriteLine("Search aborted");
+                        return;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Searching {0} files...", numberOfFilesToSearch);
+                }
                 if (_verbose) { Console.WriteLine("{0} files will be searched", searchRequest.Urls.Count); }
                 ISearch search = new SearchFilesystem();
                 search.Search(searchRequest);
@@ -140,7 +168,7 @@ namespace rmg
                 {
                     foreach (var exc in options.ExcludeFiles)
                     {
-                        searchRequest.IncludeItemStrings.Add(exc);
+                        searchRequest.ExcludeItemStrings.Add(exc);
                     }
 
                 }
@@ -149,6 +177,7 @@ namespace rmg
                 _verbose = options.Verbose;
                 searchRequest.SearchBinaries = options.SearchBinaries;
                 _outputFormat = options.OutputFormat;
+                _confirmSearch = options.ConfirmSearch;
                 return true;
             }
 

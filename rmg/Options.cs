@@ -32,6 +32,9 @@ namespace rmg
         [Option("b", "binaries", Required = false, HelpText = "Search in binary files as well as text files.")]
         public bool SearchBinaries = false;
 
+        [Option("y", "confirm", Required = false, HelpText = "Confirm search should continue once number of files to search has been shown.")]
+        public bool ConfirmSearch = false;
+
         [Option("h", "help", Required = false, HelpText = "Show this help text.")]
         public bool ShowHelp = false;
 
