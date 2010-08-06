@@ -233,9 +233,6 @@ namespace RummageFilesystem
                         return false;       //This file matches an exclude regex so we won't include it.
                     }
                 }
-
-                return ExcludeItemStrings.Select(exclString => Regex.Match(filename, exclString))
-                    .All(match => !match.Success);
             }
 
             //See if we are searching binary files and if not, check whether this file is binary
