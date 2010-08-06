@@ -105,8 +105,8 @@ namespace RummageFilesystem
         /// <summary>
         /// Prepares this Search Request. This must be called prior to initiating any search using this request.
         /// </summary>
-        /// <returns>True if prepare is successful, otherwise false</returns>
-        public bool Prepare()
+        /// <returns>The number of files which will be searched if Search() is run using this request</returns>
+        public int Prepare()
         {
            if (log.IsDebugEnabled)
            {
@@ -134,7 +134,7 @@ namespace RummageFilesystem
 
            if (SearchContainers.Count == 0 || SearchStrings.Count == 0)
            {
-               return false;
+               return 0;
            }
 
             //Now we must build up the list of files to search. This will then be handed off to the search routine via the enumerator
@@ -148,7 +148,7 @@ namespace RummageFilesystem
 
             _isPrepared = true;
 
-            return true;
+            return Urls.Count;
         }
 
         /// <summary>

@@ -71,8 +71,8 @@ namespace RummageCore
         /// <summary>
         /// Prepares this Search Request. This must be called prior to initiating any search using this request.
         /// </summary>
-        /// <returns>True if prepare is successful, otherwise false</returns>
-        bool Prepare();
+        /// <returns>The number of items which will be searched if Search() is run using this request</returns>
+        int Prepare();
 
     }
 }

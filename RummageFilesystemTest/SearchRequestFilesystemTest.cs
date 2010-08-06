@@ -24,8 +24,8 @@ namespace RummageTest
             srf.SearchStrings.Add("a");
             srf.SearchBinaries = true;
 
-            bool actual = srf.Prepare();
-            Assert.AreEqual(true, actual);
+            int actual = srf.Prepare();
+            Assert.AreEqual(6, actual);
             Assert.AreEqual(6, srf.Urls.Count);
             Assert.AreEqual(@"D:\code\Rummage\testdata\testfile1", srf.Urls[1]);
             Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.Urls[3]);
@@ -44,8 +44,8 @@ namespace RummageTest
             srf.SearchBinaries = true;
             srf.NoRecurse = true;
 
-            bool actual = srf.Prepare();
-            Assert.AreEqual(true, actual);
+            int actual = srf.Prepare();
+            Assert.AreEqual(3, actual);
             Assert.AreEqual(3, srf.Urls.Count);
             Assert.AreEqual(@"D:\code\Rummage\testdata\testfile1", srf.Urls[1]);
 
@@ -63,8 +63,8 @@ namespace RummageTest
             srf.ExcludeContainerStrings.Add("sub.*");
             srf.SearchBinaries = true;
 
-            bool actual = srf.Prepare();
-            Assert.AreEqual(true, actual);
+            int actual = srf.Prepare();
+            Assert.AreEqual(4, actual);
             Assert.AreEqual(4, srf.Urls.Count);
             Assert.AreEqual(@"D:\code\Rummage\testdata\testfile2", srf.Urls[2]);
 
@@ -81,8 +81,8 @@ namespace RummageTest
             srf.SearchStrings.Add("a");
             srf.IncludeItemStrings.Add(".*test.*");
 
-            bool actual = srf.Prepare();
-            Assert.AreEqual(true, actual);
+            int actual = srf.Prepare();
+            Assert.AreEqual(4, actual);
             Assert.AreEqual(4, srf.Urls.Count);
             Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.Urls[2]);
 
@@ -100,8 +100,8 @@ namespace RummageTest
             srf.IncludeItemStrings.Add(".*test.*");
             srf.ExcludeItemStrings.Add("2$");
 
-            bool actual = srf.Prepare();
-            Assert.AreEqual(true, actual);
+            int actual = srf.Prepare();
+            Assert.AreEqual(3, actual);
             Assert.AreEqual(3, srf.Urls.Count);
             Assert.AreEqual(@"D:\code\Rummage\testdata\testfile1", srf.Urls[0]);
             Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.Urls[1]);
@@ -121,8 +121,8 @@ namespace RummageTest
             srf.IncludeItemStrings.Add(".*test.*");
             srf.ExcludeItemStrings.Add(@"\d$");
 
-            bool actual = srf.Prepare();
-            Assert.AreEqual(true, actual);
+            int actual = srf.Prepare();
+            Assert.AreEqual(0, actual);
             Assert.AreEqual(0, srf.Urls.Count);
 
         }
@@ -139,8 +139,8 @@ namespace RummageTest
             srf.IncludeItemStrings.Add(@"simp.*\.txt");
 
 
-            bool actual = srf.Prepare();
-            Assert.AreEqual(true, actual);
+            int actual = srf.Prepare();
+            Assert.AreEqual(1, actual);
             Assert.AreEqual(1, srf.Urls.Count);
             Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.Urls[0]);
         }
@@ -158,8 +158,8 @@ namespace RummageTest
             srf.IncludeItemStrings.Add(@"3$");
 
 
-            bool actual = srf.Prepare();
-            Assert.AreEqual(true, actual);
+            int actual = srf.Prepare();
+            Assert.AreEqual(2, actual);
             Assert.AreEqual(2, srf.Urls.Count);
             Assert.AreEqual(@"D:\code\Rummage\testdata\seconddir\simpsons.txt", srf.Urls[0]);
             Assert.AreEqual(@"D:\code\Rummage\testdata\subfolder1\testfile3", srf.Urls[1]);
