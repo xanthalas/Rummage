@@ -31,5 +31,10 @@ namespace RummageCore
         /// <returns>A collection of IMatch objects holding the result of the search</returns>
         List<IMatch> Search();
 
+        /// <summary>
+        /// Raised when an item search is completed
+        /// </summary>
+        /// <param name="e"></param>
+        event ItemSearchedEventHandler ItemSearched;
     }
 }

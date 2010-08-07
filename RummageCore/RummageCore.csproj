@@ -40,9 +40,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common.cs" />
     <Compile Include="IMatch.cs" />
     <Compile Include="ISearch.cs" />
     <Compile Include="ISearchRequest.cs" />
+    <Compile Include="ItemSearchedEventArgs.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

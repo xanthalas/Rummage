@@ -79,24 +79,36 @@ namespace rmg
                 }
                 if (_verbose) { Console.WriteLine("{0} files will be searched", searchRequest.Urls.Count); }
                 ISearch search = new SearchFilesystem();
+                search.ItemSearched += new ItemSearchedEventHandler(search_ItemSearched); 
                 search.Search(searchRequest);
                 
-                foreach (IMatch match in search.Matches)
-                {
-                    if (match.Successful)
-                    {
-                        Console.WriteLine(formatOutputLine(match));
-                    }
-                    else
-                    {
-                        Console.WriteLine("Couldn't search {0}:{1}", match.MatchItem, match.ErrorMessage);
-                    }
-                }
                 if (_verbose) { Console.WriteLine("Search complete. Found {0} matches.", search.Matches.Count); }
             }
             else
             {
                 Console.WriteLine("Not enough information has been supplied to perform the search.");
+            }
+        }
+
+        /// <summary>
+        /// Event handler invoked when a file search has been completed.
+        /// </summary>
+        /// <param name="sender">Standard argument for the sender of the event</param>
+        /// <param name="e">Standard Event Args argument - ItemSearchedEventArgs</param>
+        static void search_ItemSearched(object sender, EventArgs e)
+        {
+            var iea = e as ItemSearchedEventArgs;
+
+            foreach (IMatch match in iea.Matches)
+            {
+                if (match.Successful)
+                {
+                    Console.WriteLine(formatOutputLine(match));
+                }
+                else
+                {
+                    Console.WriteLine("Couldn't search {0}:{1}", match.MatchItem, match.ErrorMessage);
+                }
             }
         }
 

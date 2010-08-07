@@ -25,6 +25,18 @@ namespace RummageFilesystem
         /// </summary>
         public List<IMatch> Matches { get; set; }
 
+        /// <summary>
+        /// Event raised when the searching of a given item is complete
+        /// </summary>
+        public event ItemSearchedEventHandler ItemSearched;
+
+        protected virtual void OnFileSearched(EventArgs e)
+        {
+            if (ItemSearched != null)
+            {
+                ItemSearched(this, e);
+            }
+        }
         #endregion
 
 
@@ -51,38 +63,57 @@ namespace RummageFilesystem
 
             foreach (string url in searchRequestFilesystem.Urls)
             {
-                if (File.Exists(url))
-                {
-                    try
-                    {
-                        using (StreamReader reader = new StreamReader(url))
-                        {
-                            int lineNumber = 0;
+                List<RummageCore.IMatch> matchesInThisFile = new List<IMatch>();
 
-                            string line;
-                            while ((line = reader.ReadLine()) != null)
-                            {
-                                lineNumber++;
-
-                                var result = searchLine(line, regexes);
-                                if (result != null)
-                                {
-                                    Matches.Add(new RummageCore.Match(result.ToString(), line, lineNumber, url));
-                                }
-                            }
-                        }
-                    }
-                    catch (IOException ioe)
-                    {
-                        RummageCore.Match failedMatch = new RummageCore.Match("", "", 0, url);
-                        failedMatch.Successful = false;
-                        failedMatch.ErrorMessage = ioe.Message;
-                        Matches.Add(failedMatch);
-                    }
-                }
+                matchesInThisFile = searchFile(regexes, url);
+                Matches.AddRange(matchesInThisFile);
+                OnFileSearched(new ItemSearchedEventArgs(url, matchesInThisFile));
             }
 
             return Matches;
+        }
+
+        private List<RummageCore.IMatch> searchFile(List<RE.Regex> regexes, string url)
+        {
+            List<RummageCore.IMatch> matchesInThisFile = new List<IMatch>();
+
+            if (!File.Exists(url))
+            {
+                RummageCore.Match failedMatch = new RummageCore.Match("", "", 0, url);
+                failedMatch.Successful = false;
+                failedMatch.ErrorMessage = String.Format("File {0} cannot be searched as it no longer exists.", url);
+                matchesInThisFile.Add(failedMatch);                
+            }
+            else
+            {
+                try
+                {
+                    using (StreamReader reader = new StreamReader(url))
+                    {
+                        int lineNumber = 0;
+
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            lineNumber++;
+
+                            var result = searchLine(line, regexes);
+                            if (result != null)
+                            {
+                                matchesInThisFile.Add(new RummageCore.Match(result.ToString(), line, lineNumber, url));
+                            }
+                        }
+                    }
+                }
+                catch (IOException ioe)
+                {
+                    RummageCore.Match failedMatch = new RummageCore.Match("", "", 0, url);
+                    failedMatch.Successful = false;
+                    failedMatch.ErrorMessage = ioe.Message;
+                    matchesInThisFile.Add(failedMatch);
+                }
+            }
+            return matchesInThisFile;
         }
 
         /// <summary>
