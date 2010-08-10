@@ -180,7 +180,7 @@ namespace RummageTest
 
             ISearch search = new SearchFilesystem();
             search.SearchRequest = srf;
-            search.Search();
+            search.Search(true);
             Assert.AreEqual(1, search.Matches.Count);
         }
 
@@ -198,7 +198,7 @@ namespace RummageTest
 
             ISearch search = new SearchFilesystem();
             search.SearchRequest = srf;
-            search.Search();
+            search.Search(true);
             Assert.AreEqual(3, search.Matches.Count);
         }
 
@@ -216,13 +216,13 @@ namespace RummageTest
 
             ISearch search = new SearchFilesystem();
             search.SearchRequest = srf;
-            search.Search();
+            search.Search(true);
             Assert.AreEqual(2, search.Matches.Count);
 
             //Now let's redo the search but case insensitive
             srf.CaseSensitive = false;
             search.SearchRequest = srf;
-            search.Search();
+            search.Search(true);
             Assert.AreEqual(3, search.Matches.Count);
 
         }
@@ -243,7 +243,7 @@ namespace RummageTest
 
             ISearch search = new SearchFilesystem();
             search.SearchRequest = srf;
-            search.Search();
+            search.Search(true);
             Assert.AreEqual(0, search.Matches.Count);
 
             //Now include binaries in the search
@@ -255,7 +255,7 @@ namespace RummageTest
 
             ISearch search2 = new SearchFilesystem();
             search2.SearchRequest = srf2;
-            search2.Search();
+            search2.Search(true);
             Assert.AreEqual(1, search2.Matches.Count);
         }
     }

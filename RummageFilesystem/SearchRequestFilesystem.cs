@@ -189,6 +189,11 @@ namespace RummageFilesystem
                 log.Debug("Unauthorized access exception on " + directory);
                 return;     //If we can't access this directory then we'll just ignore it
             }
+            catch (DirectoryNotFoundException)
+            {
+                log.Debug("Cannot find directory: " + directory);
+                return;     //If we can't access this directory then we'll just ignore it
+            }
         }
 
         /// <summary>

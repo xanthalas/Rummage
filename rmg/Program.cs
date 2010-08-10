@@ -80,7 +80,7 @@ namespace rmg
                 if (_verbose) { Console.WriteLine("{0} files will be searched", searchRequest.Urls.Count); }
                 ISearch search = new SearchFilesystem();
                 search.ItemSearched += new ItemSearchedEventHandler(search_ItemSearched); 
-                search.Search(searchRequest);
+                search.Search(searchRequest, true);
                 
                 if (_verbose) { Console.WriteLine("Search complete. Found {0} matches.", search.Matches.Count); }
             }

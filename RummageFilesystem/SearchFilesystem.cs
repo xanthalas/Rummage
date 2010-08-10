@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using RummageCore;
 using System.IO;
-using Match = System.Text.RegularExpressions.Match;
 using RE = System.Text.RegularExpressions;
 
 namespace RummageFilesystem
@@ -37,6 +38,12 @@ namespace RummageFilesystem
                 ItemSearched(this, e);
             }
         }
+
+
+        private CancellationTokenSource cancellationTokenSource;
+        private CancellationToken cancellationToken;
+        private ProgressReporter progressReporter;
+
         #endregion
 
 
@@ -44,8 +51,9 @@ namespace RummageFilesystem
         /// Executes the search
         /// </summary>
         /// <param name="searchRequestFilesystem">The search request to action</param>
+        /// <param name="waitForCompletion">If true then the Search method will not return until all searches are complete</param>
         /// <returns>A collection of IMatch objects holding the result of the search</returns>
-        public List<IMatch> Search(ISearchRequest searchRequestFilesystem)
+        public List<IMatch> Search(ISearchRequest searchRequestFilesystem, bool waitForCompletion)
         {
             SearchRequest = searchRequestFilesystem;
             Matches = new List<IMatch>();
@@ -61,16 +69,43 @@ namespace RummageFilesystem
                 regexes.AddRange(searchRequestFilesystem.SearchStrings.Select(searchString => new RE.Regex(searchString, RegexOptions.IgnoreCase)));                
             }
 
+            this.cancellationTokenSource = new CancellationTokenSource();
+            cancellationToken = this.cancellationTokenSource.Token;
+            progressReporter = new ProgressReporter();
+            List<Task> tasks = new List<Task>();
+            bool allTasksCompleted = false;
+
             foreach (string url in searchRequestFilesystem.Urls)
             {
-                List<RummageCore.IMatch> matchesInThisFile = new List<IMatch>();
-
-                matchesInThisFile = searchFile(regexes, url);
-                Matches.AddRange(matchesInThisFile);
-                OnFileSearched(new ItemSearchedEventArgs(url, matchesInThisFile));
+                searchThisUrlInBackground(regexes, url, tasks);
             }
 
+            Task.Factory.ContinueWhenAll(tasks.ToArray(),
+                  result =>
+                      {
+                          allTasksCompleted = true;
+                      });
+
+            while (waitForCompletion && !allTasksCompleted)
+            {
+                //Do nothing - just wait
+            }
             return Matches;
+        }
+
+        private void searchThisUrlInBackground(List<Regex> regexes, string url, List<Task> tasksArray)
+        {
+            var task = Task.Factory.StartNew(() =>
+                                                 {
+                                                     List<RummageCore.IMatch> matchesInThisFile = new List<IMatch>();
+
+                                                     matchesInThisFile = searchFile(regexes, url);
+                                                     Matches.AddRange(matchesInThisFile);
+                                                     OnFileSearched(new ItemSearchedEventArgs(url, matchesInThisFile));
+                                                 }, cancellationToken);
+
+
+            tasksArray.Add(task);
         }
 
         private List<RummageCore.IMatch> searchFile(List<RE.Regex> regexes, string url)
@@ -141,7 +176,8 @@ namespace RummageFilesystem
         /// Executes the search
         /// </summary>
         /// <returns>A collection of IMatch objects holding the result of the search</returns>
-        public List<IMatch> Search()
+        /// <param name="waitForCompletion">If true then the Search method will not return until all searches are complete</param>
+        public List<IMatch> Search(bool waitForCompletion)
         {
             if (SearchRequest == null)
             {
@@ -153,7 +189,7 @@ namespace RummageFilesystem
                 throw new ArgumentException("Prepare() has not yet been called on this search request");
             }
 
-            return Search(SearchRequest);
+            return Search(SearchRequest, waitForCompletion);
 
         }
 
