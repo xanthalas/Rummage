@@ -71,6 +71,25 @@ namespace RummageTest
         }
 
         /// <summary>
+        ///A test for Prepare with a directory inclusion spec
+        ///</summary>
+        [Test]
+        public void PrepareTestDirectoryInclude()
+        {
+            ISearchRequest srf = new SearchRequestFilesystem();
+            srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
+            srf.SearchStrings.Add("at");
+            srf.IncludeContainerStrings.Add("sub.*");
+            srf.SearchBinaries = false;
+
+            int actual = srf.Prepare();
+            Assert.AreEqual(4, actual);
+            Assert.AreEqual(4, srf.Urls.Count);
+            Assert.AreEqual(@"D:\code\Rummage\testdata\testfile2", srf.Urls[1]);
+
+        }
+
+        /// <summary>
         ///A test for Prepare with an include file spec
         ///</summary>
         [Test]

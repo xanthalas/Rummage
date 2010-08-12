@@ -185,6 +185,24 @@ namespace rmg
 
                 }
 
+                if (options.ExcludeDirectories != null)
+                {
+                    foreach (var exc in options.ExcludeDirectories)
+                    {
+                        searchRequest.ExcludeContainerStrings.Add(exc);
+                    }
+
+                }
+
+                if (options.IncludeDirectories != null)
+                {
+                    foreach (var inc in options.IncludeDirectories)
+                    {
+                        searchRequest.IncludeContainerStrings.Add(inc);
+                    }
+
+                }
+
                 searchRequest.CaseSensitive = options.CaseSensitive;
                 _verbose = options.Verbose;
                 searchRequest.SearchBinaries = options.SearchBinaries;

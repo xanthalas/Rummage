@@ -20,13 +20,19 @@ namespace rmg
         [OptionArray("i", "includefile", Required = false, HelpText = "Include only those files whose name matches this regex.")]
         public string[] IncludeFiles;
 
+        [OptionArray("d", "excludedirectory", Required = false, HelpText = "Exclude directories whose name matches this regex.")]
+        public string[] ExcludeDirectories;
+
+        [OptionArray("n", "includedirectory", Required = false, HelpText = "Include directories whose name matches this regex.")]
+        public string[] IncludeDirectories;
+
         [Option("c", "caseSensitive", Required = false, HelpText = "Make the search case-sensitive.")]
         public bool CaseSensitive = false;
 
         [Option("v", "verbose", Required = false, HelpText = "Show additional information during the search.")]
         public bool Verbose = false;
 
-        [Option("n", "norecurse", Required = false, HelpText = "Don't descend into sub-directories.")]
+        [Option("r", "norecurse", Required = false, HelpText = "Don't descend into sub-directories.")]
         public bool NoRecurse = false;
 
         [Option("b", "binaries", Required = false, HelpText = "Search in binary files as well as text files.")]

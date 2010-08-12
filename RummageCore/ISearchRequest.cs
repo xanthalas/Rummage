@@ -31,6 +31,11 @@ namespace RummageCore
         List<string> ExcludeItemStrings { get; set; }
 
         /// <summary>
+        /// Holds the strings used to match against container names to include those containers.
+        /// </summary>
+        List<string> IncludeContainerStrings { get; set; }
+
+        /// <summary>
         /// Holds the strings used to match against container names to exclude those containers.
         /// </summary>
         List<string> ExcludeContainerStrings { get; set; }

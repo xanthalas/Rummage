@@ -36,6 +36,11 @@ namespace RummageFilesystem
         public List<string> ExcludeItemStrings { get; set; }
 
         /// <summary>
+        /// Holds the strings used to match against container names to include those containers. For the filesystem these containers are directories.
+        /// </summary>
+        public List<string> IncludeContainerStrings { get; set; }
+
+        /// <summary>
         /// Holds the strings used to match against container names to exclude those containers. For the filesystem these containers are directories.
         /// </summary>
         public List<string> ExcludeContainerStrings { get; set; }
@@ -86,6 +91,7 @@ namespace RummageFilesystem
             SearchStrings = new List<string>();
             IncludeItemStrings = new List<string>();
             ExcludeItemStrings = new List<string>();
+            IncludeContainerStrings = new List<string>();
             ExcludeContainerStrings = new List<string>();
             CaseSensitive = false;
             SearchHidden = false;
@@ -120,13 +126,23 @@ namespace RummageFilesystem
                {
                    log.Debug("    " + s);
                }
-               log.Debug("Using the following include strings:");
+               log.Debug("Using the following file include strings:");
                foreach (string s in IncludeItemStrings)
                {
                    log.Debug("    " + s);
                }
-               log.Debug("Using the following exclude strings:");
+               log.Debug("Using the following file exclude strings:");
                foreach (string s in ExcludeItemStrings)
+               {
+                   log.Debug("    " + s);
+               }
+               log.Debug("Using the following directory include strings:");
+               foreach (string s in IncludeContainerStrings)
+               {
+                   log.Debug("    " + s);
+               }
+               log.Debug("Using the following directory exclude strings:");
+               foreach (string s in ExcludeContainerStrings)
                {
                    log.Debug("    " + s);
                }
@@ -140,10 +156,7 @@ namespace RummageFilesystem
             //Now we must build up the list of files to search. This will then be handed off to the search routine via the enumerator
             foreach (string directory in SearchContainers)
             {
-                if (includeThisDirectory(directory))
-                {
-                    enumerateThisDirectory(directory);
-                }
+                enumerateThisDirectory(directory);
             }
 
             _isPrepared = true;
@@ -259,14 +272,25 @@ namespace RummageFilesystem
         /// <returns>true if this directory should be included in the search, otherwise false</returns>
         private bool includeThisDirectory(string folder)
         {
-            if (ExcludeContainerStrings.Count == 0)
+            if (ExcludeContainerStrings.Count == 0 && IncludeContainerStrings.Count == 0)
             {
                 return true;
             }
 
-            return ExcludeContainerStrings.Select(
+            bool result = ExcludeContainerStrings.Select(
                 excludeDirectoryString => Regex.Match(folder, excludeDirectoryString))
                 .All(match => !match.Success);
+
+            if (!result)
+            {
+                return false;
+            }
+
+            result = IncludeContainerStrings.Select(
+                includeDirectoryString => Regex.Match(folder, includeDirectoryString))
+                .All(match => match.Success);
+
+            return result;
         }
 
 
