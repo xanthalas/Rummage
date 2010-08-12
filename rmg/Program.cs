@@ -220,13 +220,17 @@ namespace rmg
         /// <returns></returns>
         private static string[] loadDefaults()
         {
+            string defaultsFile = Path.Combine(System.Windows.Forms.Application.StartupPath, DEFAULT_FILE);
+
+            log.Debug("Loading defaults from file " + defaultsFile);
             string defaultOptions = string.Empty;
 
-            if (File.Exists(DEFAULT_FILE))
+            if (File.Exists(defaultsFile))
             {
+                log.Debug("Default file found");
                 try
                 {
-                    using (StreamReader sr = new StreamReader(DEFAULT_FILE))
+                    using (StreamReader sr = new StreamReader(defaultsFile))
                     {
                         defaultOptions = sr.ReadLine();
                         sr.Close();
