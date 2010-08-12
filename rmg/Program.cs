@@ -204,10 +204,12 @@ namespace rmg
                 }
 
                 searchRequest.CaseSensitive = options.CaseSensitive;
-                _verbose = options.Verbose;
                 searchRequest.SearchBinaries = options.SearchBinaries;
+                searchRequest.NoRecurse = options.NoRecurse;
+                _verbose = options.Verbose;
                 _outputFormat = options.OutputFormat;
                 _confirmSearch = options.ConfirmSearch;
+
                 return true;
             }
 
