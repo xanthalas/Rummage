@@ -8,6 +8,11 @@ namespace RummageCore
     public interface ISearch
     {
         /// <summary>
+        /// Unique identifier for this search
+        /// </summary>
+        Guid SearchId { get; }
+
+        /// <summary>
         /// Search Request to action.
         /// </summary>
         ISearchRequest SearchRequest { get; set; }

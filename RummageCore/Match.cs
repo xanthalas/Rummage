@@ -1,4 +1,6 @@
-﻿namespace RummageCore
+﻿using System;
+
+namespace RummageCore
 {
     /// <summary>
     /// Holds the result of a single match.
@@ -6,6 +8,12 @@
     public class Match : IMatch
     {
         #region Member variables
+
+        /// <summary>
+        /// Unique identifier for this match
+        /// </summary>
+        public Guid MatchId { get; private set; }
+
         /// <summary>
         /// Indicates whether this match was successful
         /// </summary>
@@ -47,6 +55,7 @@
         /// <param name="file">The file in which the matching string was found</param>
         public Match(string matchString, string matchLine, int lineNumber, string file)
         {
+            MatchId = Guid.NewGuid();
             MatchString = matchString;
             MatchLine = matchLine;
             MatchLineNumber = lineNumber;

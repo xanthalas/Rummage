@@ -12,7 +12,15 @@ namespace RummageCore
     public interface ISearchRequest
     {
         #region Member variables
-        // Holds details of the containers to search.
+
+        /// <summary>
+        /// Unique identifier for this search request
+        /// </summary>
+        Guid SearchRequestId { get; }
+
+        /// <summary>
+        ///  Holds details of the containers to search.
+        /// </summary>
         List<string> SearchContainers { get; set; }
 
         /// <summary>

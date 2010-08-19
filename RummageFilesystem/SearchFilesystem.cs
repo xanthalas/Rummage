@@ -16,6 +16,12 @@ namespace RummageFilesystem
     public class SearchFilesystem : ISearch
     {
         #region Member variables
+
+        /// <summary>
+        /// Unique identifier for this search
+        /// </summary>
+        public Guid SearchId { get; private set; }
+
         /// <summary>
         /// Search Request to action.
         /// </summary>
@@ -46,6 +52,13 @@ namespace RummageFilesystem
 
         #endregion
 
+        /// <summary>
+        /// Create a new SearchFilesystem object
+        /// </summary>
+        public SearchFilesystem()
+        {
+            SearchId = Guid.NewGuid();
+        }
 
         /// <summary>
         /// Executes the search

@@ -1,7 +1,14 @@
+using System;
+
 namespace RummageCore
 {
     public interface IMatch
     {
+        /// <summary>
+        /// Unique identifier for this match
+        /// </summary>
+        Guid MatchId { get; }
+
         /// <summary>
         /// Indicates whether this match was successful
         /// </summary>

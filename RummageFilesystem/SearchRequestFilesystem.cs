@@ -17,7 +17,12 @@ namespace RummageFilesystem
         private static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Member variables
-        // Holds details of the containers to search. For the filesystem these containers are directories.
+
+        public Guid SearchRequestId { get; private set; }
+
+        /// <summary>
+        /// Holds details of the containers to search. For the filesystem these containers are directories.
+        /// </summary>
         public List<string> SearchContainers { get; set; }
 
         /// <summary>
@@ -87,6 +92,7 @@ namespace RummageFilesystem
         /// </summary>
         public SearchRequestFilesystem()
         {
+            SearchRequestId = Guid.NewGuid();
             SearchContainers = new List<string>();
             SearchStrings = new List<string>();
             IncludeItemStrings = new List<string>();
@@ -223,12 +229,13 @@ namespace RummageFilesystem
 
             if (IncludeItemStrings.Count > 0)
             {
-                var result = IncludeItemStrings.Select(inclString => Regex.Match(filename, inclString)).Where(m => m.Success);
+                var result = IncludeItemStrings.Select(inclString => Regex.Match(filename, inclString, RegexOptions.IgnoreCase)).Where(m => m.Success);
                 
 
                 foreach (System.Text.RegularExpressions.Match m in
-                    IncludeItemStrings.Select(inclString => Regex.Match(filename, inclString)).Where(m => m.Success))
+                    IncludeItemStrings.Select(inclString => Regex.Match(filename, inclString, RegexOptions.IgnoreCase)).Where(m => m.Success))
                 {
+                    log.Debug("Including file " + filename);
                     includeFound = true;
                 }
                 
@@ -248,6 +255,7 @@ namespace RummageFilesystem
 
                     if (m.Success)
                     {
+                        log.Debug("Excluding file " + filename);
                         return false;       //This file matches an exclude regex so we won't include it.
                     }
                 }
@@ -258,6 +266,7 @@ namespace RummageFilesystem
             {
                 if (isFileBinary(fullFilename))
                 {
+                    log.Debug("Excluding binary file " + filename);
                     return false;
                 }
             }
@@ -278,7 +287,7 @@ namespace RummageFilesystem
             }
 
             bool result = ExcludeContainerStrings.Select(
-                excludeDirectoryString => Regex.Match(folder, excludeDirectoryString))
+                excludeDirectoryString => Regex.Match(folder, excludeDirectoryString,RegexOptions.IgnoreCase))
                 .All(match => !match.Success);
 
             if (!result)
@@ -287,7 +296,7 @@ namespace RummageFilesystem
             }
 
             result = IncludeContainerStrings.Select(
-                includeDirectoryString => Regex.Match(folder, includeDirectoryString))
+                includeDirectoryString => Regex.Match(folder, includeDirectoryString, RegexOptions.IgnoreCase))
                 .All(match => match.Success);
 
             return result;
