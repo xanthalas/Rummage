@@ -68,7 +68,7 @@ namespace RummageFilesystem
         /// <summary>
         /// Indicates whether to descend into subdirectories.
         /// </summary>
-        public bool NoRecurse { get; set; }
+        public bool Recurse { get; set; }
 
         /// <summary>
         /// Indicates whether this Search Request is ready for the search process to begin
@@ -101,7 +101,7 @@ namespace RummageFilesystem
             ExcludeContainerStrings = new List<string>();
             CaseSensitive = false;
             SearchHidden = false;
-            NoRecurse = false;      //We will always recurse unless told not to
+            Recurse = false;        //Don't recurse unless told to
 
             _urlToSearch = new List<string>();
         }
@@ -190,7 +190,7 @@ namespace RummageFilesystem
                 }
 
                 //Next get all the directories in this directory and then recurse through them - if recurse is on
-                if (!NoRecurse)
+                if (Recurse)
                 {
                     var dirs = from d in new DirectoryInfo(directory).GetDirectories() select d;
 

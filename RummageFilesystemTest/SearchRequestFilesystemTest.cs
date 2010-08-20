@@ -22,6 +22,7 @@ namespace RummageTest
             ISearchRequest srf = new SearchRequestFilesystem();
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
+            srf.Recurse = true;
             srf.SearchBinaries = true;
 
             int actual = srf.Prepare();
@@ -42,7 +43,7 @@ namespace RummageTest
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
             srf.SearchBinaries = true;
-            srf.NoRecurse = true;
+            srf.Recurse = false;
 
             int actual = srf.Prepare();
             Assert.AreEqual(3, actual);
@@ -62,6 +63,7 @@ namespace RummageTest
             srf.SearchStrings.Add("a");
             srf.ExcludeContainerStrings.Add("sub.*");
             srf.SearchBinaries = true;
+            srf.Recurse = true;
 
             int actual = srf.Prepare();
             Assert.AreEqual(4, actual);
@@ -81,6 +83,7 @@ namespace RummageTest
             srf.SearchStrings.Add("at");
             srf.IncludeContainerStrings.Add("sub.*");
             srf.SearchBinaries = false;
+            srf.Recurse = true;
 
             int actual = srf.Prepare();
             Assert.AreEqual(4, actual);
@@ -99,6 +102,7 @@ namespace RummageTest
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
             srf.IncludeItemStrings.Add(".*test.*");
+            srf.Recurse = true;
 
             int actual = srf.Prepare();
             Assert.AreEqual(4, actual);
@@ -118,6 +122,7 @@ namespace RummageTest
             srf.SearchStrings.Add("a");
             srf.IncludeItemStrings.Add(".*test.*");
             srf.ExcludeItemStrings.Add("2$");
+            srf.Recurse = true;
 
             int actual = srf.Prepare();
             Assert.AreEqual(3, actual);
@@ -139,6 +144,7 @@ namespace RummageTest
             srf.SearchStrings.Add("a");
             srf.IncludeItemStrings.Add(".*test.*");
             srf.ExcludeItemStrings.Add(@"\d$");
+            srf.Recurse = true;
 
             int actual = srf.Prepare();
             Assert.AreEqual(0, actual);
@@ -156,7 +162,7 @@ namespace RummageTest
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("a");
             srf.IncludeItemStrings.Add(@"simp.*\.txt");
-
+            srf.Recurse = true;
 
             int actual = srf.Prepare();
             Assert.AreEqual(1, actual);
@@ -175,7 +181,7 @@ namespace RummageTest
             srf.SearchStrings.Add("a");
             srf.IncludeItemStrings.Add(@"simp.*\.txt");
             srf.IncludeItemStrings.Add(@"3$");
-
+            srf.Recurse = true;
 
             int actual = srf.Prepare();
             Assert.AreEqual(2, actual);
@@ -195,6 +201,7 @@ namespace RummageTest
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("Bart");
             srf.IncludeItemStrings.Add(@"simp.*\.txt");
+            srf.Recurse = true;
             srf.Prepare();
 
             ISearch search = new SearchFilesystem();
@@ -213,6 +220,7 @@ namespace RummageTest
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("Krusty");
             srf.SearchStrings.Add("^T");
+            srf.Recurse = true;
             srf.Prepare();
 
             ISearch search = new SearchFilesystem();
@@ -231,6 +239,7 @@ namespace RummageTest
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("brown");
             srf.CaseSensitive = true;
+            srf.Recurse = true;
             srf.Prepare();
 
             ISearch search = new SearchFilesystem();
@@ -258,6 +267,7 @@ namespace RummageTest
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf.SearchStrings.Add("Microsoft");
             srf.SearchBinaries = false;
+            srf.Recurse = true;
             srf.Prepare();
 
             ISearch search = new SearchFilesystem();
@@ -270,6 +280,7 @@ namespace RummageTest
             srf2.SearchContainers.Add(@"D:\code\Rummage\testdata");
             srf2.SearchStrings.Add("Microsoft");
             srf2.SearchBinaries = true;
+            srf.Recurse = true;
             srf2.Prepare();
 
             ISearch search2 = new SearchFilesystem();

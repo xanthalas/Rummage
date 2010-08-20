@@ -23,6 +23,8 @@ namespace rmg
 
         private static bool _confirmSearch = false;
 
+        private static bool _helpShown = false;
+
         static void Main(string[] args)
         {
             ISearchRequest searchRequest = new SearchRequestFilesystem();
@@ -43,7 +45,17 @@ namespace rmg
 
             if (!parseOptions(searchRequest, allArgs))
             {
+                if (!_helpShown)
+                {
+                    Console.WriteLine("Couldn't understand the search request.");
+                }
                 return;     //If option parsing fails (including if help is requested) then drop out
+            }
+
+            //Search the current directory of one isn't specified
+            if (searchRequest.SearchContainers.Count == 0)
+            {
+                searchRequest.SearchContainers.Add(".");
             }
 
             if (_verbose) {Console.WriteLine("Starting search.");}
@@ -139,14 +151,21 @@ namespace rmg
         {
             var options = new Options();
             ICommandLineParser parser = new CommandLineParser();
-            if (parser.ParseArguments(args, options))
+            bool successful = false;
+            try
+            {
+                successful = parser.ParseArguments(args, options);
+            }
+            catch (Exception)
+            {
+                //Do nothing. The parsing will be flagged as unsuccessful and we'll print a message to the user
+            }
+
+            if (successful)
             {
                 if (options.ShowHelp)
                 {
-                    CommandLine.Text.HelpText ht = new HelpText("Rummage version 0.1");
-                    ht.AddOptions(options);
-                    Console.WriteLine(ht.ToString());
-                    Console.WriteLine("");
+                    showHelp(options);
                     return false;
                 }
 
@@ -201,11 +220,11 @@ namespace rmg
                         searchRequest.IncludeContainerStrings.Add(inc);
                     }
 
-                }
-
+                } 
+                
                 searchRequest.CaseSensitive = options.CaseSensitive;
                 searchRequest.SearchBinaries = options.SearchBinaries;
-                searchRequest.NoRecurse = options.NoRecurse;
+                searchRequest.Recurse = options.Recurse;
                 _verbose = options.Verbose;
                 _outputFormat = options.OutputFormat;
                 _confirmSearch = options.ConfirmSearch;
@@ -213,7 +232,26 @@ namespace rmg
                 return true;
             }
 
-            return true;
+            return false;
+        }
+
+        private static void showHelp(Options options)
+        {
+            HelpText ht = new HelpText("Rummage version 0.1");
+            ht.AddOptions(options);
+            Console.WriteLine(ht.ToString());
+            Console.WriteLine("");
+            Console.WriteLine(" The format of customised output will be whatever text you enter where the following strings");
+            Console.WriteLine(" are replaced by their values from the search:");
+            Console.WriteLine("");
+            Console.WriteLine("     {MatchItem}       - The filename of the file where the match was found");
+            Console.WriteLine("     {MatchLineNumber} - The number of the line where the match was found");
+            Console.WriteLine("     {MatchLine}       - The full contents of the line where the match was found");
+            Console.WriteLine("     {MatchString}     - The regex which matched");
+            Console.WriteLine("");
+            Console.WriteLine("");
+            _helpShown = true;
+
         }
 
         /// <summary>

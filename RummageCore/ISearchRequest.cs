@@ -66,7 +66,7 @@ namespace RummageCore
         /// <summary>
         /// Indicates whether to descend into subdirectories.
         /// </summary>
-        bool NoRecurse { get; set; }
+        bool Recurse { get; set; }
 
 
         /// <summary>
