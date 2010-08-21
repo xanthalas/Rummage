@@ -34,9 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="nunit.framework">
-      <HintPath>..\nunit.framework.dll</HintPath>
-    </Reference>
+     <Reference Include="nunit.framework">
+       <HintPath>..\SharedLibs\nunit.framework.dll</HintPath>
+     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
