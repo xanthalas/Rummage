@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="RummageFilesystem"
+                   namespace="RummageFilesystem.Domain">
+
+  <class name="SearchRequestFilesystem" table="SearchRequest">
+    <id name="SearchRequestId">
+      <generator class="hilo" />
+    </id>
+    <property name="SearchType" />
+    <property name="Name" />
+    <property name="SearchContainers" />
+    <property name="SearchStrings" />
+    <property name="IncludeItemStrings" />
+    <property name="ExcludeItemStrings" />
+    <property name="IncludeContainerStrings" />
+    <property name="ExcludeContainerStrings" />
+    <property name="CaseSensitive" />
+    <property name="SearchHidden" />
+    <property name="SearchBinaries" />
+    <property name="Recurse" />
+  </class>
+
+</hibernate-mapping>
