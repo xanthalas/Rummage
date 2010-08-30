@@ -43,12 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\SearchRequestFilesystemRepository.cs" />
     <Compile Include="Domain\SearchFilesystem.cs" />
     <Compile Include="Domain\SearchRequestFilesystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Repositories\ISearchRequestRepository.cs" />
     <Compile Include="Repositories\NHibernateHelper.cs" />
+    <Compile Include="Repositories\SearchRequestFilesystemRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RummageCore\RummageCore.csproj">
