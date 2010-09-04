@@ -1,6 +1,6 @@
 ﻿using RummageCore;
-using RummageCore.Domain;
-using RummageFilesystem.Domain;
+using RummageFilesystem;
+using System;
 using NUnit.Framework;
 
 namespace RummageTest
@@ -17,7 +17,7 @@ namespace RummageTest
         ///A test for Prepare
         ///</summary>
         [Test]
-        public void PersistTest()
+        public void PrepareTestNoParms()
         {
             ISearchRequest srf = new SearchRequestFilesystem();
             srf.SearchContainers.Add(@"D:\code\Rummage\testdata");

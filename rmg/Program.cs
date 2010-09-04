@@ -4,8 +4,7 @@ using System.Text;
 using CommandLine;
 using CommandLine.Text;
 using RummageCore;
-using RummageCore.Domain;
-using RummageFilesystem.Domain;
+using RummageFilesystem;
 
 /**********************************************************************************************************************
  * Uses the command line parser by Giacomo Stelluti Scala available here: http://commandline.codeplex.com/            *
