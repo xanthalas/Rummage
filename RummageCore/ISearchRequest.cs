@@ -87,5 +87,10 @@ namespace RummageCore
         /// <returns>The number of items which will be searched if Search() is run using this request</returns>
         int Prepare();
 
+        /// <summary>
+        /// Cancel the search request which is being prepared
+        /// </summary>
+        void CancelRequest();
+
     }
 }

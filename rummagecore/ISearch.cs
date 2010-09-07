@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace RummageCore
 {
@@ -43,5 +44,10 @@ namespace RummageCore
         /// </summary>
         /// <param name="e"></param>
         event ItemSearchedEventHandler ItemSearched;
+
+        /// <summary>
+        /// Cancel the search which is running
+        /// </summary>
+        void CancelSearch();
     }
 }

@@ -1,0 +1,21 @@
+Rummage - To Do
+---------------
+
+High
+----
+
+persistence of searches
+Tabbed display to allow multiple searches (ideally simultaneously)
+
+
+
+Medium
+------
+
+
+
+
+Low
+---
+
+Snarl integration

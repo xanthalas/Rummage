@@ -37,20 +37,15 @@ namespace RummageFilesystem
         /// </summary>
         public event ItemSearchedEventHandler ItemSearched;
 
-        protected virtual void OnFileSearched(EventArgs e)
-        {
-            if (ItemSearched != null)
-            {
-                ItemSearched(this, e);
-            }
-        }
+        #endregion
 
-
+        /// <summary>
+        /// Used to indicate this search that it will be cancelled
+        /// </summary>
         private CancellationTokenSource cancellationTokenSource;
         private CancellationToken cancellationToken;
         private ProgressReporter progressReporter;
 
-        #endregion
 
         /// <summary>
         /// Create a new SearchFilesystem object
@@ -58,6 +53,7 @@ namespace RummageFilesystem
         public SearchFilesystem()
         {
             SearchId = Guid.NewGuid();
+            this.cancellationTokenSource = new CancellationTokenSource();
         }
 
         /// <summary>
@@ -82,7 +78,6 @@ namespace RummageFilesystem
                 regexes.AddRange(searchRequestFilesystem.SearchStrings.Select(searchString => new RE.Regex(searchString, RegexOptions.IgnoreCase)));                
             }
 
-            this.cancellationTokenSource = new CancellationTokenSource();
             cancellationToken = this.cancellationTokenSource.Token;
             progressReporter = new ProgressReporter();
             List<Task> tasks = new List<Task>();
@@ -90,6 +85,10 @@ namespace RummageFilesystem
 
             foreach (string url in searchRequestFilesystem.Urls)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
                 searchThisUrlInBackground(regexes, url, tasks);
             }
 
@@ -241,6 +240,24 @@ namespace RummageFilesystem
 
             return false;
         }
+
+        protected virtual void OnFileSearched(EventArgs e)
+        {
+            if (ItemSearched != null)
+            {
+                ItemSearched(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Cancel the search which is running
+        /// </summary>
+        public void CancelSearch()
+        {
+            cancellationTokenSource.Cancel();
+        }
+
+
 
     }
 }

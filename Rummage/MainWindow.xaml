@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip">
     <DockPanel  Name="dockPanelMain">
-        <StatusBar Height="22" Name="statusBar1" DockPanel.Dock="Bottom">
+        <StatusBar Height="22" Name="statusBarMain" DockPanel.Dock="Bottom">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -13,7 +13,7 @@
                     <ColumnDefinition Width="0.5*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Name="CurrentStatus" Grid.Row="0" Grid.Column="0">Ready.</TextBlock>
+                <TextBlock Name="textBlockCurrentStatus" Grid.Row="0" Grid.Column="0">Ready.</TextBlock>
             </Grid>
         </StatusBar>
         <Grid Name="gridMain">
@@ -45,9 +45,10 @@
                     <!-- Column 2 (Where to search) -->
                     <Label Name="labelFolders" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Search here..." />
                     <TextBox Name="textBoxFolders" Grid.Row="1" Grid.Column="1" Text="d:\code\Rummage" AcceptsReturn="True" />
-                    <CheckBox Name="chkRecurse" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center" IsChecked="True">Search sub-folders</CheckBox>
+                    <CheckBox Name="chkRecurse" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="True" Margin="10,0,0,0">Search sub-folders</CheckBox>
+                    <CheckBox Name="chkBinaries" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" IsChecked="False" Margin="0,0,30,0">Search binaries</CheckBox>
                     <CheckBox Name="chkCaseSensitive" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">Case-sensitive search</CheckBox>
-                    <Button Name="btnStart" Click="btnStart_Click" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Width="150">Start Search</Button>
+                    <Button Name="btnStart" Click="btnStart_Click" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Width="150" Margin="0,0,10,0">Start Search</Button>
                 </Grid>
                 <TabControl Name="tabFilters" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2">
                     <TabItem Name="tabItemIncludes" Header="Include filters">
@@ -97,9 +98,34 @@
 
             </Grid>
             <StackPanel Name="panelSeparator" Background="Black" Grid.Row="1" Grid.Column="0" />
-            <ScrollViewer Grid.Row="2" Grid.Column="0" HorizontalScrollBarVisibility="Auto">
-                <TextBlock Name="textBlockResults" Text="Search results..."/>
-            </ScrollViewer>
+            <TabControl Name="tabResults" Grid.Row="2" TabStripPlacement="Bottom">
+                <TabItem Name="tabItemGrid" Header="Grid">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.5*" />
+                            <RowDefinition Height="Auto"  />
+                            <RowDefinition Height="0.5*"  />
+                        </Grid.RowDefinitions>
+                        <GridSplitter Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="True" Height="5" />
+                        <ListView x:Name="listViewMatches" Grid.Column="0" Grid.Row="0" ></ListView>
+                        <FlowDocumentScrollViewer Name="ScrollableViewerGrid" Grid.Row="2" Grid.Column="0" HorizontalScrollBarVisibility="Auto">
+                            <FlowDocument Name="flowResultsGrid" >
+
+                            </FlowDocument>
+                        </FlowDocumentScrollViewer>
+                    </Grid>
+                </TabItem>
+                <TabItem Name="tabItemText" Header="Text">
+                    <FlowDocumentScrollViewer Name="ScrollableViewer" Grid.Row="2" Grid.Column="0" HorizontalScrollBarVisibility="Auto">
+                        <FlowDocument Name="flowResults" >
+                            
+                        </FlowDocument>
+                    </FlowDocumentScrollViewer>
+                </TabItem>
+            </TabControl>
         </Grid>
     </DockPanel>
 </Window>

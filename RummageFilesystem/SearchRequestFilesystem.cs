@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Security.Permissions;
+using System.Threading;
 using RummageCore;
 
 namespace RummageFilesystem
@@ -16,6 +17,15 @@ namespace RummageFilesystem
         //Declare the logger
         private static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private static readonly string[] KNOWN_BINARY_FILENAME_REGEXES = new string[17]
+                                                                   {
+                                                                       @".*\.exe$", @".*\.dll$", @".*\.pdb$",
+                                                                       @".*\.ico$",
+                                                                       @".*\.jpg$", @".*\.jpeg$", @".*\.gif$",
+                                                                       @".*\.png$", @".*\.mp3$", @".*\.wma$",
+                                                                       @".*\.mpeg$", @".*\.mp4$", @".*\.mov$",
+                                                                       @".*\.avi$", @".*\.zip$", @".*\.7z$", @".*\.msi$"
+                                                                   };
         #region Member variables
 
         public Guid SearchRequestId { get; private set; }
@@ -85,6 +95,13 @@ namespace RummageFilesystem
         /// </summary>
         private bool _isPrepared = false;
 
+        /// <summary>
+        /// Used to indicate this search that it will be cancelled
+        /// </summary>
+        private CancellationTokenSource cancellationTokenSource;
+
+        private CancellationToken cancellationToken;
+
         #endregion
 
         /// <summary>
@@ -104,6 +121,16 @@ namespace RummageFilesystem
             Recurse = false;        //Don't recurse unless told to
 
             _urlToSearch = new List<string>();
+
+            this.cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        /// <summary>
+        /// Cancel the search request which is being prepared
+        /// </summary>
+        public void CancelRequest()
+        {
+            cancellationTokenSource.Cancel();
         }
 
         /// <summary>
@@ -120,44 +147,59 @@ namespace RummageFilesystem
         /// <returns>The number of files which will be searched if Search() is run using this request</returns>
         public int Prepare()
         {
-           if (log.IsDebugEnabled)
-           {
-               log.Debug("Searching for:");
-               foreach (string s in SearchStrings)
-               {
-                   log.Debug("    " + s);
-               }
-               log.Debug("Searching the following folders:");
-               foreach (string s in SearchContainers)
-               {
-                   log.Debug("    " + s);
-               }
-               log.Debug("Using the following file include strings:");
-               foreach (string s in IncludeItemStrings)
-               {
-                   log.Debug("    " + s);
-               }
-               log.Debug("Using the following file exclude strings:");
-               foreach (string s in ExcludeItemStrings)
-               {
-                   log.Debug("    " + s);
-               }
-               log.Debug("Using the following directory include strings:");
-               foreach (string s in IncludeContainerStrings)
-               {
-                   log.Debug("    " + s);
-               }
-               log.Debug("Using the following directory exclude strings:");
-               foreach (string s in ExcludeContainerStrings)
-               {
-                   log.Debug("    " + s);
-               }
-           }
+            #region Logging information
+            if (log.IsDebugEnabled)
+            {
+                log.Debug("Searching for:");
+                foreach (string s in SearchStrings)
+                {
+                    log.Debug("    " + s);
+                }
+                log.Debug("Searching the following folders:");
+                foreach (string s in SearchContainers)
+                {
+                    log.Debug("    " + s);
+                }
+                log.Debug("Using the following file include strings:");
+                foreach (string s in IncludeItemStrings)
+                {
+                    log.Debug("    " + s);
+                }
+                log.Debug("Using the following file exclude strings:");
+                foreach (string s in ExcludeItemStrings)
+                {
+                    log.Debug("    " + s);
+                }
+                log.Debug("Using the following directory include strings:");
+                foreach (string s in IncludeContainerStrings)
+                {
+                    log.Debug("    " + s);
+                }
+                log.Debug("Using the following directory exclude strings:");
+                foreach (string s in ExcludeContainerStrings)
+                {
+                    log.Debug("    " + s);
+                }
+            }
+            #endregion
 
-           if (SearchContainers.Count == 0 || SearchStrings.Count == 0)
-           {
-               return 0;
-           }
+            if (SearchContainers.Count == 0 || SearchStrings.Count == 0)
+            {
+                return 0;
+            }
+
+            //If the user has chosen to ignore binary files then we will use a known list of filename extensions to
+            //cut down the list of files to search. Every file which is not excluded by this list will still be
+            //checked to see if it is binary or not. All this list does is speed things up considerably by discarding
+            //files which we know are binary. Obviously files which the user deliberately renames to have a binary-type
+            //extension will be skipped.
+
+            if (!SearchBinaries)
+            {
+                ExcludeItemStrings.AddRange(KNOWN_BINARY_FILENAME_REGEXES);
+            }
+
+            cancellationToken = this.cancellationTokenSource.Token;
 
             //Now we must build up the list of files to search. This will then be handed off to the search routine via the enumerator
             foreach (string directory in SearchContainers)
@@ -176,13 +218,23 @@ namespace RummageFilesystem
         /// <param name="directory"></param>
         private void enumerateThisDirectory(string directory)
         {
+
             // First get all the files in this directory
             try
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
                 var files = from f in new DirectoryInfo(directory).GetFiles() select f;
 
                 foreach (FileInfo fileInfo in files)
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     if (includeThisFile(fileInfo.Name, fileInfo.FullName))
                     {
                         _urlToSearch.Add(fileInfo.FullName);
@@ -192,10 +244,20 @@ namespace RummageFilesystem
                 //Next get all the directories in this directory and then recurse through them - if recurse is on
                 if (Recurse)
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     var dirs = from d in new DirectoryInfo(directory).GetDirectories() select d;
 
                     foreach (DirectoryInfo dir in dirs)
                     {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
                         if (includeThisDirectory(dir.Name))
                         {
                             enumerateThisDirectory(dir.FullName);
