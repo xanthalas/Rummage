@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -28,10 +31,7 @@ namespace Rummage
         private ISearchRequest searchRequest;
         private DateTime startTime;
 
-        /// <summary>
-        /// Holds all the matches to be displayed to the user
-        /// </summary>
-        private Dictionary<String, List<IMatch>> matches;
+        ObservableCollection<MatchingItem> matches = new ObservableCollection<MatchingItem>();
 
         /// <summary>
         /// Indicates whether a search is currently running
@@ -43,6 +43,8 @@ namespace Rummage
         public MainWindow()
         {
             InitializeComponent();
+
+            //matches = new UniqueObservableCollection<MatchingItem>();
         }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
@@ -58,7 +60,7 @@ namespace Rummage
             }
             else
             {
-                updateResults("Search cancelled.");
+                updateDocument(flowResults, "Search cancelled.");
                 if (searchRequest != null)
                 {
                     searchRequest.CancelRequest();
@@ -76,10 +78,10 @@ namespace Rummage
         private void doSearch()
         {
             startTime = DateTime.Now;
-            //textBlockResults.Text = string.Empty;
             flowResults.Blocks.Clear();
-            listViewMatches.Items.Clear();
-            matches = new Dictionary<string, List<IMatch>>();
+            matches = new System.Collections.ObjectModel.ObservableCollection<MatchingItem>();
+            
+            listViewMatches.ItemsSource = matches;
 
             #region Build search strings and search folders
             searchRequest = new SearchRequestFilesystem();
@@ -196,54 +198,24 @@ namespace Rummage
             {
                 if (match.Successful)
                 {
-                    if (addToMatches(match))
-                    {
-                        updateList(match);      //Only add it to the list if it is a new match    
-                    }
-                    updateResults(formatOutputLine(match));
+                    addToMatches(match);
+                    updateDocument(flowResults, formatOutputLine(match));
                     
                 }
                 else
                 {
-                    updateResults(string.Format("Couldn't search {0}:{1}", match.MatchItem, match.ErrorMessage));
+                    updateDocument(flowResults, string.Format("Couldn't search {0}:{1}", match.MatchItem, match.ErrorMessage));
                 }
             }
 
-        }
-
-        private void updateList(IMatch match)
-        {
-            // Checking if this thread has access to the object.
-            if (listViewMatches.Dispatcher.CheckAccess())
-            {
-                ListViewItem newItem = new ListViewItem();
-                newItem.Content = match.MatchItem + ": Line " + match.MatchLineNumber;
-                newItem.Tag = match;
-
-                listViewMatches.Items.Add(newItem);
-            }
-            else
-            {
-                // Place the update method on the Dispatcher of the UI thread.
-                flowResults.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
-                    (Action)(() =>
-                                 {
-                                     ListViewItem newItem = new ListViewItem();
-                                     newItem.Content = match.MatchItem + ": Line " + match.MatchLineNumber;
-                                     newItem.Tag = match;
-
-                                     listViewMatches.Items.Add(newItem);
-                                 }
-                                 ));
-            }
         }
 
         private void prepareAndSearch(ISearchRequest request, ISearch search)
         {
             updateStatus("");
-            updateResults("Determining which files to search...");
+            updateDocument(flowResults, "Determining which files to search...");
             request.Prepare();
-            updateResults(string.Format("Searching {0} files...", searchRequest.Urls.Count));
+            updateDocument(flowResults, string.Format("Searching {0} files...", searchRequest.Urls.Count));
 
             if (!cancellingSearch)
             {
@@ -267,7 +239,7 @@ namespace Rummage
                 TimeSpan elapsed = endTime.Subtract(startTime);
                 string result = String.Format("Search complete. {0} matches found in {1} files out of {2} files searched ({3} seconds)",
                                               search.Matches.Count, matches.Count ,searchRequest.Urls.Count, elapsed.TotalSeconds);
-                updateResults(result);
+                updateDocument(flowResults, result);
                 updateStatus(result);
             }
             btnStart.Content = "Start Search";
@@ -279,36 +251,34 @@ namespace Rummage
         /// 
         /// </summary>
         /// <param name="message"></param>
-        private void updateResults(string message)
+        private void updateDocument(FlowDocument document, string message)
         {
             // Checking if this thread has access to the object.
-            if (flowResults.Dispatcher.CheckAccess())
+            if (document.Dispatcher.CheckAccess())
             {
                 Paragraph p = new Paragraph();
                 p.FontSize = 10;
                 p.Inlines.Add(message);
 
                 // This thread has access so it can update the UI thread.      
-                flowResults.Blocks.Add(p);
+                document.Blocks.Add(p);
                 ScrollViewer sv = FindScrollViewer(ScrollableViewer);
                 if (sv != null)
                 {
                     sv.ScrollToEnd();
                 }
-
-
             }
             else
             {
                 // This thread does not have access to the UI thread.
                 // Place the update method on the Dispatcher of the UI thread.
-                flowResults.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                document.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                     (Action)(() =>
                                  {
                                      Paragraph p = new Paragraph();
                                      p.FontSize = 10;
                                      p.Inlines.Add(message);
-                                     flowResults.Blocks.Add(p);
+                                     document.Blocks.Add(p);
                                      ScrollViewer sv = FindScrollViewer(ScrollableViewer);
                                      if (sv != null)
                                      {
@@ -380,24 +350,25 @@ namespace Rummage
         /// </summary>
         /// <param name="match">The match to add</param>
         /// <returns>True if this is a new item which has been matched or False if this match has been added to an existing item</returns>
-        private bool addToMatches(IMatch match)
+        private void addToMatches(IMatch match)
         {
-            bool isANewMatch = false;
+            MatchingItem mi = new MatchingItem(match.MatchItem);
+            textBlockCurrentStatus.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                (Action)(() =>
+                {
+                    if (matches.Contains(mi))
+                    {
+                        int index = matches.IndexOf(mi);
+                        MatchingItem miToUpdate = matches[index] as MatchingItem;
+                        miToUpdate.matches.Add(match);
+                    }
+                    else
+                    {
+                        matches.Add(new MatchingItem(match.MatchItem, match));
+                    }
 
-            if (matches.ContainsKey(match.MatchItem))
-            {
-                List<IMatch> matchesForThisItem = matches[match.MatchItem];
-                matchesForThisItem.Add(match);
-                isANewMatch = false;
-            }
-            else
-            {
-                List<IMatch> newMatch = new List<IMatch>();
-                matches.Add(match.MatchItem, newMatch);
-                isANewMatch = true;
-            }
+                }));
 
-            return isANewMatch;
         }
 
         #region Helper methods
@@ -458,5 +429,21 @@ namespace Rummage
 
         #endregion
 
+        private void listViewMatches_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            flowResultsGrid.Blocks.Clear();
+            if (listViewMatches.SelectedItem != null)
+            {
+                MatchingItem itemToSearchFor = listViewMatches.SelectedItem as MatchingItem;
+
+                if (itemToSearchFor != null && itemToSearchFor.matches != null)
+                {
+                    foreach (IMatch match in itemToSearchFor.matches)
+                    {
+                        updateDocument(flowResultsGrid, match.MatchLineNumber + ":" + match.MatchLine);
+                    }
+                }
+            }
+        }
     }
 }

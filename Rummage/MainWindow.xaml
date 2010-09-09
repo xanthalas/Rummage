@@ -1,6 +1,7 @@
 ﻿<Window x:Class="Rummage.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip">
     <DockPanel  Name="dockPanelMain">
         <StatusBar Height="22" Name="statusBarMain" DockPanel.Dock="Bottom">
@@ -110,9 +111,16 @@
                             <RowDefinition Height="0.5*"  />
                         </Grid.RowDefinitions>
                         <GridSplitter Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="True" Height="5" />
-                        <ListView x:Name="listViewMatches" Grid.Column="0" Grid.Row="0" ></ListView>
+                        <ListView x:Name="listViewMatches" Grid.Column="0" Grid.Row="0" SelectionChanged="listViewMatches_SelectionChanged" >
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="500" Header="File" DisplayMemberBinding="{Binding ItemKey}" />
+                                    <GridViewColumn Width="140" Header="Number of matches"  DisplayMemberBinding="{Binding MatchingLinesCount}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
                         <FlowDocumentScrollViewer Name="ScrollableViewerGrid" Grid.Row="2" Grid.Column="0" HorizontalScrollBarVisibility="Auto">
-                            <FlowDocument Name="flowResultsGrid" >
+                            <FlowDocument Name="flowResultsGrid" FontFamily="Courier New">
 
                             </FlowDocument>
                         </FlowDocumentScrollViewer>
@@ -120,12 +128,12 @@
                 </TabItem>
                 <TabItem Name="tabItemText" Header="Text">
                     <FlowDocumentScrollViewer Name="ScrollableViewer" Grid.Row="2" Grid.Column="0" HorizontalScrollBarVisibility="Auto">
-                        <FlowDocument Name="flowResults" >
-                            
+                        <FlowDocument Name="flowResults" FontFamily="Courier New" >
                         </FlowDocument>
                     </FlowDocumentScrollViewer>
                 </TabItem>
             </TabControl>
         </Grid>
     </DockPanel>
+
 </Window>
