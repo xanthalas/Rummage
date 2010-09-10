@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -27,61 +27,66 @@ namespace Rummage
         /// </summary>
         private CancellationTokenSource tokenSource = new CancellationTokenSource();
 
+        /// <summary>
+        /// The search to action
+        /// </summary>
         private ISearch search;
+
+        /// <summary>
+        /// The search request to action.
+        /// </summary>
         private ISearchRequest searchRequest;
+
+        /// <summary>
+        /// Holds the time the search was started so we can track how long it took.
+        /// </summary>
         private DateTime startTime;
 
+        /// <summary>
+        /// Collection of matches found by the search which can be bound to the UI
+        /// </summary>
         ObservableCollection<MatchingItem> matches = new ObservableCollection<MatchingItem>();
+
+
+        /// <summary>
+        /// Collection of matching lines in the currently selected match
+        /// </summary>
+        ObservableCollection<IMatch> matchingLinesForCurrentSelection = new ObservableCollection<IMatch>();
 
         /// <summary>
         /// Indicates whether a search is currently running
         /// </summary>
         private bool searchRunning = false;
 
+        /// <summary>
+        /// Used to cancel a running search
+        /// </summary>
         private bool cancellingSearch = false;
 
+        private Brush normalBorderBrush;
+
+        /// <summary>
+        /// Main entry point to the program
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
 
-            //matches = new UniqueObservableCollection<MatchingItem>();
+            normalBorderBrush = textBoxFolders.BorderBrush;
         }
 
-        private void btnStart_Click(object sender, RoutedEventArgs e)
-        {
-            if (!searchRunning)
-            {
-                if (checkParms())
-                {
-                    btnStart.Content = "Cancel Search";
-                    cancellingSearch = false;
-                    doSearch();
-                }
-            }
-            else
-            {
-                updateDocument(flowResults, "Search cancelled.");
-                if (searchRequest != null)
-                {
-                    searchRequest.CancelRequest();
-                }
-                if (search != null)
-                {
-                    search.CancelSearch();
-                }
-
-                cancellingSearch = true;
-                btnStart.Content = "Start Search";
-            }
-        }
-
+        /// <summary>
+        /// Builds the Search Request, prepares it and then executes it
+        /// </summary>
         private void doSearch()
         {
             startTime = DateTime.Now;
             flowResults.Blocks.Clear();
             matches = new System.Collections.ObjectModel.ObservableCollection<MatchingItem>();
+            matchingLinesForCurrentSelection.Clear();
             
             listViewMatches.ItemsSource = matches;
+            listViewMatchesForSelection.ItemsSource = matchingLinesForCurrentSelection;
 
             #region Build search strings and search folders
             searchRequest = new SearchRequestFilesystem();
@@ -145,15 +150,23 @@ namespace Rummage
             searchRequest.Recurse = chkRecurse.IsChecked.Value;
             searchRequest.CaseSensitive = chkCaseSensitive.IsChecked.Value;
             searchRequest.SearchBinaries = chkBinaries.IsChecked.Value;
+            searchRequest.NotifyProgress += new NotifyProgressEventHandler(searchRequest_NotifyProgress);
                 
             search = new SearchFilesystem();
             search.ItemSearched += new ItemSearchedEventHandler(search_ItemSearched);
+
             searchRunning = true;
             performSearchOnSeparateThread(search, searchRequest);
 
         }
 
 
+
+        /// <summary>
+        /// Prepare and execute the search on a separate thread.
+        /// </summary>
+        /// <param name="search">The search to run</param>
+        /// <param name="request">The search request to action</param>
         private void performSearchOnSeparateThread(ISearch search, ISearchRequest request)
         {
             List<Task> tasks = new List<Task>();
@@ -170,13 +183,7 @@ namespace Rummage
                                             , null);
             }, token);
 
-            /*
-            t.ContinueWith(task =>
-                                this.Dispatcher.BeginInvoke(new Action(() =>
-                                                                        updateStatus("")
-                                                           )
-                                                            , null));
-            */
+
             tasks.Add(t);
 
 
@@ -190,26 +197,12 @@ namespace Rummage
 
         }
 
-        void search_ItemSearched(object sender, EventArgs e)
-        {
-            var iea = e as ItemSearchedEventArgs;
 
-            foreach (IMatch match in iea.Matches)
-            {
-                if (match.Successful)
-                {
-                    addToMatches(match);
-                    updateDocument(flowResults, formatOutputLine(match));
-                    
-                }
-                else
-                {
-                    updateDocument(flowResults, string.Format("Couldn't search {0}:{1}", match.MatchItem, match.ErrorMessage));
-                }
-            }
-
-        }
-
+        /// <summary>
+        /// Prepares the search and then runs it.
+        /// </summary>
+        /// <param name="request">The search request to action</param>
+        /// <param name="search">The search to run</param>
         private void prepareAndSearch(ISearchRequest request, ISearch search)
         {
             updateStatus("");
@@ -238,19 +231,23 @@ namespace Rummage
                 DateTime endTime = DateTime.Now;
                 TimeSpan elapsed = endTime.Subtract(startTime);
                 string result = String.Format("Search complete. {0} matches found in {1} files out of {2} files searched ({3} seconds)",
-                                              search.Matches.Count, matches.Count ,searchRequest.Urls.Count, elapsed.TotalSeconds);
+                                              search.Matches.Count, matches.Count ,searchRequest.Urls.Count, String.Format("{0:0.00}", elapsed.TotalSeconds));
+                searchingX.Text = "Searching file " + searchRequest.Urls.Count.ToString() + " ";
+                searchingOfY.Text = "of " + searchRequest.Urls.Count.ToString();
                 updateDocument(flowResults, result);
                 updateStatus(result);
             }
             btnStart.Content = "Start Search";
             searchRunning = false;
             cancellingSearch = false;
+            
         }
 
         /// <summary>
-        /// 
+        /// Writes the message passed in to the document passed in.
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="document">The document to update</param>
+        /// <param name="message">The message to write to the document</param>
         private void updateDocument(FlowDocument document, string message)
         {
             // Checking if this thread has access to the object.
@@ -291,9 +288,9 @@ namespace Rummage
 
 
         /// <summary>
-        /// 
+        /// Updates the Status Bar message area with the message passed in
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">Message to display in the status bar</param>
         private void updateStatus(string message)
         {
             // Checking if this thread has access to the object.
@@ -329,6 +326,10 @@ namespace Rummage
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Check whether there are enough valid parameters present to be able to search
+        /// </summary>
+        /// <returns>True if the parameters being checked are valid</returns>
         private bool checkParms()
         {
             if (textBoxSearchStrings.Text.Trim().Length == 0)
@@ -371,6 +372,46 @@ namespace Rummage
 
         }
 
+        private void updateProgressBar(int x, int ofY, string processName)
+        {
+            // Checking if this thread has access to the object.
+            if (runningProgress.Dispatcher.CheckAccess())
+            {
+                // This thread has access so it can update the UI thread.      
+                runningProgress.Value = x;
+                runningProgress.Maximum = ofY;
+                searchingX.Text = processName + " file " + x.ToString() + " ";
+                if (ofY == 0)
+                {
+                    searchingOfY.Text = string.Empty;
+                }
+                else
+                {
+                    searchingOfY.Text = "of " + ofY.ToString();
+                }
+            }
+            else
+            {
+                // This thread does not have access to the UI thread.
+                // Place the update method on the Dispatcher of the UI thread.
+                runningProgress.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                    (Action)(() =>
+                                 {
+                                     runningProgress.Value = x;
+                                     runningProgress.Maximum = ofY;
+                                     searchingX.Text = processName + " file " + x.ToString() + " ";
+                                     if (ofY == 0)
+                                     {
+                                         searchingOfY.Text = string.Empty;
+                                     }
+                                     else
+                                     {
+                                         searchingOfY.Text = "of " + ofY.ToString();
+                                     }
+                                 }));
+            }
+
+        }
         #region Helper methods
         public static ScrollViewer FindScrollViewer(FlowDocumentScrollViewer flowDocumentScrollViewer)
         {
@@ -429,21 +470,193 @@ namespace Rummage
 
         #endregion
 
+        #region Event Handlers
+
+        /// <summary>
+        /// Starts of Stops the search
+        /// </summary>
+        /// <param name="sender">Standard sender object</param>
+        /// <param name="e">Not used</param>
+        private void btnStart_Click(object sender, RoutedEventArgs e)
+        {
+            if (!searchRunning)
+            {
+                if (checkParms())
+                {
+                    btnStart.Content = "Cancel Search";
+                    cancellingSearch = false;
+                    doSearch();
+                }
+            }
+            else
+            {
+                updateDocument(flowResults, "Search cancelled.");
+                if (searchRequest != null)
+                {
+                    searchRequest.CancelRequest();
+                }
+                if (search != null)
+                {
+                    search.CancelSearch();
+                }
+
+                cancellingSearch = true;
+                btnStart.Content = "Start Search";
+            }
+        }
+
+        /// <summary>
+        /// When the selected item changes reload the bottom display with the matches from the selected item
+        /// </summary>
+        /// <param name="sender">Standard sender object</param>
+        /// <param name="e">Argument holding the selected item</param>
         private void listViewMatches_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            flowResultsGrid.Blocks.Clear();
             if (listViewMatches.SelectedItem != null)
             {
+                matchingLinesForCurrentSelection = new ObservableCollection<IMatch>();
                 MatchingItem itemToSearchFor = listViewMatches.SelectedItem as MatchingItem;
 
                 if (itemToSearchFor != null && itemToSearchFor.matches != null)
                 {
                     foreach (IMatch match in itemToSearchFor.matches)
                     {
-                        updateDocument(flowResultsGrid, match.MatchLineNumber + ":" + match.MatchLine);
+                        matchingLinesForCurrentSelection.Add(match);
+                    }
+                }
+                listViewMatchesForSelection.ItemsSource = matchingLinesForCurrentSelection;
+            }
+
+        }
+
+        /// <summary>
+        /// Triggered when a match is found. Updates the collection of matches for display to the user.
+        /// </summary>
+        /// <param name="sender">Standard sender object</param>
+        /// <param name="e">ItemSearchedEventArgs object holding details of the match</param>
+        void search_ItemSearched(object sender, EventArgs e)
+        {
+            var iea = e as ItemSearchedEventArgs;
+            if (iea != null)
+            {
+                updateProgressBar(iea.FileX, iea.FileOfY, "Searching");
+
+                foreach (IMatch match in iea.Matches)
+                {
+                    if (match.Successful)
+                    {
+                        addToMatches(match);
+                        updateDocument(flowResults, formatOutputLine(match));
+
+                    }
+                    else
+                    {
+                        updateDocument(flowResults,
+                                       string.Format("Couldn't search {0}:{1}", match.MatchItem, match.ErrorMessage));
                     }
                 }
             }
+        }
+ 
+        /// <summary>
+        /// Whenever the text changes we'll check whether the entered folders exist
+        /// </summary>
+        /// <param name="sender">Standard sender object</param>
+        /// <param name="e"></param>
+        private void textBoxFolders_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            checkFoldersExist();
+        }
+
+        /// <summary>
+        /// Check all the folders specified in the Folders textbox to ensure they all exist
+        /// </summary>
+        private void checkFoldersExist()
+        {
+            string missingFolder = string.Empty;
+
+            for (int index = 0; index < textBoxFolders.LineCount; index++)
+            {
+                string line = textBoxFolders.GetLineText(index).Trim();
+                if (line.Length > 0 && !Directory.Exists(line))
+                {
+                    missingFolder = line;
+                    break;
+                }
+            }
+
+            if (missingFolder.Length > 0)
+            {
+                updateStatus(String.Format("Search Folder {0} doesn't exist", missingFolder));
+                textBoxFolders.BorderBrush = Brushes.Red;
+                textBoxFolders.BorderThickness = new Thickness(3, 3, 3, 3);
+            }
+            else
+            {
+                if (textBlockCurrentStatus.Text.StartsWith("Search Folder ") && textBlockCurrentStatus.Text.EndsWith("doesn't exist"))
+                {
+                    updateStatus(String.Empty);
+                }
+                textBoxFolders.BorderBrush = normalBorderBrush;
+                textBoxFolders.BorderThickness = new Thickness(1, 1, 1, 1);
+            }
+        }
+
+
+        void searchRequest_NotifyProgress(object sender, EventArgs e)
+        {
+            NotifyProgressEventArgs nea = e as NotifyProgressEventArgs;
+
+            if (nea != null)
+            {
+                updateProgressBar(nea.NumberOfFilesScanned, 0, "Scanning");
+            }
+        }
+
+        #endregion
+
+        private void textBoxSearchStrings_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            checkSearchesAreValid();
+        }
+
+        private void checkSearchesAreValid()
+        {
+            string invalidRegex = string.Empty;
+
+            for (int index = 0; index < textBoxSearchStrings.LineCount; index++)
+            {
+                string line = textBoxSearchStrings.GetLineText(index).Trim();
+                if (line.Length > 0)
+                {
+                    try
+                    {
+                        Regex rx = new Regex(line);
+                    }
+                    catch (ArgumentException)
+                    {
+                        invalidRegex = line;
+                        break;
+                    }
+                }
+            }
+
+            if (invalidRegex.Length > 0)
+            {
+                updateStatus(String.Format("Search term {0} is not a valid regular expression", invalidRegex));
+                textBoxSearchStrings.BorderBrush = Brushes.Red;
+                textBoxSearchStrings.BorderThickness = new Thickness(3, 3, 3, 3);
+            }
+            else
+            {
+                if (textBlockCurrentStatus.Text.StartsWith("Search term ") && textBlockCurrentStatus.Text.EndsWith("is not a valid regular expression"))
+                {
+                    updateStatus(String.Empty);
+                }
+                textBoxSearchStrings.BorderBrush = normalBorderBrush;
+                textBoxSearchStrings.BorderThickness = new Thickness(1, 1, 1, 1);
+            }
+
         }
     }
 }

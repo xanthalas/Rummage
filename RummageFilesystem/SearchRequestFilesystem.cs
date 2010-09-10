@@ -102,6 +102,16 @@ namespace RummageFilesystem
 
         private CancellationToken cancellationToken;
 
+        /// <summary>
+        /// Keeps tracked of the number of files which have been scanned
+        /// </summary>
+        private int filesScanned;
+
+        /// <summary>
+        /// Event raised when notifying progress
+        /// </summary>
+        public event NotifyProgressEventHandler NotifyProgress;
+
         #endregion
 
         /// <summary>
@@ -230,6 +240,12 @@ namespace RummageFilesystem
 
                 foreach (FileInfo fileInfo in files)
                 {
+                    filesScanned++;
+                    if (filesScanned % 10 == 0)
+                    {
+                        OnNotifyProgress(new NotifyProgressEventArgs(filesScanned));
+                    }
+
                     if (cancellationToken.IsCancellationRequested)
                     {
                         return;
@@ -422,6 +438,15 @@ namespace RummageFilesystem
                 }
             }
         }
+
+        protected virtual void OnNotifyProgress(NotifyProgressEventArgs eventArgs)
+        {
+            if (NotifyProgress != null)
+            {
+                NotifyProgress(this, eventArgs);
+            }
+        }
+
 
     }
 }

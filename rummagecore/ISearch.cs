@@ -25,6 +25,11 @@ namespace RummageCore
         List<IMatch> Matches {get; set; }
 
         /// <summary>
+        /// The number of the file (within the collection of all the files) which is being searched
+        /// </summary>
+        int ItemNumber { get; set; }
+
+        /// <summary>
         /// Executes the search
         /// </summary>
         /// <param name="searchRequest">The search request to action</param>

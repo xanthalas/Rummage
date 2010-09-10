@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using RummageCore;
+using System.IO;
 
 namespace Rummage
 {
@@ -27,6 +28,18 @@ namespace Rummage
                     this.itemKey = value;
                     NotifyPropertyChanged("ItemKey");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Returns the extension type of this item
+        /// </summary>
+        public string ItemType
+        {
+            get
+            {
+                FileInfo fi = new FileInfo(itemKey);
+                return (fi.Extension.Trim().Length == 0 ? "-" : fi.Extension);
             }
         }
 

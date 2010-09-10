@@ -92,5 +92,11 @@ namespace RummageCore
         /// </summary>
         void CancelRequest();
 
+        /// <summary>
+        /// Raised at pre-determined times to notify progress
+        /// </summary>
+        /// <param name="e"></param>
+        event NotifyProgressEventHandler NotifyProgress;
+
     }
 }

@@ -46,6 +46,7 @@
     <Compile Include="ISearchRequest.cs" />
     <Compile Include="ItemSearchedEventArgs.cs" />
     <Compile Include="Match.cs" />
+    <Compile Include="NotifyProgressEventArgs.cs" />
     <Compile Include="ProgressReporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

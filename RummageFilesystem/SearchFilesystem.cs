@@ -33,6 +33,11 @@ namespace RummageFilesystem
         public List<IMatch> Matches { get; set; }
 
         /// <summary>
+        /// The number of the file (within the collection of all the files) which is being searched
+        /// </summary>
+        public int ItemNumber { get; set; }
+
+        /// <summary>
         /// Event raised when the searching of a given item is complete
         /// </summary>
         public event ItemSearchedEventHandler ItemSearched;
@@ -52,6 +57,7 @@ namespace RummageFilesystem
         /// </summary>
         public SearchFilesystem()
         {
+            ItemNumber = 0;
             SearchId = Guid.NewGuid();
             this.cancellationTokenSource = new CancellationTokenSource();
         }
@@ -113,7 +119,7 @@ namespace RummageFilesystem
 
                                                      matchesInThisFile = searchFile(regexes, url);
                                                      Matches.AddRange(matchesInThisFile);
-                                                     OnFileSearched(new ItemSearchedEventArgs(url, matchesInThisFile));
+                                                     OnFileSearched(new ItemSearchedEventArgs(url, matchesInThisFile, ItemNumber, SearchRequest.Urls.Count));
                                                  }, cancellationToken);
 
 
@@ -122,6 +128,8 @@ namespace RummageFilesystem
 
         private List<RummageCore.IMatch> searchFile(List<RE.Regex> regexes, string url)
         {
+            ItemNumber++;
+
             List<RummageCore.IMatch> matchesInThisFile = new List<IMatch>();
 
             if (!File.Exists(url))

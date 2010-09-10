@@ -5,18 +5,53 @@
         Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip">
     <DockPanel  Name="dockPanelMain">
         <StatusBar Height="22" Name="statusBarMain" DockPanel.Dock="Bottom">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Name="textBlockCurrentStatus" DockPanel.Dock="Left" MinWidth="400">Ready.</TextBlock>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="1">
+                <ProgressBar Name="runningProgress" MinWidth="200" Height="22" DockPanel.Dock="Right"></ProgressBar>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="2" HorizontalAlignment="Right">
+                <TextBlock Name="searchingX" HorizontalAlignment="Right"></TextBlock>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="3" HorizontalAlignment="Left">
+                <TextBlock Name="searchingOfY" HorizontalAlignment="Left"></TextBlock>
+            </StatusBarItem>
+        </StatusBar>
+        <!--
+        <StatusBar Height="22" Name="statusBarMain" DockPanel.Dock="Bottom">
+            <TextBlock Name="textBlockCurrentStatus" DockPanel.Dock="Left" MinWidth="400">Ready.</TextBlock>
+            <ProgressBar Name="runningProgress" MinWidth="200" DockPanel.Dock="Right"></ProgressBar>
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.5*"/>
-                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="200"/>
                 </Grid.ColumnDefinitions>
-
                 <TextBlock Name="textBlockCurrentStatus" Grid.Row="0" Grid.Column="0">Ready.</TextBlock>
+                <ProgressBar Name="runningProgress" Grid.Row="0" Grid.Column="1" MinWidth="200" HorizontalAlignment="Right"></ProgressBar>
+
             </Grid>
         </StatusBar>
+            -->
         <Grid Name="gridMain">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" MinHeight="150" MaxHeight="150"/>
@@ -42,10 +77,10 @@
                     </Grid.ColumnDefinitions>
                     <!-- Column 1 (Search for) -->
                     <Label Name="labelSearchStrings" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Search for..." />
-                    <TextBox Name="textBoxSearchStrings" Grid.Row="1" Grid.Column="0" Text="xanthalas" AcceptsReturn="True" />
+                    <TextBox Name="textBoxSearchStrings" Grid.Row="1" Grid.Column="0" MaxHeight="90" Text="xanthalas" AcceptsReturn="True" TextChanged="textBoxSearchStrings_TextChanged" />
                     <!-- Column 2 (Where to search) -->
                     <Label Name="labelFolders" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Search here..." />
-                    <TextBox Name="textBoxFolders" Grid.Row="1" Grid.Column="1" Text="d:\code\Rummage" AcceptsReturn="True" />
+                    <TextBox Name="textBoxFolders" Grid.Row="1" Grid.Column="1" MaxHeight="90" Text="d:\code\Rummage" AcceptsReturn="True" TextChanged="textBoxFolders_TextChanged" />
                     <CheckBox Name="chkRecurse" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="True" Margin="10,0,0,0">Search sub-folders</CheckBox>
                     <CheckBox Name="chkBinaries" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" IsChecked="False" Margin="0,0,30,0">Search binaries</CheckBox>
                     <CheckBox Name="chkCaseSensitive" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">Case-sensitive search</CheckBox>
@@ -116,24 +151,30 @@
                                 <GridView>
                                     <GridViewColumn Width="500" Header="File" DisplayMemberBinding="{Binding ItemKey}" />
                                     <GridViewColumn Width="140" Header="Number of matches"  DisplayMemberBinding="{Binding MatchingLinesCount}"/>
+                                    <GridViewColumn Width="140" Header="File type"  DisplayMemberBinding="{Binding ItemType}"/>
                                 </GridView>
                             </ListView.View>
                         </ListView>
-                        <FlowDocumentScrollViewer Name="ScrollableViewerGrid" Grid.Row="2" Grid.Column="0" HorizontalScrollBarVisibility="Auto">
-                            <FlowDocument Name="flowResultsGrid" FontFamily="Courier New">
-
-                            </FlowDocument>
-                        </FlowDocumentScrollViewer>
+                        <ListView x:Name="listViewMatchesForSelection" Grid.Column="0" Grid.Row="2"  >
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="Auto" Header="Line #" DisplayMemberBinding="{Binding MatchLineNumber}" />
+                                    <GridViewColumn Width="750" Header="Text"  DisplayMemberBinding="{Binding MatchLine}"/>
+                                    <GridViewColumn Width="Auto" Header="Regex which matched"  DisplayMemberBinding="{Binding MatchString}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
                     </Grid>
                 </TabItem>
                 <TabItem Name="tabItemText" Header="Text">
                     <FlowDocumentScrollViewer Name="ScrollableViewer" Grid.Row="2" Grid.Column="0" HorizontalScrollBarVisibility="Auto">
-                        <FlowDocument Name="flowResults" FontFamily="Courier New" >
+                        <FlowDocument Name="flowResults" FontFamily="Courier New" PageWidth="5000" >
                         </FlowDocument>
                     </FlowDocumentScrollViewer>
                 </TabItem>
             </TabControl>
         </Grid>
+
     </DockPanel>
 
 </Window>
