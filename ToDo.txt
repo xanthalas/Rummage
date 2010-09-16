@@ -11,11 +11,23 @@ Tabbed display to allow multiple searches (ideally simultaneously)
 
 Medium
 ------
-
+Implement CTRL+Up/Down to jump to prev/next match in file pane
 
 
 
 Low
 ---
+
+Right-click menu on Include/Exclude includes common filter patterns which user can add
+
+
+
+
+
+
+
+
+Completed
+---------
 
 Snarl integration

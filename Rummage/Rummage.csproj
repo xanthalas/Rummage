@@ -39,6 +39,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -56,6 +57,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Snarl\M_RESULT.cs" />
+    <Compile Include="Snarl\SnarlConnector.cs" />
+    <Compile Include="Snarl\SnarlException.cs" />
+    <Compile Include="Snarl\SNARLSTRUCT.cs" />
+    <Compile Include="Snarl\SNARLSTRUCTEX.cs" />
+    <Compile Include="Snarl\SNARL_COMMAND.cs" />
+    <Compile Include="Snarl\WindowsMessage.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

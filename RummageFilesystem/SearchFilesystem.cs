@@ -89,24 +89,27 @@ namespace RummageFilesystem
             List<Task> tasks = new List<Task>();
             bool allTasksCompleted = false;
 
-            foreach (string url in searchRequestFilesystem.Urls)
+            if (searchRequestFilesystem.Urls.Count > 0)
             {
-                if (cancellationToken.IsCancellationRequested)
+                foreach (string url in searchRequestFilesystem.Urls)
                 {
-                    break;
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    searchThisUrlInBackground(regexes, url, tasks);
                 }
-                searchThisUrlInBackground(regexes, url, tasks);
-            }
 
-            Task.Factory.ContinueWhenAll(tasks.ToArray(),
-                  result =>
-                      {
-                          allTasksCompleted = true;
-                      });
+                Task.Factory.ContinueWhenAll(tasks.ToArray(),
+                                             result =>
+                                                 {
+                                                     allTasksCompleted = true;
+                                                 });
 
-            while (waitForCompletion && !allTasksCompleted)
-            {
-                //Do nothing - just wait
+                while (waitForCompletion && !allTasksCompleted)
+                {
+                    //Do nothing - just wait
+                }
             }
             return Matches;
         }

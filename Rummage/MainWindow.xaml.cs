@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Threading;
 using System.Threading.Tasks;
 using RummageCore;
 using RummageFilesystem;
+using Snarl;
 
 namespace Rummage
 {
@@ -65,14 +68,24 @@ namespace Rummage
 
         private Brush normalBorderBrush;
 
+        private int snarlHandle = 1846493;      //Number picked at random
+
         /// <summary>
         /// Main entry point to the program
         /// </summary>
         public MainWindow()
         {
             InitializeComponent();
+            Snarl.SnarlConnector.RegisterConfig((IntPtr)snarlHandle, "Rummage", WindowsMessage.WM_NULL);
 
             normalBorderBrush = textBoxFolders.BorderBrush;
+
+            this.Closed += new EventHandler(MainWindow_Closed);
+        }
+
+        void MainWindow_Closed(object sender, EventArgs e)
+        {
+            SnarlConnector.RevokeConfig((IntPtr) snarlHandle);
         }
 
         /// <summary>
@@ -205,14 +218,24 @@ namespace Rummage
         /// <param name="search">The search to run</param>
         private void prepareAndSearch(ISearchRequest request, ISearch search)
         {
-            updateStatus("");
+            updateStatus("Determining which files to search...");
             updateDocument(flowResults, "Determining which files to search...");
             request.Prepare();
-            updateDocument(flowResults, string.Format("Searching {0} files...", searchRequest.Urls.Count));
-
+            string displayString = string.Format("Searching {0} files...", searchRequest.Urls.Count);
+            updateDocument(flowResults, displayString);
+            updateStatus(displayString);
             if (!cancellingSearch)
             {
-                search.Search(request, true);
+                try
+                {
+                    search.Search(request, true);
+                }
+                catch (Exception exception)
+                {
+                    cancelRunningSearch();
+                    updateDocument(flowResults, "Search aborted due to error: " + exception.Message);
+                    updateStatus("Search aborted due to error: " + exception.Message);
+                }
             }
 
         }
@@ -230,14 +253,21 @@ namespace Rummage
             {
                 DateTime endTime = DateTime.Now;
                 TimeSpan elapsed = endTime.Subtract(startTime);
-                string result = String.Format("Search complete. {0} matches found in {1} files out of {2} files searched ({3} seconds)",
-                                              search.Matches.Count, matches.Count ,searchRequest.Urls.Count, String.Format("{0:0.00}", elapsed.TotalSeconds));
+
+                string matchWord = search.Matches.Count == 1 ? "match" : "matches";
+                string fileWord = matches.Count == 1 ? "file" : "files";
+ 
+                string result = String.Format("Search complete. {0} {4} found in {1} {5} out of {2} files searched ({3} seconds)",
+                                              search.Matches.Count, matches.Count, searchRequest.Urls.Count, String.Format("{0:0.00}", elapsed.TotalSeconds), matchWord, fileWord);
                 searchingX.Text = "Searching file " + searchRequest.Urls.Count.ToString() + " ";
                 searchingOfY.Text = "of " + searchRequest.Urls.Count.ToString();
                 updateDocument(flowResults, result);
                 updateStatus(result);
+
+                string snarlResult = string.Format("\n    {0} {1} found", search.Matches.Count, matchWord);
+                Int32 nReturnId = SnarlConnector.ShowMessage("Rummage - search complete", snarlResult, 10, "", (IntPtr) 0, 0);
             }
-            btnStart.Content = "Start Search";
+            btnStart.Content = "_Start Search";
             searchRunning = false;
             cancellingSearch = false;
             
@@ -380,7 +410,14 @@ namespace Rummage
                 // This thread has access so it can update the UI thread.      
                 runningProgress.Value = x;
                 runningProgress.Maximum = ofY;
-                searchingX.Text = processName + " file " + x.ToString() + " ";
+                if (processName.Trim().Length == 0)
+                {
+                    searchingX.Text = string.Empty;
+                }
+                else
+                {
+                    searchingX.Text = processName + " file " + x.ToString() + " ";
+                }
                 if (ofY == 0)
                 {
                     searchingOfY.Text = string.Empty;
@@ -412,6 +449,114 @@ namespace Rummage
             }
 
         }
+
+        /// <summary>
+        /// Check all the regexes entered in the search box and highlight it if any are invalid
+        /// </summary>
+        /// <returns>true if all the searches are valid, otherwise false</returns>
+        private bool checkSearchesAreValid()
+        {
+            if (textBoxSearchStrings == null)
+            {
+                return false;
+            }
+
+            bool result = true;
+            string invalidRegex = string.Empty;
+
+            for (int index = 0; index < textBoxSearchStrings.LineCount; index++)
+            {
+                string line = textBoxSearchStrings.GetLineText(index).Trim();
+                if (line.Length > 0)
+                {
+                    try
+                    {
+                        Regex rx = new Regex(line);
+                    }
+                    catch (ArgumentException)
+                    {
+                        invalidRegex = line;
+                        break;
+                    }
+                }
+            }
+
+            if (invalidRegex.Length > 0)
+            {
+                updateStatus(String.Format("Search term {0} is not a valid regular expression", invalidRegex));
+                textBoxSearchStrings.BorderBrush = Brushes.Red;
+                textBoxSearchStrings.BorderThickness = new Thickness(3, 3, 3, 3);
+                result = false;
+            }
+            else
+            {
+                if (textBlockCurrentStatus.Text.StartsWith("Search term ") && textBlockCurrentStatus.Text.EndsWith("is not a valid regular expression"))
+                {
+                    updateStatus(String.Empty);
+                }
+                textBoxSearchStrings.BorderBrush = normalBorderBrush;
+                textBoxSearchStrings.BorderThickness = new Thickness(1, 1, 1, 1);
+                result = true;
+            }
+
+            return result;
+        }
+
+        private void enableDisableSearchButton()
+        {
+            if (btnStart != null)
+            {
+                btnStart.IsEnabled = checkSearchesAreValid() && checkFoldersExist();
+            }
+        }
+
+        /// <summary>
+        /// Check all the folders specified in the Folders textbox to ensure they all exist
+        /// </summary>
+        /// <returns>true if all the folders specified exist, otherwise false</returns>
+        private bool checkFoldersExist()
+        {
+            if (textBoxFolders == null)
+            {
+                return false;
+            }
+
+            string missingFolder = string.Empty;
+            bool result = true;
+
+            for (int index = 0; index < textBoxFolders.LineCount; index++)
+            {
+                string line = textBoxFolders.GetLineText(index).Trim();
+                if (line.Length > 0 && !Directory.Exists(line))
+                {
+                    missingFolder = line;
+                    break;
+                }
+            }
+
+            if (missingFolder.Length > 0)
+            {
+                updateStatus(String.Format("Search Folder {0} doesn't exist", missingFolder));
+                textBoxFolders.BorderBrush = Brushes.Red;
+                textBoxFolders.BorderThickness = new Thickness(3, 3, 3, 3);
+                result = false;
+            }
+            else
+            {
+                if (textBlockCurrentStatus.Text.StartsWith("Search Folder ") && textBlockCurrentStatus.Text.EndsWith("doesn't exist"))
+                {
+                    updateStatus(String.Empty);
+                }
+                textBoxFolders.BorderBrush = normalBorderBrush;
+                textBoxFolders.BorderThickness = new Thickness(1, 1, 1, 1);
+                result = true;
+            }
+
+            return result;
+        }
+
+
+
         #region Helper methods
         public static ScrollViewer FindScrollViewer(FlowDocumentScrollViewer flowDocumentScrollViewer)
         {
@@ -483,7 +628,7 @@ namespace Rummage
             {
                 if (checkParms())
                 {
-                    btnStart.Content = "Cancel Search";
+                    btnStart.Content = "_Cancel Search";
                     cancellingSearch = false;
                     doSearch();
                 }
@@ -491,18 +636,27 @@ namespace Rummage
             else
             {
                 updateDocument(flowResults, "Search cancelled.");
-                if (searchRequest != null)
-                {
-                    searchRequest.CancelRequest();
-                }
-                if (search != null)
-                {
-                    search.CancelSearch();
-                }
-
-                cancellingSearch = true;
-                btnStart.Content = "Start Search";
+                cancelRunningSearch();
             }
+        }
+
+        /// <summary>
+        /// Sends cancel messages to the search process to stop it running
+        /// </summary>
+        private void cancelRunningSearch()
+        {
+            if (searchRequest != null)
+            {
+                searchRequest.CancelRequest();
+            }
+            if (search != null)
+            {
+                search.CancelSearch();
+            }
+
+            cancellingSearch = true;
+            btnStart.Content = "_Start Search";
+            updateProgressBar(0, 0, string.Empty);
         }
 
         /// <summary>
@@ -565,43 +719,8 @@ namespace Rummage
         /// <param name="e"></param>
         private void textBoxFolders_TextChanged(object sender, TextChangedEventArgs e)
         {
-            checkFoldersExist();
+            enableDisableSearchButton();
         }
-
-        /// <summary>
-        /// Check all the folders specified in the Folders textbox to ensure they all exist
-        /// </summary>
-        private void checkFoldersExist()
-        {
-            string missingFolder = string.Empty;
-
-            for (int index = 0; index < textBoxFolders.LineCount; index++)
-            {
-                string line = textBoxFolders.GetLineText(index).Trim();
-                if (line.Length > 0 && !Directory.Exists(line))
-                {
-                    missingFolder = line;
-                    break;
-                }
-            }
-
-            if (missingFolder.Length > 0)
-            {
-                updateStatus(String.Format("Search Folder {0} doesn't exist", missingFolder));
-                textBoxFolders.BorderBrush = Brushes.Red;
-                textBoxFolders.BorderThickness = new Thickness(3, 3, 3, 3);
-            }
-            else
-            {
-                if (textBlockCurrentStatus.Text.StartsWith("Search Folder ") && textBlockCurrentStatus.Text.EndsWith("doesn't exist"))
-                {
-                    updateStatus(String.Empty);
-                }
-                textBoxFolders.BorderBrush = normalBorderBrush;
-                textBoxFolders.BorderThickness = new Thickness(1, 1, 1, 1);
-            }
-        }
-
 
         void searchRequest_NotifyProgress(object sender, EventArgs e)
         {
@@ -609,54 +728,50 @@ namespace Rummage
 
             if (nea != null)
             {
-                updateProgressBar(nea.NumberOfFilesScanned, 0, "Scanning");
+                updateProgressBar(nea.NumberOfFilesScanned, 0, "Examining");
+            }
+        }
+
+
+        private void textBoxSearchStrings_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            enableDisableSearchButton();
+        }
+
+
+        private void listViewMatches_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (listViewMatches.SelectedItem != null)
+            {
+                MatchingItem selectedItem = listViewMatches.SelectedItem as MatchingItem;
+
+                if (selectedItem != null)
+                {
+                    ProcessStartInfo procStartInfo = new ProcessStartInfo(@"c:\vim\vim73\gvim.exe");
+                    procStartInfo.Arguments = @"""" + selectedItem.ItemKey + @"""";
+                    procStartInfo.CreateNoWindow = true;
+                    procStartInfo.UseShellExecute = true;
+                    Process.Start(procStartInfo);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Open a Folder-Browse dialog and add the user's selection to the Folders box
+        /// </summary>
+        /// <param name="sender">Standard sender object</param>
+        /// <param name="e">Standard EventArgs object</param>
+        private void Browse_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                textBoxFolders.Text += "\n" + fbd.SelectedPath;
             }
         }
 
         #endregion
 
-        private void textBoxSearchStrings_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            checkSearchesAreValid();
-        }
-
-        private void checkSearchesAreValid()
-        {
-            string invalidRegex = string.Empty;
-
-            for (int index = 0; index < textBoxSearchStrings.LineCount; index++)
-            {
-                string line = textBoxSearchStrings.GetLineText(index).Trim();
-                if (line.Length > 0)
-                {
-                    try
-                    {
-                        Regex rx = new Regex(line);
-                    }
-                    catch (ArgumentException)
-                    {
-                        invalidRegex = line;
-                        break;
-                    }
-                }
-            }
-
-            if (invalidRegex.Length > 0)
-            {
-                updateStatus(String.Format("Search term {0} is not a valid regular expression", invalidRegex));
-                textBoxSearchStrings.BorderBrush = Brushes.Red;
-                textBoxSearchStrings.BorderThickness = new Thickness(3, 3, 3, 3);
-            }
-            else
-            {
-                if (textBlockCurrentStatus.Text.StartsWith("Search term ") && textBlockCurrentStatus.Text.EndsWith("is not a valid regular expression"))
-                {
-                    updateStatus(String.Empty);
-                }
-                textBoxSearchStrings.BorderBrush = normalBorderBrush;
-                textBoxSearchStrings.BorderThickness = new Thickness(1, 1, 1, 1);
-            }
-
-        }
     }
 }
