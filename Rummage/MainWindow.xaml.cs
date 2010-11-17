@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using RummageCore;
 using RummageFilesystem;
 using Snarl;
+using Application = System.Windows.Application;
 
 namespace Rummage
 {
@@ -70,6 +71,16 @@ namespace Rummage
 
         private int snarlHandle = 1846493;      //Number picked at random
 
+        private bool _searchStringsChanged = false;
+        private bool _foldersChanged = false;
+        private bool _includeFilesChanged = false;
+        private bool _includeFoldersChanged = false;
+        private bool _excludeFilesChanged = false;
+        private bool _excludeFoldersChanged = false;
+        private bool _recurseChanged = false;
+        private bool _binariesChanged = false;
+        private bool _caseSensitivityChanged = false;
+
         /// <summary>
         /// Main entry point to the program
         /// </summary>
@@ -81,6 +92,9 @@ namespace Rummage
             normalBorderBrush = textBoxFolders.BorderBrush;
 
             this.Closed += new EventHandler(MainWindow_Closed);
+
+            setChangedStatus(true);     //Initially set the changed status to true to ensure that all initial selections are captured
+//            loadTheme("XXX");
         }
 
         void MainWindow_Closed(object sender, EventArgs e)
@@ -102,73 +116,111 @@ namespace Rummage
             listViewMatchesForSelection.ItemsSource = matchingLinesForCurrentSelection;
 
             #region Build search strings and search folders
-            searchRequest = new SearchRequestFilesystem();
-            for (int index = 0; index < textBoxSearchStrings.LineCount; index++)
+            if (searchRequest == null)
             {
-                string line = textBoxSearchStrings.GetLineText(index).Trim();
-                if (line.Length > 0)
+                searchRequest = new SearchRequestFilesystem();
+            }
+
+            if (_searchStringsChanged)
+            {
+                searchRequest.SearchStrings.Clear();
+
+                for (int index = 0; index < textBoxSearchStrings.LineCount; index++)
                 {
-                    searchRequest.SearchStrings.Add(line);
+                    string line = textBoxSearchStrings.GetLineText(index).Trim();
+                    if (line.Length > 0)
+                    {
+                        searchRequest.AddSearchString(line);
+                    }
                 }
             }
-            for (int index = 0; index < textBoxFolders.LineCount; index++)
+            if (_foldersChanged)
             {
-                string line = textBoxFolders.GetLineText(index).Trim();
-                if (line.Length > 0)
+                searchRequest.SearchContainers.Clear();
+
+                for (int index = 0; index < textBoxFolders.LineCount; index++)
                 {
-                    searchRequest.SearchContainers.Add(line);
+                    string line = textBoxFolders.GetLineText(index).Trim();
+                    if (line.Length > 0)
+                    {
+                        searchRequest.AddSearchContainer(line);
+                    }
                 }
             }
+
             #endregion
 
             #region Build includes
-            for (int index = 0; index < textBoxIncludeFiles.LineCount; index++)
+            if (_includeFilesChanged)
             {
-                string line = textBoxIncludeFiles.GetLineText(index).Trim();
-                if (line.Length > 0)
+                searchRequest.IncludeItemStrings.Clear();
+
+                for (int index = 0; index < textBoxIncludeFiles.LineCount; index++)
                 {
-                    searchRequest.IncludeItemStrings.Add(line);
+                    string line = textBoxIncludeFiles.GetLineText(index).Trim();
+                    if (line.Length > 0)
+                    {
+                        searchRequest.AddIncludeItemString(line);
+                    }
                 }
             }
-            for (int index = 0; index < textBoxIncludeFolders.LineCount; index++)
+            if (_includeFoldersChanged)
             {
-                string line = textBoxIncludeFolders.GetLineText(index).Trim();
-                if (line.Length > 0)
+                searchRequest.IncludeContainerStrings.Clear();
+
+                for (int index = 0; index < textBoxIncludeFolders.LineCount; index++)
                 {
-                    searchRequest.IncludeContainerStrings.Add(line);
+                    string line = textBoxIncludeFolders.GetLineText(index).Trim();
+                    if (line.Length > 0)
+                    {
+                        searchRequest.AddIncludeContainerString(line);
+                    }
                 }
             }
+
             #endregion
 
             #region Build excludes
-            for (int index = 0; index < textBoxExcludeFiles.LineCount; index++)
+            if (_excludeFilesChanged)
             {
-                string line = textBoxExcludeFiles.GetLineText(index).Trim();
-                if (line.Length > 0)
+                searchRequest.ExcludeItemStrings.Clear();
+
+                for (int index = 0; index < textBoxExcludeFiles.LineCount; index++)
                 {
-                    searchRequest.ExcludeItemStrings.Add(line);
+                    string line = textBoxExcludeFiles.GetLineText(index).Trim();
+                    if (line.Length > 0)
+                    {
+                        searchRequest.AddExcludeItemString(line);
+                    }
                 }
             }
-            for (int index = 0; index < textBoxExcludeFolders.LineCount; index++)
+            if (_excludeFoldersChanged)
             {
-                string line = textBoxExcludeFolders.GetLineText(index).Trim();
-                if (line.Length > 0)
+                searchRequest.ExcludeContainerStrings.Clear();
+
+                for (int index = 0; index < textBoxExcludeFolders.LineCount; index++)
                 {
-                    searchRequest.ExcludeContainerStrings.Add(line);
+                    string line = textBoxExcludeFolders.GetLineText(index).Trim();
+                    if (line.Length > 0)
+                    {
+                        searchRequest.AddExcludeContainerString(line);
+                    }
                 }
             }
+
             #endregion
 
 
-            searchRequest.Recurse = chkRecurse.IsChecked.Value;
-            searchRequest.CaseSensitive = chkCaseSensitive.IsChecked.Value;
-            searchRequest.SearchBinaries = chkBinaries.IsChecked.Value;
+            searchRequest.SetRecurse(chkRecurse.IsChecked.Value);
+            searchRequest.SetCaseSensitive(chkCaseSensitive.IsChecked.Value);
+            searchRequest.SetSearchBinaries(chkBinaries.IsChecked.Value);
             searchRequest.NotifyProgress += new NotifyProgressEventHandler(searchRequest_NotifyProgress);
                 
             search = new SearchFilesystem();
             search.ItemSearched += new ItemSearchedEventHandler(search_ItemSearched);
 
             searchRunning = true;
+            setChangedStatus(false);        //Reset the changed status now that the search is about to run
             performSearchOnSeparateThread(search, searchRequest);
 
         }
@@ -220,7 +272,12 @@ namespace Rummage
         {
             updateStatus("Determining which files to search...");
             updateDocument(flowResults, "Determining which files to search...");
-            request.Prepare();
+            setChangedStatus(false);
+
+            if (!request.IsPrepared)
+            {
+                request.Prepare();                
+            }
             string displayString = string.Format("Searching {0} files...", searchRequest.Urls.Count);
             updateDocument(flowResults, displayString);
             updateStatus(displayString);
@@ -555,7 +612,90 @@ namespace Rummage
             return result;
         }
 
+        private void loadTheme(string themePath)
+        {
+            this.Background = Brushes.Black;
+            this.Foreground = Brushes.Green;
+            this.FontFamily = new FontFamily("Courier New");
 
+            textBoxSearchStrings.Background = Brushes.Black;
+            textBoxSearchStrings.Foreground = Brushes.Green;
+            textBoxSearchStrings.FontFamily = new FontFamily("Courier New");
+
+            textBoxFolders.Background = Brushes.Black;
+            textBoxFolders.Foreground = Brushes.Green;
+            textBoxFolders.FontFamily = new FontFamily("Courier New");
+
+            listViewMatches.Background = Brushes.Black;
+            listViewMatches.Foreground = Brushes.Green;
+
+            listViewMatchesForSelection.Background = Brushes.Black;
+            listViewMatchesForSelection.Foreground = Brushes.Green;
+
+            chkRecurse.Background = Brushes.Black;
+            chkRecurse.Foreground = Brushes.Green;
+
+            chkCaseSensitive.Background = Brushes.Black;
+            chkCaseSensitive.Foreground = Brushes.Green;
+
+            chkBinaries.Background = Brushes.Black;
+            chkBinaries.Foreground = Brushes.Green;
+
+            textBoxIncludeFiles.Background = Brushes.Black;
+            textBoxIncludeFiles.Foreground = Brushes.Green;
+
+            textBoxIncludeFolders.Background = Brushes.Black;
+            textBoxIncludeFolders.Foreground = Brushes.Green;
+
+            textBoxExcludeFiles.Background = Brushes.Black;
+            textBoxExcludeFiles.Foreground = Brushes.Green;
+
+            textBoxExcludeFolders.Background = Brushes.Black;
+            textBoxExcludeFolders.Foreground = Brushes.Green;
+
+            textBlockCurrentStatus.Background = Brushes.Black;
+            textBlockCurrentStatus.Foreground = Brushes.Green;
+
+            statusBarMain.Background = Brushes.Black;
+            statusBarMain.Foreground = Brushes.Green;
+
+            tabResults.Background = Brushes.Black;
+            tabResults.Foreground = Brushes.Green;
+
+            tabFilters.Background = Brushes.Black;
+            tabFilters.Foreground = Brushes.Green;
+
+            tabItemExcludes.Background = Brushes.Black;
+            tabItemExcludes.Foreground = Brushes.Green;
+
+            tabItemIncludes.Background = Brushes.Black;
+            tabItemIncludes.Foreground = Brushes.Green;
+
+            labelExcludeTabHeader.Background = Brushes.Black;
+            labelExcludeTabHeader.Foreground = Brushes.Green;
+
+            labelIncludeTabHeader.Background = Brushes.Black;
+            labelIncludeTabHeader.Foreground = Brushes.Green;
+
+        }
+
+        /// <summary>
+        /// Set the "Changed" status
+        /// </summary>
+        /// <param name="status"></param>
+        private void setChangedStatus(bool status)
+        {
+            _searchStringsChanged = status;
+            _foldersChanged = status;
+            _includeFilesChanged = status;
+            _includeFoldersChanged = status;
+            _excludeFilesChanged = status;
+            _excludeFoldersChanged = status;
+            _recurseChanged = status;
+            _binariesChanged = status;
+            _caseSensitivityChanged = status;
+            
+        }
 
         #region Helper methods
         public static ScrollViewer FindScrollViewer(FlowDocumentScrollViewer flowDocumentScrollViewer)
@@ -720,6 +860,7 @@ namespace Rummage
         private void textBoxFolders_TextChanged(object sender, TextChangedEventArgs e)
         {
             enableDisableSearchButton();
+            _foldersChanged = true;
         }
 
         void searchRequest_NotifyProgress(object sender, EventArgs e)
@@ -736,6 +877,7 @@ namespace Rummage
         private void textBoxSearchStrings_TextChanged(object sender, TextChangedEventArgs e)
         {
             enableDisableSearchButton();
+            _searchStringsChanged = true;
         }
 
 
@@ -771,6 +913,57 @@ namespace Rummage
             }
         }
 
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void MainMenuHelpAbout_Click(object sender, RoutedEventArgs e)
+        {
+            RummageAbout about = new RummageAbout
+                                     {
+                                         Owner = this,
+                                         WindowStartupLocation = WindowStartupLocation.CenterOwner
+                                     };
+
+            about.ShowDialog();
+        }
+
+        private void chkRecurse_Checked(object sender, RoutedEventArgs e)
+        {
+            _recurseChanged = true;
+        }
+
+        private void chkBinaries_Checked(object sender, RoutedEventArgs e)
+        {
+            _binariesChanged = true;
+        }
+
+        private void chkCaseSensitive_Checked(object sender, RoutedEventArgs e)
+        {
+            _caseSensitivityChanged = true;
+        }
+
+        private void textBoxIncludeFiles_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _includeFilesChanged = true;
+        }
+
+        private void textBoxIncludeFolders_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _includeFoldersChanged = true;
+        }
+
+        private void textBoxExcludeFiles_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _excludeFilesChanged = true;
+        }
+
+        private void textBoxExcludeFolders_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _excludeFoldersChanged = true;
+        }
         #endregion
 
     }

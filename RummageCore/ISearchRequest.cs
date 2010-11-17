@@ -98,5 +98,55 @@ namespace RummageCore
         /// <param name="e"></param>
         event NotifyProgressEventHandler NotifyProgress;
 
+        /// <summary>
+        ///  Add a container to search
+        /// </summary>
+        void AddSearchContainer(string container);
+
+        /// <summary>
+        /// Add a string to search for.
+        /// </summary>
+        void AddSearchString(string searchString);
+
+        /// <summary>
+        /// Add an include string used to match against item names to include those items in the search.
+        /// </summary>
+        void AddIncludeItemString(string includeItem);
+
+        /// <summary>
+        /// Add an exclude string used to match against item names to exclude those items.
+        /// </summary>
+        void AddExcludeItemString(string excludeItem);
+
+        /// <summary>
+        /// Add an include string used to match against container names to include those containers.
+        /// </summary>
+        void AddIncludeContainerString(string includeContainer);
+
+        /// <summary>
+        /// Add an exclude string used to match against container names to exclude those containers.
+        /// </summary>
+        void AddExcludeContainerString(string excludeContainer);
+
+        /// <summary>
+        /// Indicates whether the search should be case sensitive.
+        /// </summary>
+        void SetCaseSensitive(bool caseSensitive);
+
+        /// <summary>
+        /// Indicates whether to search hidden items.
+        /// </summary>
+        void SetSearchHidden(bool searchHidden);
+
+        /// <summary>
+        /// Indicates whether to search binary items.
+        /// </summary>
+        void SetSearchBinaries(bool searchBinaries);
+
+        /// <summary>
+        /// Indicates whether to descend into subdirectories.
+        /// </summary>
+        void SetRecurse(bool recurse);
+
     }
 }

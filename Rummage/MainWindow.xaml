@@ -67,7 +67,7 @@
                 </Grid.ColumnDefinitions>
                 <Grid Name="gridSearchParms" Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" MinHeight="30" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" MaxHeight="90"/>
                         <RowDefinition Height="Auto" MinHeight="30" />
                     </Grid.RowDefinitions>
@@ -75,38 +75,57 @@
                         <ColumnDefinition Width="300"/>
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
+					<Menu Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left">
+						<MenuItem Header="File">
+							<MenuItem Header="Exit" Click="MenuItem_Click"></MenuItem>
+						</MenuItem>
+						<MenuItem Header="Options"></MenuItem>
+						<MenuItem Header="Help">
+							<MenuItem Name="MainMenuHelpAbout" Header="About" Click="MainMenuHelpAbout_Click"></MenuItem>
+						</MenuItem>
+					</Menu>
                     <!-- Column 1 (Search for) -->
-                    <Border Grid.Column="0" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,1,1">
-                        <Label Name="labelSearchStrings" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Search for..." />
-                    </Border>
+					<Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Search for ...</Label>
                     <Border Grid.Column="0" Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,0">
-                        <TextBox Name="textBoxSearchStrings" Grid.Row="1" Grid.Column="0" MaxHeight="90" Text="xanthalas" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextChanged="textBoxSearchStrings_TextChanged" />
+                        <TextBox Name="textBoxSearchStrings" Grid.Row="1" Grid.Column="0" MaxHeight="90" Text="" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextChanged="textBoxSearchStrings_TextChanged" TabIndex="0" Opacity="0.8" />
                     </Border>
                     <!-- Column 2 (Where to search) -->
+					<Label Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Search here ...</Label>
                     <Border Grid.Column="1" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,0,1">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="300"/>
+                                <ColumnDefinition Width="300" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <Label Name="labelFolders" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Search here..." />
-                            <Button Name="Browse"  Grid.Row="0" Grid.Column="1" Click="Browse_Click">Browse...</Button>
+                            <Button Name="Browse"  Grid.Row="0" Grid.Column="1" Click="Browse_Click" TabIndex="7">Browse...</Button>
                         </Grid>
                     </Border>
-                    <TextBox Name="textBoxFolders"  Grid.Row="1" Grid.Column="1" MaxHeight="90" Text="d:\code\Rummage" AcceptsReturn="True" TextChanged="textBoxFolders_TextChanged" VerticalScrollBarVisibility="Auto"/>
+                    <TextBox Name="textBoxFolders"  Grid.Row="1" Grid.Column="1" MaxHeight="90" Text="d:\wip\Autumn2010" AcceptsReturn="True" TextChanged="textBoxFolders_TextChanged" VerticalScrollBarVisibility="Auto" TabIndex="1" Opacity="0.8"/>
                     
                     <Border Grid.Column="0" Grid.Row="2" BorderBrush="Gray" BorderThickness="0,1,0,0" />
                     <Border Grid.Column="1" Grid.Row="2" BorderBrush="Gray" BorderThickness="0,1,0,0" />
-                    <CheckBox Name="chkRecurse" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="True" Margin="10,0,0,0">Search sub-folders</CheckBox>
-                        <CheckBox Name="chkBinaries" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" IsChecked="False" Margin="0,0,30,0">Search binaries</CheckBox>
-                        <CheckBox Name="chkCaseSensitive" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left">Case-sensitive search</CheckBox>
-                        <Button Name="btnStart" Click="btnStart_Click" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Width="150" Margin="0,0,10,0">_Start Search</Button>
+                    <CheckBox Name="chkRecurse" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="True" Margin="10,0,0,0" TabIndex="4" Checked="chkRecurse_Checked">Search sub-folders</CheckBox>
+                        <CheckBox Name="chkBinaries" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" IsChecked="False" Margin="0,0,30,0" TabIndex="5" Checked="chkBinaries_Checked">Search binaries</CheckBox>
+                        <CheckBox Name="chkCaseSensitive" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" TabIndex="6" Checked="chkCaseSensitive_Checked">Case-sensitive search</CheckBox>
+                        <Button Name="btnStart" Click="btnStart_Click" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Width="150" Margin="0,0,10,0" TabIndex="3">
+                        	<Button.Background>
+                        		<LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                        			<GradientStop Color="#FFF3F3F3" Offset="0"/>
+                        			<GradientStop Color="#FFEBEBEB" Offset="0.5"/>
+                        			<GradientStop Color="#FFDDDDDD" Offset="0.5"/>
+                        			<GradientStop Color="#FF8CE428" Offset="1"/>
+                        		</LinearGradientBrush>
+                        	</Button.Background>_Start Search</Button>
+                        
                 </Grid>
                 <TabControl Name="tabFilters" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2">
-                    <TabItem Name="tabItemIncludes" Header="Include filters">
+                    <TabItem Name="tabItemIncludes">
+                    	<TabItem.Header>
+							<StackPanel Orientation="Horizontal"><Label Name="labelIncludeTabHeader">Include Items</Label><Label Foreground="Green" FontWeight="Bold">++</Label></StackPanel>             	
+						</TabItem.Header>
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -119,15 +138,20 @@
 
                             <!-- (Files to include) -->
                             <Label Name="labelIncludeFiles" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Include files..." />
-                            <TextBox Name="textBoxIncludeFiles" Grid.Row="1" Grid.Column="0" Text="" AcceptsReturn="True" MaxHeight="92" />
+                            <TextBox Name="textBoxIncludeFiles" Grid.Row="1" Grid.Column="0" Text="" AcceptsReturn="True" MaxHeight="92" TabIndex="8" TextChanged="textBoxIncludeFiles_TextChanged" />
 
                             <!-- (Folders to include) -->
                             <Label Name="labelIncludeFolders" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Include folders..." />
-                            <TextBox Name="textBoxIncludeFolders" Grid.Row="1" Grid.Column="1" Text="" AcceptsReturn="True" MaxHeight="92"/>
+                            <TextBox Name="textBoxIncludeFolders" Grid.Row="1" Grid.Column="1" Text="" AcceptsReturn="True" MaxHeight="92" TabIndex="9" TextChanged="textBoxIncludeFolders_TextChanged" />
 
                         </Grid>
                     </TabItem>
-                    <TabItem  Name="tabItemExcludes" Header="Exclude filters">
+                    <TabItem  Name="tabItemExcludes">
+                    	<TabItem.Header>
+							<StackPanel Orientation="Horizontal">
+                                <Label Name="labelExcludeTabHeader">Exclude Items</Label><Label Foreground="Red" FontWeight="Bold">--</Label>
+							</StackPanel>             	
+						</TabItem.Header>
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -140,11 +164,11 @@
 
                             <!-- (Files to exclude) -->
                             <Label Name="labelExcludeFiles" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Exclude files..." />
-                            <TextBox Name="textBoxExcludeFiles" Grid.Row="1" Grid.Column="0" Text="" AcceptsReturn="True" MaxHeight="92" />
+                            <TextBox Name="textBoxExcludeFiles" Grid.Row="1" Grid.Column="0" Text="" AcceptsReturn="True" MaxHeight="92" TabIndex="10" TextChanged="textBoxExcludeFiles_TextChanged" />
 
                             <!-- (Folders to exclude) -->
                             <Label Name="labelExcludeFolders" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="Exclude folders..." />
-                            <TextBox Name="textBoxExcludeFolders" Grid.Row="1" Grid.Column="1" Text="" AcceptsReturn="True" MaxHeight="92" />
+                            <TextBox Name="textBoxExcludeFolders" Grid.Row="1" Grid.Column="1" Text=".svn" AcceptsReturn="True" MaxHeight="92" TabIndex="11" TextChanged="textBoxExcludeFolders_TextChanged" />
 
                         </Grid>
 
@@ -165,7 +189,7 @@
                             <RowDefinition Height="0.5*"  />
                         </Grid.RowDefinitions>
                         <GridSplitter Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="True" Height="5" />
-                        <ListView x:Name="listViewMatches" Grid.Column="0" Grid.Row="0" SelectionChanged="listViewMatches_SelectionChanged" MouseDoubleClick="listViewMatches_MouseDoubleClick" >
+                        <ListView x:Name="listViewMatches" Grid.Column="0" Grid.Row="0" SelectionChanged="listViewMatches_SelectionChanged" MouseDoubleClick="listViewMatches_MouseDoubleClick" TabIndex="12" >
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="500" Header="File" DisplayMemberBinding="{Binding ItemKey}" />
@@ -174,7 +198,7 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
-                        <ListView x:Name="listViewMatchesForSelection" Grid.Column="0" Grid.Row="2"  >
+                        <ListView x:Name="listViewMatchesForSelection" Grid.Column="0" Grid.Row="2" TabIndex="13"  >
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="Auto" Header="Line #" DisplayMemberBinding="{Binding MatchLineNumber}" />

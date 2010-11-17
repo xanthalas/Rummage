@@ -6,14 +6,14 @@ High
 
 persistence of searches
 Tabbed display to allow multiple searches (ideally simultaneously)
-
+Modify the search so the prepare is not called for subsequent searches when only the search strings have changed
 
 
 Medium
 ------
 Implement CTRL+Up/Down to jump to prev/next match in file pane
-
-
+Add pop-up history box which will show previous search paths and previous search strings which the user can click on to select for the new search
+Right-click menu on matching file view
 
 Low
 ---

@@ -28,12 +28,61 @@ namespace RummageFilesystem
                                                                    };
         #region Member variables
 
+        /// <summary>
+        /// Holds details of the containers to search. For the filesystem these containers are directories.
+        /// </summary>
+        private List<string> _searchContainers;
+
+        /// <summary>
+        /// Holds the strings used to match against item names to include those items in the search. For the filesystem these items are files.
+        /// </summary>
+        private List<string> _includeItemStrings;
+
+        /// <summary>
+        /// Holds the strings used to match against item names to exclude those items. For the filesystem these items are files.
+        /// </summary>
+        private List<string> _excludeItemStrings;
+
+        /// <summary>
+        /// Holds the strings used to match against container names to include those containers. For the filesystem these containers are directories.
+        /// </summary>
+        private List<string> _includeContainerStrings;
+
+        /// <summary>
+        /// Holds the strings used to match against container names to exclude those containers. For the filesystem these containers are directories.
+        /// </summary>
+        private List<string> _excludeContainerStrings;
+
+        /// <summary>
+        /// Indicates whether to seach hidden files and folders.
+        /// </summary>
+        private bool _searchHidden = false;
+
+        /// <summary>
+        /// Indicates whether to search binary items.
+        /// </summary>
+        private bool _searchBinaries = false;
+
+        /// <summary>
+        /// Indicates whether to descend into subdirectories.
+        /// </summary>
+        private bool _searchRecursively = true;
+
         public Guid SearchRequestId { get; private set; }
 
         /// <summary>
         /// Holds details of the containers to search. For the filesystem these containers are directories.
         /// </summary>
-        public List<string> SearchContainers { get; set; }
+        public List<string> SearchContainers
+        {
+            get { return _searchContainers;  }
+ 
+            set 
+            { 
+                _searchContainers = value;
+                _isPrepared = false;
+            }
+        }
 
         /// <summary>
         /// Holds the strings to search for.
@@ -43,22 +92,56 @@ namespace RummageFilesystem
         /// <summary>
         /// Holds the strings used to match against item names to include those items in the search. For the filesystem these items are files.
         /// </summary>
-        public List<string> IncludeItemStrings { get; set; }
+        public List<string> IncludeItemStrings
+        {
+            get { return _includeItemStrings; }
+            set 
+            { 
+                _includeItemStrings = value;
+                _isPrepared = false;
+            }
+        }
 
         /// <summary>
         /// Holds the strings used to match against item names to exclude those items. For the filesystem these items are files.
         /// </summary>
-        public List<string> ExcludeItemStrings { get; set; }
+        public List<string> ExcludeItemStrings
+        {
+            get { return _excludeItemStrings; }
+            set
+            {
+                _excludeItemStrings = value;
+                _isPrepared = false;
+            }
+        }
 
         /// <summary>
         /// Holds the strings used to match against container names to include those containers. For the filesystem these containers are directories.
         /// </summary>
-        public List<string> IncludeContainerStrings { get; set; }
+        public List<string> IncludeContainerStrings
+        {
+            get { return _includeContainerStrings; }
+            set
+            {
+                _includeContainerStrings = value;
+                _isPrepared = false;
+            }
+
+        }
 
         /// <summary>
         /// Holds the strings used to match against container names to exclude those containers. For the filesystem these containers are directories.
         /// </summary>
-        public List<string> ExcludeContainerStrings { get; set; }
+        public List<string> ExcludeContainerStrings
+        {
+            get { return _excludeContainerStrings; }
+            set
+            {
+                _excludeContainerStrings = value;
+                _isPrepared = false;
+            }
+
+        }
 
         /// <summary>
         /// Indicates whether the search should be case sensitive.
@@ -68,17 +151,41 @@ namespace RummageFilesystem
         /// <summary>
         /// Indicates whether to seach hidden files and folders.
         /// </summary>
-        public bool SearchHidden { get; set; }
+        public bool SearchHidden
+        {
+            get { return _searchHidden; }
+            set
+            {
+                _searchHidden = value;
+                _isPrepared = false;
+            }
+        }
 
         /// <summary>
         /// Indicates whether to search binary items.
         /// </summary>
-        public bool SearchBinaries { get; set; }
+        public bool SearchBinaries
+        {
+            get { return _searchBinaries; }
+            set
+            {
+                _searchBinaries = value;
+                _isPrepared = false;
+            }
+        }
 
         /// <summary>
         /// Indicates whether to descend into subdirectories.
         /// </summary>
-        public bool Recurse { get; set; }
+        public bool Recurse
+        {
+            get { return _searchRecursively; }
+            set
+            {
+                _searchRecursively = value;
+                _isPrepared = false;
+            }
+        }
 
         /// <summary>
         /// Indicates whether this Search Request is ready for the search process to begin
@@ -111,6 +218,130 @@ namespace RummageFilesystem
         /// Event raised when notifying progress
         /// </summary>
         public event NotifyProgressEventHandler NotifyProgress;
+
+        #endregion
+
+        #region Interface implementations
+
+        /// <summary>
+        ///  Add a container to search
+        /// </summary>
+        public void AddSearchContainer(string container)
+        {
+            if (!SearchContainers.Contains(container))
+            {
+                SearchContainers.Add(container);
+                _isPrepared = false;
+            }
+        }
+
+        /// <summary>
+        /// Add a string to search for.
+        /// </summary>
+        /// <remarks>Adding a search string does not change whether or not the search has been prepared</remarks>
+        public void AddSearchString(string searchString)
+        {
+            if (!SearchStrings.Contains(searchString))
+            {
+                SearchStrings.Add(searchString);
+            }
+        }
+
+        /// <summary>
+        /// Add an include string used to match against item names to include those items in the search.
+        /// </summary>
+        public void AddIncludeItemString(string includeItem)
+        {
+            if (!IncludeItemStrings.Contains(includeItem))
+            {
+                IncludeItemStrings.Add(includeItem);
+                _isPrepared = false;
+            }
+        }
+
+        /// <summary>
+        /// Add an exclude string used to match against item names to exclude those items.
+        /// </summary>
+        public void AddExcludeItemString(string excludeItem)
+        {
+            if (!ExcludeItemStrings.Contains(excludeItem))
+            {
+                ExcludeItemStrings.Add(excludeItem);
+                _isPrepared = false;
+            }
+        }
+
+        /// <summary>
+        /// Add an include string used to match against container names to include those containers.
+        /// </summary>
+        public void AddIncludeContainerString(string includeContainer)
+        {
+            if (!IncludeContainerStrings.Contains(includeContainer))
+            {
+                IncludeContainerStrings.Add(includeContainer);
+                _isPrepared = false;
+            }
+        }
+
+        /// <summary>
+        /// Add an exclude string used to match against container names to exclude those containers.
+        /// </summary>
+        public void AddExcludeContainerString(string excludeContainer)
+        {
+            if (!ExcludeContainerStrings.Contains(excludeContainer))
+            {
+                ExcludeContainerStrings.Add(excludeContainer);
+                _isPrepared = false;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the search should be case sensitive.
+        /// </summary>
+        public void SetCaseSensitive(bool caseSensitive)
+        {
+            if (CaseSensitive != caseSensitive)
+            {
+                CaseSensitive = caseSensitive;
+                _isPrepared = false;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether to search hidden items.
+        /// </summary>
+        public void SetSearchHidden(bool searchHidden)
+        {
+            if (SearchHidden != searchHidden)
+            {
+                SearchHidden = searchHidden;
+                _isPrepared = false;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether to search binary items.
+        /// </summary>
+        public void SetSearchBinaries(bool searchBinaries)
+        {
+            if (SearchBinaries != searchBinaries)
+            {
+                SearchBinaries = searchBinaries;
+                _isPrepared = false;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether to descend into subdirectories.
+        /// </summary>
+        public void SetRecurse(bool recurse)
+        {
+            if (Recurse != recurse)
+            {
+                Recurse = recurse;
+                _isPrepared = false;
+            }
+        }
 
         #endregion
 
@@ -291,6 +522,12 @@ namespace RummageFilesystem
                 log.Debug("Cannot find directory: " + directory);
                 return;     //If we can't access this directory then we'll just ignore it
             }
+            catch (PathTooLongException)
+            {
+                log.Debug("Path too long for .Net to handle: " + directory);
+                return;     //If we can't access this directory then we'll just ignore it
+            }
+
         }
 
         /// <summary>

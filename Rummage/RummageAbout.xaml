@@ -1,0 +1,17 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing" x:Class="Rummage.RummageAbout"
+        Title="About Rummage" Height="200" Width="400" Background="{x:Null}"
+        WindowStyle="None" AllowsTransparency="True"
+    >
+    <Grid>
+    	<ed:Callout AnchorPoint="0.5,0.54" CalloutStyle="RoundedRectangle" Fill="#FF9CC3E5" FontSize="16" Height="200" Stroke="Black" VerticalAlignment="Top" HorizontalAlignment="Left" Width="400" BorderBrush="#FF9CC3E5" BorderThickness="0">
+    		<StackPanel>
+    			<Label HorizontalAlignment="Center">Rummage v 0.1 (Development version)</Label>
+				<Label HorizontalAlignment="Center">Copyright (c) Xanthalas (www.xanthalas.co.uk)</Label>
+                <Button Name="Close" Click="Close_Click" MaxWidth="60" Background="LightGreen" Margin="0,30,0,0">Close</Button>
+			</StackPanel>  	
+		</ed:Callout>
+    </Grid>
+</Window>
