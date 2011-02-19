@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using FirebirdSql.Data.FirebirdClient;
-
+using RummageCore;
 
 namespace RummageIO
 {
@@ -39,6 +39,21 @@ namespace RummageIO
         /// <param name="connection">Connection string for the database</param>
         public DatabaseHandlerFirebird()
         {
+        }
+
+        /// <summary>
+        /// Returns the connection string for the database built from the parameters passed in
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <param name="databasePath"></param>
+        /// <returns></returns>
+        public override string BuildConnectionString(string server, string user, string password, string databasePath)
+        {
+            string connectionString = String.Format(@"Server={0};User={1};Password={2};Database={3}", server, user,password, databasePath);
+
+            return connectionString;
         }
 
         #region SQL-specific methods (as opposed to Rummage-specific methods)
@@ -146,15 +161,90 @@ namespace RummageIO
         /// <returns>The id of the container in the database</returns>
         public override int StoreContainer(string container, string type)
         {
-            FbCommand cmd = new FbCommand("INSERTCONTAINER");
-            cmd.CommandType = CommandType.StoredProcedure;
+            FbCommand cmd = new FbCommand("INSERTCONTAINER") { CommandType = CommandType.StoredProcedure };
 
-            cmd.Parameters.Add("containerURL", container.TrimEnd());
-            cmd.Parameters.Add("containerTypeCode", "DIR");
+            cmd.Parameters.Add("containerURL", container);
+            cmd.Parameters.Add("containerTypeCode", type);
 
-            int idOfAddedContainer = (int) this.ExecuteScalar(cmd);
+            int idOfAddedContainer = (int)this.ExecuteScalar(cmd);
 
             return idOfAddedContainer;
+        }
+
+        /// <summary>
+        /// Stores a search request.
+        /// </summary>
+        /// <param name="name">The name of the request</param>
+        /// <param name="request">The search request object holding the details of the search</param>
+        /// <param name="searchContainerType">The type of container to be searched</param>
+        /// <returns>The id of the search request just stored in the database</returns>
+        public override int StoreSearchRequest(string name, ISearchRequest request, SearchContainerType searchContainerType)
+        {
+            string type;
+
+            if (searchContainerType == SearchContainerType.Database)
+            {
+                type = "SQL";
+            }
+            else
+            {
+                type = "DIR";
+            }
+
+            FbCommand cmd = new FbCommand("INSERTSEARCHREQUEST") { CommandType = CommandType.StoredProcedure };
+
+            cmd.Parameters.Add("GUID", request.SearchRequestId.ToString());
+            cmd.Parameters.Add("NAME", name);
+            cmd.Parameters.Add("CASESENSITIVE", request.CaseSensitive);
+            cmd.Parameters.Add("SEARCHHIDDEN", request.SearchHidden);
+            cmd.Parameters.Add("SEARCHBINARIES", request.SearchBinaries);
+            cmd.Parameters.Add("RECURSE", request.Recurse);
+
+            int idOfAddedSearch = (int)this.ExecuteScalar(cmd);
+
+            //Now store the containers against this search
+            storeContainers(idOfAddedSearch, request, type);
+
+            return idOfAddedSearch;
+        }
+
+        /// <summary>
+        /// Store the containers which will be searched by this search request
+        /// </summary>
+        /// <param name="idOfAddedSearch">The Id of the newly added search request</param>
+        /// <param name="request">The search request we are storing</param>
+        private void storeContainers(int idOfAddedSearch, ISearchRequest request, string containerType)
+        {
+            using (FbCommand cmd = new FbCommand("INSERTSEARCHREQUESTCONTAINER") { CommandType = CommandType.StoredProcedure })
+            {
+                foreach (var container in request.SearchContainers)
+                {
+                    int containerId = StoreContainer(container, containerType);
+
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.Add("SEARCHREQUESTID", idOfAddedSearch);
+                    cmd.Parameters.Add("SEARCHCONTAINERID", containerId);
+
+                    this.ExecuteNoResult(cmd);
+                }
+            }
+
+        }
+
+
+        /// <summary>
+        /// Stores a new search term against a search request.
+        /// </summary>
+        /// <param name="requestId">Id of the search request to store the term against</param>
+        /// <param name="searchTerm">The search term to store</param>
+        public override void StoreSearchTerm(int requestId, string searchTerm)
+        {
+            FbCommand cmd = new FbCommand("INSERTSEARCHTERM") { CommandType = CommandType.StoredProcedure };
+
+            cmd.Parameters.Add("searchRequestId", requestId);
+            cmd.Parameters.Add("searchTerm", searchTerm);
+
+            this.ExecuteNoResult(cmd);
         }
 
         #region Private methods

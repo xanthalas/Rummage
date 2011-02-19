@@ -10,6 +10,11 @@ To create a new database
 
 2. Type: create database 'd:\code\Rummage\rummage.fdb';
 
+3. When installing a new firebird instance start up GSEC with user SYSDBA and password masterkey.
+   The type "add xanthalas -pw rummage"
+   This adds the user required by Rummage.
+
+
 There is no need to pass the user and password parameters to the create
 statement (as shown in the Firebird quickstart manual).
 

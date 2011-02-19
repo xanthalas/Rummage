@@ -42,6 +42,11 @@ namespace RummageFilesystem
         /// </summary>
         public event ItemSearchedEventHandler ItemSearched;
 
+        /// <summary>
+        /// The Database handler used to converse with the database.
+        /// </summary>
+        public IDatabaseHandler _databaseHandler { get; set; }
+
         #endregion
 
         /// <summary>
@@ -60,6 +65,15 @@ namespace RummageFilesystem
             ItemNumber = 0;
             SearchId = Guid.NewGuid();
             this.cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        /// <summary>
+        /// Create a new SearchFilesystem object
+        /// </summary>
+        public SearchFilesystem(IDatabaseHandler databaseHandler) 
+            : this()
+        {
+            _databaseHandler = databaseHandler;
         }
 
         /// <summary>
@@ -83,6 +97,9 @@ namespace RummageFilesystem
             {
                 regexes.AddRange(searchRequestFilesystem.SearchStrings.Select(searchString => new RE.Regex(searchString, RegexOptions.IgnoreCase)));                
             }
+
+            //Before kicking off the search we will save it to the database
+            SaveSearchRequest(SearchRequest, SearchContainerType.Filesystem);
 
             cancellationToken = this.cancellationTokenSource.Token;
             progressReporter = new ProgressReporter();
@@ -268,7 +285,21 @@ namespace RummageFilesystem
             cancellationTokenSource.Cancel();
         }
 
+        /// <summary>
+        /// Save the details of the Search Request.
+        /// </summary>
+        /// <param name="searchRequest">The Search Request to save</param>
+        /// <param name="searchContainerType">The type of container being searched</param>
+        /// <returns>The id of the request which was just stored</returns>
+        public int SaveSearchRequest(ISearchRequest searchRequest, SearchContainerType searchContainerType)
+        {
+            if (_databaseHandler == null)
+            {
+                return -1;      //Quit if there is no database to write to
+            }
 
+            return _databaseHandler.StoreSearchRequest(string.Format("Search on {0} at {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString()), searchRequest,searchContainerType);
+        }
 
     }
 }

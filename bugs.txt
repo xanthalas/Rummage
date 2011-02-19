@@ -1,0 +1,2 @@
+0001: Incorrectly specified regex in file filter box (and possibly other filter boxes) causes crash.
+

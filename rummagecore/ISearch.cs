@@ -29,6 +29,7 @@ namespace RummageCore
         /// </summary>
         int ItemNumber { get; set; }
 
+
         /// <summary>
         /// Executes the search
         /// </summary>
@@ -54,5 +55,13 @@ namespace RummageCore
         /// Cancel the search which is running
         /// </summary>
         void CancelSearch();
+
+        /// <summary>
+        /// Save the details of the Search Request.
+        /// </summary>
+        /// <param name="searchRequest">The Search Request to save</param>
+        /// <param name="searchContainerType">The type of container being searched</param>
+        /// <returns>The id of the request which was just stored</returns>
+        int SaveSearchRequest(ISearchRequest searchRequest, SearchContainerType searchContainerType);
     }
 }

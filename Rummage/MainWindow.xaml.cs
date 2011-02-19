@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using RummageCore;
 using RummageFilesystem;
+using RummageIO;
 using Snarl;
 using Application = System.Windows.Application;
 
@@ -25,7 +26,11 @@ namespace Rummage
     /// </summary>
     public partial class MainWindow : Window
     {
-        
+        /// <summary>
+        /// The name of the ini file
+        /// </summary>
+        private const string INI_FILE = @"\Rummage.ini";
+
         /// <summary>
         /// Used to indicate to the running tasks that a cancellation has been requested
         /// </summary>
@@ -81,6 +86,8 @@ namespace Rummage
         private bool _binariesChanged = false;
         private bool _caseSensitivityChanged = false;
 
+        private IDatabaseHandler _databaseHandler;
+
         /// <summary>
         /// Main entry point to the program
         /// </summary>
@@ -94,6 +101,9 @@ namespace Rummage
             this.Closed += new EventHandler(MainWindow_Closed);
 
             setChangedStatus(true);     //Initially set the changed status to true to ensure that all initial selections are captured
+
+            readIniFile();
+
 //            loadTheme("XXX");
         }
 
@@ -101,6 +111,85 @@ namespace Rummage
         {
             SnarlConnector.RevokeConfig((IntPtr) snarlHandle);
         }
+
+        /// <summary>
+        /// Read startup parameters from the ini file
+        /// </summary>
+        private void readIniFile()
+        {
+            string iniFile = Path.Combine(Environment.CurrentDirectory + INI_FILE);
+
+            if (!File.Exists(iniFile))
+            {
+                return;
+            }
+
+            using (StreamReader reader = new StreamReader(iniFile))
+            {
+                string line;
+                string databaseType = string.Empty;
+                string databasePath = string.Empty;
+                string server = string.Empty;
+                string user = string.Empty;
+                string password = string.Empty;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Length > 13 && line.Substring(0, 13) == "DatabaseType=")
+                    {
+                        databaseType = line.Substring(13);
+                    }
+
+                    if (line.Length > 7 && line.Substring(0, 7) == "Server=")
+                    {
+                        server = line.Substring(7);
+                    }
+
+                    if (line.Length > 5 && line.Substring(0, 5) == "User=")
+                    {
+                        user = line.Substring(5);
+                    }
+
+                    if (line.Length > 9 && line.Substring(0, 9) == "Password=")
+                    {
+                        password = line.Substring(9);
+                    }
+
+                    if (line.Length > 13 && line.Substring(0, 13) == "DatabaseFile=")
+                    {
+                        databasePath = line.Substring(13);
+                        if (!databasePath.Contains(@"\"))
+                        {
+                            databasePath = Path.Combine(Environment.CurrentDirectory, databasePath);
+                        }
+                    }
+                }
+
+                reader.Close();
+
+                if (databasePath.Length > 0 && File.Exists(databasePath))
+                {
+                    openDatabase(databaseType, server, user, password, databasePath);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Open the database whose details are passed in.
+        /// </summary>
+        /// <param name="databasePath">Full path to the database file</param>
+        /// <param name="databaseType">Database type</param>
+        private void openDatabase(string databaseType, string server, string user, string password, string databasePath)
+        {
+            _databaseHandler = DatabaseHandler.GetHandler(databaseType);
+
+            if (_databaseHandler != null)
+            {
+                string connectionString = _databaseHandler.BuildConnectionString(server, user, password, databasePath);
+                _databaseHandler.OpenConnection(connectionString);
+            }
+        }
+
 
         /// <summary>
         /// Builds the Search Request, prepares it and then executes it
@@ -216,7 +305,7 @@ namespace Rummage
             searchRequest.SetSearchBinaries(chkBinaries.IsChecked.Value);
             searchRequest.NotifyProgress += new NotifyProgressEventHandler(searchRequest_NotifyProgress);
                 
-            search = new SearchFilesystem();
+            search = new SearchFilesystem(_databaseHandler);
             search.ItemSearched += new ItemSearchedEventHandler(search_ItemSearched);
 
             searchRunning = true;
@@ -459,7 +548,7 @@ namespace Rummage
 
         }
 
-        private void updateProgressBar(int x, int ofY, string processName)
+        private void updateProgressBar(int x, int ofY, string processName, string item, bool showProgressBar)
         {
             // Checking if this thread has access to the object.
             if (runningProgress.Dispatcher.CheckAccess())
@@ -473,7 +562,8 @@ namespace Rummage
                 }
                 else
                 {
-                    searchingX.Text = processName + " file " + x.ToString() + " ";
+                    searchingX.Text = String.Format("{0} {1} {2}", processName, item, x.ToString());
+                    //searchingX.Text = processName + " file " + x.ToString() + " ";
                 }
                 if (ofY == 0)
                 {
@@ -483,6 +573,8 @@ namespace Rummage
                 {
                     searchingOfY.Text = "of " + ofY.ToString();
                 }
+
+                runningProgress.Visibility = (showProgressBar ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden);
             }
             else
             {
@@ -493,7 +585,8 @@ namespace Rummage
                                  {
                                      runningProgress.Value = x;
                                      runningProgress.Maximum = ofY;
-                                     searchingX.Text = processName + " file " + x.ToString() + " ";
+                                     searchingX.Text = String.Format("{0} {1} {2}", processName, item, x.ToString());
+                                     //searchingX.Text = processName + " file " + x.ToString() + " ";
                                      if (ofY == 0)
                                      {
                                          searchingOfY.Text = string.Empty;
@@ -502,6 +595,8 @@ namespace Rummage
                                      {
                                          searchingOfY.Text = "of " + ofY.ToString();
                                      }
+
+                                     runningProgress.Visibility = (showProgressBar ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden);
                                  }));
             }
 
@@ -796,7 +891,7 @@ namespace Rummage
 
             cancellingSearch = true;
             btnStart.Content = "_Start Search";
-            updateProgressBar(0, 0, string.Empty);
+            updateProgressBar(0, 0, string.Empty, string.Empty, false);
         }
 
         /// <summary>
@@ -833,7 +928,7 @@ namespace Rummage
             var iea = e as ItemSearchedEventArgs;
             if (iea != null)
             {
-                updateProgressBar(iea.FileX, iea.FileOfY, "Searching");
+                updateProgressBar(iea.FileX, iea.FileOfY, "Searching", "file", true);
 
                 foreach (IMatch match in iea.Matches)
                 {
@@ -869,7 +964,7 @@ namespace Rummage
 
             if (nea != null)
             {
-                updateProgressBar(nea.NumberOfFilesScanned, 0, "Examining");
+                updateProgressBar(nea.NumberOfFilesScanned, 0, "Examining", "filenames", false);
             }
         }
 

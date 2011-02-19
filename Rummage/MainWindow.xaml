@@ -12,7 +12,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="4*"/>
+                            <ColumnDefinition Width="3*"/>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -103,7 +103,7 @@
                             <Button Name="Browse"  Grid.Row="0" Grid.Column="1" Click="Browse_Click" TabIndex="7">Browse...</Button>
                         </Grid>
                     </Border>
-                    <TextBox Name="textBoxFolders"  Grid.Row="1" Grid.Column="1" MaxHeight="90" Text="d:\wip\Autumn2010" AcceptsReturn="True" TextChanged="textBoxFolders_TextChanged" VerticalScrollBarVisibility="Auto" TabIndex="1" Opacity="0.8"/>
+                    <TextBox Name="textBoxFolders"  Grid.Row="1" Grid.Column="1" MaxHeight="90" Text="" AcceptsReturn="True" TextChanged="textBoxFolders_TextChanged" VerticalScrollBarVisibility="Auto" TabIndex="1" Opacity="0.8"/>
                     
                     <Border Grid.Column="0" Grid.Row="2" BorderBrush="Gray" BorderThickness="0,1,0,0" />
                     <Border Grid.Column="1" Grid.Row="2" BorderBrush="Gray" BorderThickness="0,1,0,0" />

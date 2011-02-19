@@ -19,8 +19,8 @@ Low
 ---
 
 Right-click menu on Include/Exclude includes common filter patterns which user can add
-
-
+Highlight the "Include Items" and "Exclude Items" tabs in some way to indicate when there are filters present.
+Remove the watermark under the search boxes when it is going to be covered by the text to ensure the text is easily readable.
 
 
 
