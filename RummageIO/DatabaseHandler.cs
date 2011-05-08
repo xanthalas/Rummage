@@ -86,8 +86,8 @@ namespace RummageIO
         /// Stores a new search term against a search request.
         /// </summary>
         /// <param name="requestId">Id of the search request to store the term against</param>
-        /// <param name="searchTerm">The search term to store</param>
-        public abstract void StoreSearchTerm(int requestId, string searchTerm);
+        /// <param name="searchTermId">Id of the search term to store against this request</param>
+        public abstract void StoreSearchTermAgainstRequest(int requestId, int searchTermId);
 
 
         #region Static methods

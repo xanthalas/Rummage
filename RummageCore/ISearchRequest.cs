@@ -14,6 +14,11 @@ namespace RummageCore
         #region Member variables
 
         /// <summary>
+        /// Identifier for this search request as provided by storage system.
+        /// </summary>
+        int Id { get; set; }
+
+        /// <summary>
         /// Unique identifier for this search request
         /// </summary>
         Guid SearchRequestId { get; }

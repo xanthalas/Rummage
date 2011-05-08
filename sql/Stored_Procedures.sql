@@ -138,7 +138,7 @@ SET TERM ; ^
 --* Author: Xanthalas                                       Date: December 2010                   *
 --* Name:   INSERTSEARCHREQUESTCONTAINER                                                          *
 --*                                                                                               *
---* Stored Procedure which links a search term to a search request.                               *
+--* Stored Procedure which links a search container to a search request.                          *
 --*************************************************************************************************
 SET TERM ^ ;
 
@@ -154,4 +154,26 @@ end^
     execute procedure INSERTSEARCHREQUESTCONTAINER 1, 1;
 
 */
+SET TERM ; ^
+--*************************************************************************************************
+--* System: Rummage                                         Type: Firebird SQL                    *
+--* Author: Xanthalas                                       Date: February 2011                   *
+--* Name:   INSERTSEARCHREQUESTTERM                                                               *
+--*                                                                                               *
+--* Stored Procedure which links a search term to a search request.                               *
+--*************************************************************************************************
+SET TERM ^ ;
+create procedure InsertSearchRequestTerm (searchRequestId Integer, searchTermId Integer)
+
+as
+
+begin
+        insert into SEARCH_REQUEST_TERM (search_request_id, search_term_id)
+                        values (:searchRequestId, :searchTermId);
+end^
+
+/* Test command:
+    execute procedure INSERTSEARCHREQUESTTERM 1, 1;
+*/
+
 SET TERM ; ^

@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
+using RummageFilesystem;
 using RummageIO;
 using RummageCore;
 using System.Data;
+using Microsoft.Practices.Unity;
 
 namespace RummageIOTest
 {
@@ -24,11 +26,16 @@ namespace RummageIOTest
 
         private string constructedConnectionString;
 
+        private IUnityContainer _container;
 
         [SetUp]
         private void setup()
         {
             constructedConnectionString = string.Format(CONNECTION_STRING, System.Environment.CurrentDirectory);
+
+            _container = new UnityContainer();
+
+            _container.RegisterType<ISearchRequest, SearchRequestFilesystem>();
         }
 
         [Test]
@@ -136,29 +143,21 @@ namespace RummageIOTest
          */
 
         [Test]
-        public void TestStoreSearchTerm()
+        public void StoreSearchRequestAndTerms()
         {
-            //TODO Re-enable these tests once a mocking framework is in place to mock SearchRequest objects
-            /*
+
             DatabaseHandler handler = DatabaseHandler.GetHandler("Firebird");
             handler.OpenConnection(constructedConnectionString);
 
             Assert.AreEqual("Open", handler.Status);
-            //Add the first request
 
-            var idOfAddedRequest = handler.StoreSearchRequest("Request 1");
-            Assert.AreEqual(1, idOfAddedRequest);
-
-            //Add a second request
-            idOfAddedRequest = handler.StoreSearchRequest("Request 2");
-            Assert.AreEqual(2, idOfAddedRequest);
-
-            //Add another request with the same name as the first - this is fine.
-            idOfAddedRequest = handler.StoreSearchRequest("Request 1");
-            Assert.AreEqual(3, idOfAddedRequest);
+            var request = _container.Resolve<ISearchRequest>();
+            request.SearchStrings.Add("Search Term 1");
+            request.SearchStrings.Add("Search Term 2");
+            request.Id = handler.StoreSearchRequest("Request for TestStoreSearchTermAgainstRequest", request,
+                                       SearchContainerType.Filesystem);
 
             handler.CloseConnection();
-             */
         }
         /*
         [Test]

@@ -56,6 +56,21 @@ namespace RummageIO
             return connectionString;
         }
 
+        /// <summary>
+        /// Links a stored search term to a search request
+        /// </summary>
+        /// <param name="requestId">Id of the search request to which this term will be attached</param>
+        /// <param name="searchTermId">Id of the search term to be stored against this request</param>
+        public override void StoreSearchTermAgainstRequest(int requestId, int searchTermId)
+        {
+            using (FbCommand cmd = new FbCommand("INSERTSEARCHREQUESTTERM") { CommandType = CommandType.StoredProcedure })
+            {
+                cmd.Parameters.Add("SEARCHREQUESTID", requestId);
+                cmd.Parameters.Add("SEARCHTERMID", searchTermId);
+                this.ExecuteNoResult(cmd);
+            }
+        }
+
         #region SQL-specific methods (as opposed to Rummage-specific methods)
 
         /// <summary>
@@ -172,7 +187,7 @@ namespace RummageIO
         }
 
         /// <summary>
-        /// Stores a search request.
+        /// Stores an entire search request, including all search locations, terms, etc.
         /// </summary>
         /// <param name="name">The name of the request</param>
         /// <param name="request">The search request object holding the details of the search</param>
@@ -200,20 +215,54 @@ namespace RummageIO
             cmd.Parameters.Add("SEARCHBINARIES", request.SearchBinaries);
             cmd.Parameters.Add("RECURSE", request.Recurse);
 
-            int idOfAddedSearch = (int)this.ExecuteScalar(cmd);
+            request.Id = (int)this.ExecuteScalar(cmd);
 
             //Now store the containers against this search
-            storeContainers(idOfAddedSearch, request, type);
+            storeContainers(request, type);
 
-            return idOfAddedSearch;
+            //Next store the search terms for this search
+            storeSearchTerms(request);
+
+            return request.Id;
+        }
+
+        /// <summary>
+        /// Stores all the search terms for a request
+        /// </summary>
+        /// <param name="request"></param>
+        private void storeSearchTerms(ISearchRequest request)
+        {
+            foreach (string searchTerm in request.SearchStrings)
+            {
+                int newTermId = StoreSearchTerm(searchTerm);
+
+                StoreSearchTermAgainstRequest(request.Id, newTermId);
+            }
+        }
+
+        /// <summary>
+        /// Stores a search term and returns it's id, or simply returns the existing id if the search term is already present
+        /// </summary>
+        /// <param name="searchTerm"></param>
+        /// <returns></returns>
+        public int StoreSearchTerm(string searchTerm)
+        {
+            int termId = -1;
+
+            using (FbCommand cmd = new FbCommand("INSERTSEARCHTERM") { CommandType = CommandType.StoredProcedure })
+            {
+                    cmd.Parameters.Add("SEARCHTERM", searchTerm);
+                    termId = (int)this.ExecuteScalar(cmd);
+            }
+
+            return termId;
         }
 
         /// <summary>
         /// Store the containers which will be searched by this search request
         /// </summary>
-        /// <param name="idOfAddedSearch">The Id of the newly added search request</param>
         /// <param name="request">The search request we are storing</param>
-        private void storeContainers(int idOfAddedSearch, ISearchRequest request, string containerType)
+        private void storeContainers(ISearchRequest request, string containerType)
         {
             using (FbCommand cmd = new FbCommand("INSERTSEARCHREQUESTCONTAINER") { CommandType = CommandType.StoredProcedure })
             {
@@ -222,29 +271,13 @@ namespace RummageIO
                     int containerId = StoreContainer(container, containerType);
 
                     cmd.Parameters.Clear();
-                    cmd.Parameters.Add("SEARCHREQUESTID", idOfAddedSearch);
+                    cmd.Parameters.Add("SEARCHREQUESTID", request.Id);
                     cmd.Parameters.Add("SEARCHCONTAINERID", containerId);
 
                     this.ExecuteNoResult(cmd);
                 }
             }
 
-        }
-
-
-        /// <summary>
-        /// Stores a new search term against a search request.
-        /// </summary>
-        /// <param name="requestId">Id of the search request to store the term against</param>
-        /// <param name="searchTerm">The search term to store</param>
-        public override void StoreSearchTerm(int requestId, string searchTerm)
-        {
-            FbCommand cmd = new FbCommand("INSERTSEARCHTERM") { CommandType = CommandType.StoredProcedure };
-
-            cmd.Parameters.Add("searchRequestId", requestId);
-            cmd.Parameters.Add("searchTerm", searchTerm);
-
-            this.ExecuteNoResult(cmd);
         }
 
         #region Private methods

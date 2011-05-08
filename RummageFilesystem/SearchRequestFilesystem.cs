@@ -68,6 +68,11 @@ namespace RummageFilesystem
         /// </summary>
         private bool _searchRecursively = true;
 
+        /// <summary>
+        /// Identifier for this search request as provided by storage system.
+        /// </summary>
+        public int Id { get; set; }
+
         public Guid SearchRequestId { get; private set; }
 
         /// <summary>
@@ -350,6 +355,7 @@ namespace RummageFilesystem
         /// </summary>
         public SearchRequestFilesystem()
         {
+            Id = -1;    //Until this request is stored this Id is not required and so is set to a default
             SearchRequestId = Guid.NewGuid();
             SearchContainers = new List<string>();
             SearchStrings = new List<string>();

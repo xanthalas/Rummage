@@ -80,10 +80,10 @@ namespace RummageCore
         string BuildConnectionString(string server, string user, string password, string databasePath);
 
         /// <summary>
-        /// Stores a new search term against a search request.
+        /// Links a stored search term to a search request
         /// </summary>
-        /// <param name="requestId">Id of the search request to store the term against</param>
-        /// <param name="searchTerm">The search term to store</param>
-        void StoreSearchTerm(int requestId, string searchTerm);
+        /// <param name="requestId">Id of the search request to which this term will be attached</param>
+        /// <param name="searchTermId">Id of the search term to be stored against this request</param>
+        void StoreSearchTermAgainstRequest(int requestId, int searchTermId);
     }
 }
