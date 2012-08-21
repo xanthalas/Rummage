@@ -29,7 +29,7 @@ namespace Rummage
         /// <summary>
         /// The name of the ini file
         /// </summary>
-        private const string INI_FILE = @"\Rummage.ini";
+        private const string INI_FILE = "Rummage.ini";
 
         /// <summary>
         /// Used to indicate to the running tasks that a cancellation has been requested
@@ -90,6 +90,10 @@ namespace Rummage
 
         private HistoryPopup folderHistoryWindow;
 
+        private string editor = "notepad.exe";
+
+        private string editorArguments = string.Empty;
+
         /// <summary>
         /// Main entry point to the program
         /// </summary>
@@ -147,13 +151,26 @@ namespace Rummage
         /// </summary>
         private void readIniFile()
         {
-            // ########## Currently there are no startup parameters so this doesn't do anything for now #########
-            /*
-            string iniFile = Path.Combine(Environment.CurrentDirectory + INI_FILE);
+            string iniFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), INI_FILE);
 
             if (!File.Exists(iniFile))
             {
-                return;
+                //If it doesn't exist then we'll create it
+                try
+                {
+                    using (StreamWriter sw = new StreamWriter(iniFile))
+                    {
+                        sw.WriteLine("#This is the ini file for the Rummage search tool.");
+                        sw.WriteLine(@"editor=notepad.exe");
+                        sw.WriteLine(@"editorargs=+");
+                        sw.Close();
+                    }
+                }
+                catch (IOException)
+                {
+                    //If it doesn't exist and we can't create it then we'll manage without
+                    return;
+                }
             }
 
             using (StreamReader reader = new StreamReader(iniFile))
@@ -164,15 +181,20 @@ namespace Rummage
                 while ((line = reader.ReadLine()) != null)
                 {
 
-                    if (line.Length > 13 && line.Substring(0, 13) == "whatever-we-need=")
+                    if (line.Length > 7 && line.Substring(0, 7) == "editor=")
                     {
-                        setting = line.Substring(13);
+                        editor = line.Substring(7);
                     }
+
+                    if (line.Length > 11 && line.Substring(0, 11) == "editorargs=")
+                    {
+                        editorArguments = line.Substring(11);
+                    }
+                    
                 }
 
                 reader.Close();
             }
-             */
         }
 
         /// <summary>
@@ -1014,34 +1036,21 @@ namespace Rummage
 
                 if (selectedItem != null)
                 {
-                    string editor = "notepad.exe";
-
-                    try
-                    {
-                        TextReader reader = new StreamReader("editor.cfg");
-                        string line = null;
-
-                        line = reader.ReadLine();
-
-                        if (line != null && line.Length > 1)
-                        {
-                            editor = line;
-                        }
-                        
-                    }
-                    catch (Exception)
-                    {
-                        // Do nothing. If we can't determine which editor the user wants to use then we'll just use notepad
-                    }
-                    //ProcessStartInfo procStartInfo = new ProcessStartInfo(@"c:\vim\vim73\gvim.exe");
-                    ProcessStartInfo procStartInfo = new ProcessStartInfo(editor);
-                    procStartInfo.Arguments = @"""" + selectedItem.ItemKey + @"""";
-                    procStartInfo.CreateNoWindow = true;
-                    procStartInfo.UseShellExecute = true;
-                    Process.Start(procStartInfo);
+                    string arguments = @"""" + selectedItem.ItemKey + @"""";
+                    StartEditor(arguments);
                 }
             }
 
+        }
+
+        private void StartEditor(string arguments)
+        {
+            ProcessStartInfo procStartInfo = new ProcessStartInfo(editor);
+            procStartInfo.Arguments = arguments;
+
+            procStartInfo.CreateNoWindow = true;
+            procStartInfo.UseShellExecute = true;
+            Process.Start(procStartInfo);
         }
 
         /// <summary>
@@ -1137,6 +1146,33 @@ namespace Rummage
                 textBoxSearchStrings.Text = textBoxSearchStrings.Text.Trim();
             }
 
+        }
+
+        private void listViewMatchesForSelection_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (listViewMatches.SelectedItem != null)
+            {
+                MatchingItem selectedItem = listViewMatches.SelectedItem as MatchingItem;
+                if (listViewMatchesForSelection.SelectedItem != null)
+                {
+                    var match = listViewMatchesForSelection.SelectedItem as RummageCore.Match;
+                    if (match != null)
+                    {
+                        int lineNumber = match.MatchLineNumber;
+
+                        if (selectedItem != null)
+                        {
+                            string arguments = @"""" + selectedItem.ItemKey + @"""";
+                            if (editorArguments.Length > 0)
+                            {
+                                arguments = arguments + " " + editorArguments + lineNumber.ToString();
+                            }
+                            StartEditor(arguments);
+                        }
+
+                    }
+            }
+            }
         }
 
     }
