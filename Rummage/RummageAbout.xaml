@@ -6,10 +6,11 @@
         WindowStyle="None" AllowsTransparency="True"
     >
     <Grid>
-    	<ed:Callout AnchorPoint="0.5,0.54" CalloutStyle="RoundedRectangle" Fill="#FF9CC3E5" FontSize="16" Height="200" Stroke="Black" VerticalAlignment="Top" HorizontalAlignment="Left" Width="400" BorderBrush="#FF9CC3E5" BorderThickness="0">
+    	<ed:Callout AnchorPoint="0.5,0.54" CalloutStyle="RoundedRectangle" Fill="White" FontSize="16" Height="200" Stroke="Black" VerticalAlignment="Top" HorizontalAlignment="Left" Width="400" BorderBrush="#FF9CC3E5" BorderThickness="0">
     		<StackPanel>
     			<Label HorizontalAlignment="Center">Rummage v 0.1 (Development version)</Label>
 				<Label HorizontalAlignment="Center">Copyright (c) Xanthalas (www.xanthalas.co.uk)</Label>
+                <Label HorizontalAlignment="Center">Released under the GNU Public license</Label>
                 <Button Name="close" Click="close_Click" MaxWidth="60" Background="LightGreen" Margin="0,30,0,0">Close</Button>
 			</StackPanel>  	
 		</ed:Callout>

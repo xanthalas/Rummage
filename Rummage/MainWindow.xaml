@@ -77,22 +77,21 @@
                     </Grid.ColumnDefinitions>
 					<Menu Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left">
 						<MenuItem Header="File">
-                            <MenuItem Name="MainMenuFileSearchHistory"  Header="Search History" Click="MainMenuFileSearchHistory_Click"></MenuItem>
+                            <!--<MenuItem Name="MainMenuFileSearchHistory"  Header="Search History" Click="MainMenuFileSearchHistory_Click"></MenuItem>-->
                             <MenuItem Header="Exit" Click="MenuItem_Click"></MenuItem>
 						</MenuItem>
-						<MenuItem Header="Options"></MenuItem>
 						<MenuItem Header="Help">
 							<MenuItem Name="MainMenuHelpAbout" Header="About" Click="MainMenuHelpAbout_Click"></MenuItem>
 						</MenuItem>
 					</Menu>
                     <!-- Column 1 (Search for) -->
-					<Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Search for ...</Label>
+					<Label Name="lblSearchFor" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Search for ...</Label>
                     <Border Grid.Column="0" Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,0">
                         <TextBox Name="textBoxSearchStrings" Grid.Row="1" Grid.Column="0" MaxHeight="90" Text="" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextChanged="textBoxSearchStrings_TextChanged" TabIndex="0" Opacity="0.8" />
                     </Border>
                     <Button Name="btnSearchHistory" Grid.Row="1" Grid.Column="0" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="right" Click="btnSearchHistory_Click">=</Button>
                     <!-- Column 2 (Where to search) -->
-					<Label Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Search here ...</Label>
+					<Label Name="lblSearchHere"  Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Search where ...</Label>
                     <Border Grid.Column="1" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,0,1">
                         <Grid>
                             <Grid.RowDefinitions>

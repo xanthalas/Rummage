@@ -968,6 +968,15 @@ namespace Rummage
         {
             enableDisableSearchButton();
             _foldersChanged = true;
+
+            if (textBoxFolders.LineCount > 2)
+            {
+                lblSearchHere.Content = string.Empty;
+            }
+            else
+            {
+                lblSearchHere.Content = "Search where ...";
+            }
         }
 
         void searchRequest_NotifyProgress(object sender, EventArgs e)
@@ -985,6 +994,15 @@ namespace Rummage
         {
             enableDisableSearchButton();
             _searchStringsChanged = true;
+
+            if (textBoxSearchStrings.LineCount > 2)
+            {
+                lblSearchFor.Content = string.Empty;
+            }
+            else
+            {
+                lblSearchFor.Content = "Search for ...";
+            }
         }
 
 

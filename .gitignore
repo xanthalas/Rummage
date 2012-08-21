@@ -8,3 +8,4 @@ _ReSharper.Rummage
 *.vs10x
 *.sln.docstates
 *typemock*
+*.user
