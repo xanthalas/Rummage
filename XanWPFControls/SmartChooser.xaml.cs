@@ -201,7 +201,6 @@ namespace XanWPFControls
         /// <param name="e"></param>
         private void filter_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string filterText;
             generateFilteredList(filter.Text.Trim());
         }
 

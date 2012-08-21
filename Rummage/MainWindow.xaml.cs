@@ -16,7 +16,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using RummageCore;
 using RummageFilesystem;
-using RummageIO;
 using Snarl;
 using Application = System.Windows.Application;
 
@@ -87,8 +86,6 @@ namespace Rummage
         private bool _binariesChanged = false;
         private bool _caseSensitivityChanged = false;
 
-        private IDatabaseHandler _databaseHandler;
-
         private HistoryPopup searchHistoryWindow;
 
         private HistoryPopup folderHistoryWindow;
@@ -150,6 +147,8 @@ namespace Rummage
         /// </summary>
         private void readIniFile()
         {
+            // ########## Currently there are no startup parameters so this doesn't do anything for now #########
+            /*
             string iniFile = Path.Combine(Environment.CurrentDirectory + INI_FILE);
 
             if (!File.Exists(iniFile))
@@ -160,71 +159,21 @@ namespace Rummage
             using (StreamReader reader = new StreamReader(iniFile))
             {
                 string line;
-                string databaseType = string.Empty;
-                string databasePath = string.Empty;
-                string server = string.Empty;
-                string user = string.Empty;
-                string password = string.Empty;
+                string setting = string.Empty;
 
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (line.Length > 13 && line.Substring(0, 13) == "DatabaseType=")
-                    {
-                        databaseType = line.Substring(13);
-                    }
 
-                    if (line.Length > 7 && line.Substring(0, 7) == "Server=")
+                    if (line.Length > 13 && line.Substring(0, 13) == "whatever-we-need=")
                     {
-                        server = line.Substring(7);
-                    }
-
-                    if (line.Length > 5 && line.Substring(0, 5) == "User=")
-                    {
-                        user = line.Substring(5);
-                    }
-
-                    if (line.Length > 9 && line.Substring(0, 9) == "Password=")
-                    {
-                        password = line.Substring(9);
-                    }
-
-                    if (line.Length > 13 && line.Substring(0, 13) == "DatabaseFile=")
-                    {
-                        databasePath = line.Substring(13);
-                        if (!databasePath.Contains(@"\"))
-                        {
-                            databasePath = Path.Combine(Environment.CurrentDirectory, databasePath);
-                        }
+                        setting = line.Substring(13);
                     }
                 }
 
                 reader.Close();
-
-                if (databasePath.Length > 0 && File.Exists(databasePath))
-                {
-                    openDatabase(databaseType, server, user, password, databasePath);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Open the database whose details are passed in.
-        /// </summary>
-        /// <param name="databasePath">Full path to the database file</param>
-        /// <param name="databaseType">Database type</param>
-        private void openDatabase(string databaseType, string server, string user, string password, string databasePath)
-        {
-            /*
-            _databaseHandler = DatabaseHandler.GetHandler(databaseType);
-
-            if (_databaseHandler != null)
-            {
-                string connectionString = _databaseHandler.BuildConnectionString(server, user, password, databasePath);
-                _databaseHandler.OpenConnection(connectionString);
             }
              */
         }
-
 
         /// <summary>
         /// Builds the Search Request, prepares it and then executes it
@@ -350,7 +299,7 @@ namespace Rummage
             searchRequest.SetSearchBinaries(chkBinaries.IsChecked.Value);
             searchRequest.NotifyProgress += new NotifyProgressEventHandler(searchRequest_NotifyProgress);
                 
-            search = new SearchFilesystem(_databaseHandler);
+            search = new SearchFilesystem();
             search.ItemSearched += new ItemSearchedEventHandler(search_ItemSearched);
 
             searchRunning = true;

@@ -10,7 +10,7 @@
     		<StackPanel>
     			<Label HorizontalAlignment="Center">Rummage v 0.1 (Development version)</Label>
 				<Label HorizontalAlignment="Center">Copyright (c) Xanthalas (www.xanthalas.co.uk)</Label>
-                <Button Name="Close" Click="Close_Click" MaxWidth="60" Background="LightGreen" Margin="0,30,0,0">Close</Button>
+                <Button Name="close" Click="close_Click" MaxWidth="60" Background="LightGreen" Margin="0,30,0,0">Close</Button>
 			</StackPanel>  	
 		</ed:Callout>
     </Grid>

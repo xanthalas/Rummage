@@ -195,11 +195,6 @@ namespace RummageFilesystem
         }
 
         /// <summary>
-        /// Indicates whether this Search Request is ready for the search process to begin
-        /// </summary>
-        private bool _isSearchReady = false;
-
-        /// <summary>
         /// This list holds all the URLs (in this provider these are filenames (including paths)) to search
         /// </summary>
         private List<String> _urlToSearch;
@@ -575,8 +570,6 @@ namespace RummageFilesystem
 
             if (ExcludeItemStrings.Count > 0)
             {
-                bool excludeFound = false;
-
                 foreach (string exclString in ExcludeItemStrings)
                 {
                     System.Text.RegularExpressions.Match m = Regex.Match(filename, exclString);
@@ -660,7 +653,7 @@ namespace RummageFilesystem
                     return true;
                 }
             }
-            catch(IOException ioe)
+            catch(IOException)
             {
                 //This is a bit crude but we'll assume that if there is a problem reading the file then we 
                 //can't search it anyway so we'll set it to not-binary and let it fail during the main search

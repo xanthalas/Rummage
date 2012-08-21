@@ -43,11 +43,6 @@ namespace RummageFilesystem
         /// </summary>
         public event ItemSearchedEventHandler ItemSearched;
 
-        /// <summary>
-        /// The Database handler used to converse with the database.
-        /// </summary>
-        public IDatabaseHandler _databaseHandler { get; set; }
-
         #endregion
 
         /// <summary>
@@ -68,14 +63,6 @@ namespace RummageFilesystem
             this.cancellationTokenSource = new CancellationTokenSource();
         }
 
-        /// <summary>
-        /// Create a new SearchFilesystem object
-        /// </summary>
-        public SearchFilesystem(IDatabaseHandler databaseHandler) 
-            : this()
-        {
-            _databaseHandler = databaseHandler;
-        }
 
         /// <summary>
         /// Executes the search

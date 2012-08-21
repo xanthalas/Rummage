@@ -65,7 +65,7 @@ namespace Rummage
             }
         }
 
-        public bool? ShowDialog()
+        public new bool? ShowDialog()
         {
             this.chooser.Focus();
             this.chooser.SetFocusToFilter();

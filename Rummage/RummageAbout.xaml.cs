@@ -23,7 +23,7 @@ namespace Rummage
             InitializeComponent();
         }
 
-        private void Close_Click(object sender, RoutedEventArgs e)
+        private void close_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }

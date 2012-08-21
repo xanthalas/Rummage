@@ -20,10 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RummageFilesystemTest", "Ru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rmg", "rmg\rmg.csproj", "{C287ED48-5664-470E-974F-2D2282442962}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RummageIO", "RummageIO\RummageIO.csproj", "{34E9640A-CBFC-432D-96A2-C540333F1C25}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RummageIOTest", "RummageIOTest\RummageIOTest.csproj", "{A03496E3-280F-4395-8CB2-723F084AAE4E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XanWPFControls", "XanWPFControls\XanWPFControls.csproj", "{E1FD4D30-3BFC-4F79-AB69-60F24E50EF1A}"
 EndProject
 Global
@@ -99,26 +95,6 @@ Global
 		{C287ED48-5664-470E-974F-2D2282442962}.Release|Mixed Platforms.Build.0 = Release|x86
 		{C287ED48-5664-470E-974F-2D2282442962}.Release|x86.ActiveCfg = Release|x86
 		{C287ED48-5664-470E-974F-2D2282442962}.Release|x86.Build.0 = Release|x86
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Release|Any CPU.Build.0 = Release|Any CPU
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{34E9640A-CBFC-432D-96A2-C540333F1C25}.Release|x86.ActiveCfg = Release|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{A03496E3-280F-4395-8CB2-723F084AAE4E}.Release|x86.ActiveCfg = Release|Any CPU
 		{E1FD4D30-3BFC-4F79-AB69-60F24E50EF1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E1FD4D30-3BFC-4F79-AB69-60F24E50EF1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1FD4D30-3BFC-4F79-AB69-60F24E50EF1A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
