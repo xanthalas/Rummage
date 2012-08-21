@@ -1,2 +1,4 @@
 0001: Incorrectly specified regex in file filter box (and possibly other filter boxes) causes crash.
+0002: Changing the search location and then running a new search doesn't remove the previous search location so both old and new get searched.
+
 

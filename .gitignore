@@ -5,3 +5,6 @@ _ReSharper.Rummage
 *.suo
 *.ReSharper.user
 *.csproj.user
+*.vs10x
+*.sln.docstates
+*typemock*

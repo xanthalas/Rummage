@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Security.Permissions;
 using System.Threading;
+using System.Data.Linq;
+using System.Data.Linq.Mapping;
 using RummageCore;
 
 namespace RummageFilesystem
@@ -449,6 +451,11 @@ namespace RummageFilesystem
             cancellationToken = this.cancellationTokenSource.Token;
 
             //Now we must build up the list of files to search. This will then be handed off to the search routine via the enumerator
+            if (_urlToSearch.Count > 0)
+            {
+                _urlToSearch = new List<string>();
+            }
+
             foreach (string directory in SearchContainers)
             {
                 enumerateThisDirectory(directory);

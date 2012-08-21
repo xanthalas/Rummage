@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Linq;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -293,12 +294,8 @@ namespace RummageFilesystem
         /// <returns>The id of the request which was just stored</returns>
         public int SaveSearchRequest(ISearchRequest searchRequest, SearchContainerType searchContainerType)
         {
-            if (_databaseHandler == null)
-            {
-                return -1;      //Quit if there is no database to write to
-            }
 
-            return _databaseHandler.StoreSearchRequest(string.Format("Search on {0} at {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString()), searchRequest,searchContainerType);
+            return 0;
         }
 
     }

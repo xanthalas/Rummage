@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -78,15 +79,19 @@ namespace Rummage
 
         private bool _searchStringsChanged = false;
         private bool _foldersChanged = false;
-        private bool _includeFilesChanged = false;
-        private bool _includeFoldersChanged = false;
-        private bool _excludeFilesChanged = false;
-        private bool _excludeFoldersChanged = false;
+        private bool _includeFilesChanged = true;
+        private bool _includeFoldersChanged = true;
+        private bool _excludeFilesChanged = true;
+        private bool _excludeFoldersChanged = true;
         private bool _recurseChanged = false;
         private bool _binariesChanged = false;
         private bool _caseSensitivityChanged = false;
 
         private IDatabaseHandler _databaseHandler;
+
+        private HistoryPopup searchHistoryWindow;
+
+        private HistoryPopup folderHistoryWindow;
 
         /// <summary>
         /// Main entry point to the program
@@ -104,11 +109,39 @@ namespace Rummage
 
             readIniFile();
 
+            createHistoryWindows();
+
+            try
+            {
+                regexHelpDocument.Navigate(Path.Combine(Environment.CurrentDirectory, "regexhelp.html"));
+            }
+            catch (Exception)
+            {
+                //Do nothing.
+            }
+
 //            loadTheme("XXX");
+        }
+
+        /// <summary>
+        /// Creates instances of the search history windows
+        /// </summary>
+        private void createHistoryWindows()
+        {
+            searchHistoryWindow = new HistoryPopup(Application.Current.MainWindow.GetType().Assembly.FullName + "." + "searchHistoryWindow");
+
+
+            folderHistoryWindow = new HistoryPopup(Application.Current.MainWindow.GetType().Assembly.FullName + "." + "folderHistoryWindow");
         }
 
         void MainWindow_Closed(object sender, EventArgs e)
         {
+            searchHistoryWindow.ForceClose();
+            searchHistoryWindow = null;
+
+            folderHistoryWindow.ForceClose();
+            folderHistoryWindow = null;
+
             SnarlConnector.RevokeConfig((IntPtr) snarlHandle);
         }
 
@@ -181,6 +214,7 @@ namespace Rummage
         /// <param name="databaseType">Database type</param>
         private void openDatabase(string databaseType, string server, string user, string password, string databasePath)
         {
+            /*
             _databaseHandler = DatabaseHandler.GetHandler(databaseType);
 
             if (_databaseHandler != null)
@@ -188,6 +222,7 @@ namespace Rummage
                 string connectionString = _databaseHandler.BuildConnectionString(server, user, password, databasePath);
                 _databaseHandler.OpenConnection(connectionString);
             }
+             */
         }
 
 
@@ -244,9 +279,11 @@ namespace Rummage
             {
                 searchRequest.IncludeItemStrings.Clear();
 
-                for (int index = 0; index < textBoxIncludeFiles.LineCount; index++)
+                string[] lines = textBoxIncludeFiles.Text.Split('\n');
+
+                for (int index = 0; index < lines.Length; index++)
                 {
-                    string line = textBoxIncludeFiles.GetLineText(index).Trim();
+                    string line = lines[index].Trim();
                     if (line.Length > 0)
                     {
                         searchRequest.AddIncludeItemString(line);
@@ -257,9 +294,11 @@ namespace Rummage
             {
                 searchRequest.IncludeContainerStrings.Clear();
 
-                for (int index = 0; index < textBoxIncludeFolders.LineCount; index++)
+                string[] lines = textBoxIncludeFolders.Text.Split('\n');
+
+                for (int index = 0; index < lines.Length; index++)
                 {
-                    string line = textBoxIncludeFolders.GetLineText(index).Trim();
+                    string line = lines[index].Trim();
                     if (line.Length > 0)
                     {
                         searchRequest.AddIncludeContainerString(line);
@@ -274,9 +313,11 @@ namespace Rummage
             {
                 searchRequest.ExcludeItemStrings.Clear();
 
-                for (int index = 0; index < textBoxExcludeFiles.LineCount; index++)
+                string[] lines = textBoxExcludeFiles.Text.Split('\n');
+
+                for (int index = 0; index < lines.Length; index++)
                 {
-                    string line = textBoxExcludeFiles.GetLineText(index).Trim();
+                    string line = lines[index].Trim();
                     if (line.Length > 0)
                     {
                         searchRequest.AddExcludeItemString(line);
@@ -287,9 +328,11 @@ namespace Rummage
             {
                 searchRequest.ExcludeContainerStrings.Clear();
 
-                for (int index = 0; index < textBoxExcludeFolders.LineCount; index++)
+                string[] lines = textBoxExcludeFolders.Text.Split('\n');
+
+                for (int index = 0; index < lines.Length; index++)
                 {
-                    string line = textBoxExcludeFolders.GetLineText(index).Trim();
+                    string line = lines[index].Trim();
                     if (line.Length > 0)
                     {
                         searchRequest.AddExcludeContainerString(line);
@@ -299,6 +342,8 @@ namespace Rummage
 
             #endregion
 
+            //Update the history popups with the values from this search
+            updateHistoryPopups();
 
             searchRequest.SetRecurse(chkRecurse.IsChecked.Value);
             searchRequest.SetCaseSensitive(chkCaseSensitive.IsChecked.Value);
@@ -313,7 +358,6 @@ namespace Rummage
             performSearchOnSeparateThread(search, searchRequest);
 
         }
-
 
 
         /// <summary>
@@ -894,6 +938,25 @@ namespace Rummage
             updateProgressBar(0, 0, string.Empty, string.Empty, false);
         }
 
+
+        private void updateHistoryPopups()
+        {
+            foreach (var searchString in searchRequest.SearchStrings)
+            {
+                searchHistoryWindow.AddItemToList(searchString);
+            }
+
+            searchHistoryWindow.SaveList();
+
+            foreach (var containerString in searchRequest.SearchContainers)
+            {
+                folderHistoryWindow.AddItemToList(containerString);
+            }
+
+            folderHistoryWindow.SaveList();
+
+        }
+
         /// <summary>
         /// When the selected item changes reload the bottom display with the matches from the selected item
         /// </summary>
@@ -984,7 +1047,27 @@ namespace Rummage
 
                 if (selectedItem != null)
                 {
-                    ProcessStartInfo procStartInfo = new ProcessStartInfo(@"c:\vim\vim73\gvim.exe");
+                    string editor = "notepad.exe";
+
+                    try
+                    {
+                        TextReader reader = new StreamReader("editor.cfg");
+                        string line = null;
+
+                        line = reader.ReadLine();
+
+                        if (line != null && line.Length > 1)
+                        {
+                            editor = line;
+                        }
+                        
+                    }
+                    catch (Exception)
+                    {
+                        // Do nothing. If we can't determine which editor the user wants to use then we'll just use notepad
+                    }
+                    //ProcessStartInfo procStartInfo = new ProcessStartInfo(@"c:\vim\vim73\gvim.exe");
+                    ProcessStartInfo procStartInfo = new ProcessStartInfo(editor);
                     procStartInfo.Arguments = @"""" + selectedItem.ItemKey + @"""";
                     procStartInfo.CreateNoWindow = true;
                     procStartInfo.UseShellExecute = true;
@@ -1060,6 +1143,34 @@ namespace Rummage
             _excludeFoldersChanged = true;
         }
         #endregion
+
+        private void MainMenuFileSearchHistory_Click(object sender, RoutedEventArgs e)
+        {
+            
+
+        }
+
+        private void btnFoldersHistory_Click(object sender, RoutedEventArgs e)
+        {
+            folderHistoryWindow.ShowDialog();
+
+            if (folderHistoryWindow.SelectedItem != null && folderHistoryWindow.SelectedItem.Length > 0)
+            {
+                textBoxFolders.Text += "\n" + folderHistoryWindow.SelectedItem;
+                textBoxFolders.Text = textBoxFolders.Text.Trim();
+            }
+        }
+
+        private void btnSearchHistory_Click(object sender, RoutedEventArgs e)
+        {
+            searchHistoryWindow.ShowDialog();
+            if (searchHistoryWindow.SelectedItem != null && searchHistoryWindow.SelectedItem.Length > 0)
+            {
+                textBoxSearchStrings.Text += "\n" + searchHistoryWindow.SelectedItem;
+                textBoxSearchStrings.Text = textBoxSearchStrings.Text.Trim();
+            }
+
+        }
 
     }
 }

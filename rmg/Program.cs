@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Linq;
 using System.IO;
 using System.Text;
 using CommandLine;
@@ -91,6 +92,7 @@ namespace rmg
                 }
                 if (_verbose) { Console.WriteLine("{0} files will be searched", searchRequest.Urls.Count); }
                 ISearch search = new SearchFilesystem();
+
                 search.ItemSearched += new ItemSearchedEventHandler(search_ItemSearched); 
                 search.Search(searchRequest, true);
                 
@@ -249,6 +251,7 @@ namespace rmg
             Console.WriteLine("     {MatchLine}       - The full contents of the line where the match was found");
             Console.WriteLine("     {MatchString}     - The regex which matched");
             Console.WriteLine("");
+            Console.WriteLine(@" Example: rmg -s findme -f c:\code\rummage -y -r -d .svn");
             Console.WriteLine("");
             _helpShown = true;
 

@@ -42,6 +42,7 @@
     <Reference Include="Microsoft.Expression.Drawing" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,6 +61,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="HistoryPopup.xaml.cs">
+      <DependentUpon>HistoryPopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SearchHistory.xaml.cs">
+      <DependentUpon>SearchHistory.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Snarl\M_RESULT.cs" />
     <Compile Include="Snarl\SnarlConnector.cs" />
     <Compile Include="Snarl\SnarlException.cs" />
@@ -70,6 +77,10 @@
     <Compile Include="RummageAbout.xaml.cs">
       <DependentUpon>RummageAbout.xaml</DependentUpon>
     </Compile>
+    <Page Include="HistoryPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -83,6 +94,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="RummageAbout.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchHistory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -129,6 +144,15 @@
       <Project>{34E9640A-CBFC-432D-96A2-C540333F1C25}</Project>
       <Name>RummageIO</Name>
     </ProjectReference>
+    <ProjectReference Include="..\XanWPFControls\XanWPFControls.csproj">
+      <Project>{E1FD4D30-3BFC-4F79-AB69-60F24E50EF1A}</Project>
+      <Name>XanWPFControls</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="regexhelp.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

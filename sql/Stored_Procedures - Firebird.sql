@@ -177,3 +177,34 @@ end^
 */
 
 SET TERM ; ^
+--*************************************************************************************************
+--* System: Rummage                                         Type: Firebird SQL                    *
+--* Author: Xanthalas                                       Date: June 2011                       *
+--* Name:   GETSEARCHHISTORY                                                                      *
+--*                                                                                               *
+--* Stored Procedure which retrieves a lightweight list of previous searches.                     *
+--*************************************************************************************************
+SET TERM ^ ;
+alter procedure GetSearchHistory
+
+returns (search_request_id int, 
+        search_request_guid varchar(64), 
+        name varchar(64), 
+        date_request_created timestamp, 
+        container_url varchar(8192))
+as
+
+begin
+	for select sr.search_request_id, sr.search_request_guid, sr.name, sr.date_request_created, c.container_url
+	from search_request sr 
+	join search_request_container src on sr.search_request_id = src.search_request_id
+	join container c on c.container_id = src.container_id
+	into :search_request_id, :search_request_guid, :name, :date_request_created, :container_url
+	
+	do 
+	begin
+        suspend;
+    end
+end^
+
+SET TERM ; ^
