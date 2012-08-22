@@ -9,3 +9,4 @@ _ReSharper.Rummage
 *.sln.docstates
 *typemock*
 *.user
+tags

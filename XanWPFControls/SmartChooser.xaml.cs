@@ -47,7 +47,7 @@ namespace XanWPFControls
             foreach (var item in initialList)
             {
                 ListItem li = new ListItem();
-                baseItems.Add(item);
+                baseItems.Insert(0, item);
             }
 
             generateFilteredList(filter.Text.Trim());
@@ -171,10 +171,10 @@ namespace XanWPFControls
             {
                 if (baseItems.Count >= MaximumEntries)
                 {
-                    baseItems.RemoveAt(0);          //Remove the oldest
+                    baseItems.RemoveAt(baseItems.Count - 1);          //Remove the oldest
                 }
 
-                baseItems.Add(newItem);
+                baseItems.Insert(0, newItem);
             }
             else
             {
