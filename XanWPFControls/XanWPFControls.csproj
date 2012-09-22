@@ -52,10 +52,19 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="DirectoryChooser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SmartChooser.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="DirectoryChooser.xaml.cs">
+      <DependentUpon>DirectoryChooser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DirectoryPathMatch.cs" />
+    <Compile Include="DirectoryScanner.cs" />
     <Compile Include="SmartChooser.xaml.cs">
       <DependentUpon>SmartChooser.xaml</DependentUpon>
       <SubType>Code</SubType>

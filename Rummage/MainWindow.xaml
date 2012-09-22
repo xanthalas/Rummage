@@ -1,6 +1,7 @@
 ﻿<Window x:Class="Rummage.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xwc="clr-namespace:XanWPFControls;assembly=XanWPFControls"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip">
     <DockPanel  Name="dockPanelMain">
@@ -104,8 +105,9 @@
                             <Button Name="Browse"  Grid.Row="0" Grid.Column="1" Click="Browse_Click" TabIndex="7">Browse...</Button>
                         </Grid>
                     </Border>
-                    <TextBox Name="textBoxFolders"  Grid.Row="1" Grid.Column="1" MaxHeight="90" Text="" AcceptsReturn="True" TextChanged="textBoxFolders_TextChanged" VerticalScrollBarVisibility="Auto" TabIndex="1" Opacity="0.8"/>
-                    <Button Name="btnFoldersHistory" Grid.Row="1" Grid.Column="1" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="right" Click="btnFoldersHistory_Click">=</Button>
+                    <!--<TextBox Name="textBoxFolders"  Grid.Row="1" Grid.Column="1" MaxHeight="90" Text="" AcceptsReturn="True" TextChanged="textBoxFolders_TextChanged" VerticalScrollBarVisibility="Auto" TabIndex="1" Opacity="0.8"/>-->
+                    <xwc:DirectoryChooser Name="dirChooser" Grid.Row="1" Grid.Column="1" MaxHeight="90" TextChanged="dirChooser_TextChanged"  TabIndex="1" Opacity="0.8"></xwc:DirectoryChooser>
+                        <Button Name="btnFoldersHistory" Grid.Row="1" Grid.Column="1" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="right" Click="btnFoldersHistory_Click">=</Button>
                     
                     <Border Grid.Column="0" Grid.Row="2" BorderBrush="Gray" BorderThickness="0,1,0,0" />
                     <Border Grid.Column="1" Grid.Row="2" BorderBrush="Gray" BorderThickness="0,1,0,0" />

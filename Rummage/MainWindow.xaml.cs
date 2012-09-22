@@ -102,7 +102,7 @@ namespace Rummage
             InitializeComponent();
             Snarl.SnarlConnector.RegisterConfig((IntPtr)snarlHandle, "Rummage", WindowsMessage.WM_NULL);
 
-            normalBorderBrush = textBoxFolders.BorderBrush;
+            normalBorderBrush = dirChooser.InternalTextBox.BorderBrush;
 
             this.Closed += new EventHandler(MainWindow_Closed);
 
@@ -233,9 +233,9 @@ namespace Rummage
             {
                 searchRequest.SearchContainers.Clear();
 
-                for (int index = 0; index < textBoxFolders.LineCount; index++)
+                for (int index = 0; index < dirChooser.InternalTextBox.LineCount; index++)
                 {
-                    string line = textBoxFolders.GetLineText(index).Trim();
+                    string line = dirChooser.InternalTextBox.GetLineText(index).Trim();
                     if (line.Length > 0)
                     {
                         searchRequest.AddSearchContainer(line);
@@ -528,7 +528,7 @@ namespace Rummage
                 return false;
             }
 
-            if (textBoxFolders.Text.Trim().Length == 0)
+            if (dirChooser.InternalTextBox.Text.Trim().Length == 0)
             {
                 return false;
             }
@@ -683,7 +683,7 @@ namespace Rummage
         /// <returns>true if all the folders specified exist, otherwise false</returns>
         private bool checkFoldersExist()
         {
-            if (textBoxFolders == null)
+            if (dirChooser.InternalTextBox == null)
             {
                 return false;
             }
@@ -691,9 +691,9 @@ namespace Rummage
             string missingFolder = string.Empty;
             bool result = true;
 
-            for (int index = 0; index < textBoxFolders.LineCount; index++)
+            for (int index = 0; index < dirChooser.InternalTextBox.LineCount; index++)
             {
-                string line = textBoxFolders.GetLineText(index).Trim();
+                string line = dirChooser.InternalTextBox.GetLineText(index).Trim();
                 if (line.Length > 0 && !Directory.Exists(line))
                 {
                     missingFolder = line;
@@ -704,8 +704,8 @@ namespace Rummage
             if (missingFolder.Length > 0)
             {
                 updateStatus(String.Format("Search Folder {0} doesn't exist", missingFolder));
-                textBoxFolders.BorderBrush = Brushes.Red;
-                textBoxFolders.BorderThickness = new Thickness(3, 3, 3, 3);
+                dirChooser.InternalTextBox.BorderBrush = Brushes.Red;
+                dirChooser.InternalTextBox.BorderThickness = new Thickness(3, 3, 3, 3);
                 result = false;
             }
             else
@@ -714,8 +714,8 @@ namespace Rummage
                 {
                     updateStatus(String.Empty);
                 }
-                textBoxFolders.BorderBrush = normalBorderBrush;
-                textBoxFolders.BorderThickness = new Thickness(1, 1, 1, 1);
+                dirChooser.InternalTextBox.BorderBrush = normalBorderBrush;
+                dirChooser.InternalTextBox.BorderThickness = new Thickness(1, 1, 1, 1);
                 result = true;
             }
 
@@ -732,9 +732,9 @@ namespace Rummage
             textBoxSearchStrings.Foreground = Brushes.Green;
             textBoxSearchStrings.FontFamily = new FontFamily("Courier New");
 
-            textBoxFolders.Background = Brushes.Black;
-            textBoxFolders.Foreground = Brushes.Green;
-            textBoxFolders.FontFamily = new FontFamily("Courier New");
+            dirChooser.InternalTextBox.Background = Brushes.Black;
+            dirChooser.InternalTextBox.Foreground = Brushes.Green;
+            dirChooser.InternalTextBox.FontFamily = new FontFamily("Courier New");
 
             listViewMatches.Background = Brushes.Black;
             listViewMatches.Foreground = Brushes.Green;
@@ -986,12 +986,12 @@ namespace Rummage
         /// </summary>
         /// <param name="sender">Standard sender object</param>
         /// <param name="e"></param>
-        private void textBoxFolders_TextChanged(object sender, TextChangedEventArgs e)
+        private void dirChooser_TextChanged(object sender, TextChangedEventArgs e)
         {
             enableDisableSearchButton();
             _foldersChanged = true;
 
-            if (textBoxFolders.LineCount > 2)
+            if (dirChooser.InternalTextBox.LineCount > 2)
             {
                 lblSearchHere.Content = string.Empty;
             }
@@ -1063,7 +1063,7 @@ namespace Rummage
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                textBoxFolders.Text += "\n" + fbd.SelectedPath;
+                dirChooser.InternalTextBox.Text += "\n" + fbd.SelectedPath;
             }
         }
 
@@ -1132,8 +1132,8 @@ namespace Rummage
 
             if (folderHistoryWindow.SelectedItem != null && folderHistoryWindow.SelectedItem.Length > 0)
             {
-                textBoxFolders.Text += "\n" + folderHistoryWindow.SelectedItem;
-                textBoxFolders.Text = textBoxFolders.Text.Trim();
+                dirChooser.InternalTextBox.Text += "\n" + folderHistoryWindow.SelectedItem;
+                dirChooser.InternalTextBox.Text = dirChooser.InternalTextBox.Text.Trim();
             }
         }
 
