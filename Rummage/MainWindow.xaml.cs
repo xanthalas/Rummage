@@ -12,6 +12,7 @@ using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Threading;
+using System.Windows.Input;
 using System.Threading;
 using System.Threading.Tasks;
 using RummageCore;
@@ -1172,6 +1173,66 @@ namespace Rummage
 
                     }
             }
+            }
+        }
+
+
+        /// <summary>
+        /// Allow Ctrl+Up/Down to change the selected match in the list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if ((e.Key == Key.Down || e.Key == Key.Up) && ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control))
+            {
+                NavigateResultRows(e.Key);
+            }
+        }
+
+
+        /// <summary>
+        /// Move the selection up/down the list of matches
+        /// </summary>
+        /// <param name="key">The key the user pressed to initiate the selection</param>
+        private void NavigateResultRows(Key key)
+        {
+            if (listViewMatches != null && listViewMatches.Items.Count > 1)
+            {
+                if (listViewMatches.SelectedItems.Count == 0)
+                {
+                    listViewMatches.SelectedIndex = 0;
+                    return;
+                }
+
+                if (key == Key.Down)
+                {
+                    if (listViewMatches.SelectedIndex == listViewMatches.Items.Count - 1)
+                    {
+                        listViewMatches.SelectedIndex = 0;
+                    }
+                    else
+                    {
+                        if (listViewMatches.SelectedIndex < listViewMatches.Items.Count - 1)
+                        {
+                            listViewMatches.SelectedIndex++;
+                        }
+                    }
+                }
+                else
+                {
+                    if (listViewMatches.SelectedIndex == 0)
+                    {
+                        listViewMatches.SelectedIndex = listViewMatches.Items.Count - 1;
+                    }
+                    else
+                    {
+                        if (listViewMatches.SelectedIndex > 0)
+                        {
+                            listViewMatches.SelectedIndex--;
+                        }
+                    }                
+                }
             }
         }
 

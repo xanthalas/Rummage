@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:xwc="clr-namespace:XanWPFControls;assembly=XanWPFControls"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip">
+        Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip" KeyDown="Window_KeyDown">
     <DockPanel  Name="dockPanelMain">
         <StatusBar Height="22" Name="statusBarMain" DockPanel.Dock="Bottom">
             <StatusBar.ItemsPanel>

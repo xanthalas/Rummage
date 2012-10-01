@@ -10,6 +10,7 @@ namespace XanWPFControls
     {
         public static DirectoryPathMatch GetMatchingPath(string initialisationString)
         {
+            initialisationString =  initialisationString.Trim();
             var directoryPathMatch = new DirectoryPathMatch();
 
             if (Directory.Exists(initialisationString))
