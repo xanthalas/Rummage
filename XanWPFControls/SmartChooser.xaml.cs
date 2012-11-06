@@ -221,7 +221,7 @@ namespace XanWPFControls
             {
                 try
                 {
-                    regex = new Regex(filterText);
+                    regex = new Regex(filterText, RegexOptions.IgnoreCase);
                     filterLabel.Foreground = Brushes.Green;
                 }
                 catch (ArgumentException)

@@ -67,7 +67,7 @@ namespace XanWPFControls
             {
                var directoryScanner = DirectoryScanner.GetMatchingPath(currentLine);
 
-                if (directoryScanner.MatchingPathTail.Length > 0)
+                if (directoryScanner != null && directoryScanner.MatchingPathTail.Length > 0)
                 {
                     lines[lineNumber] = directoryScanner.BaseDirectory + "\\" + directoryScanner.MatchingPathTail;
                     StringBuilder replaceText = new StringBuilder();

@@ -46,6 +46,11 @@ namespace XanWPFControls
                     //If what the user entered is not valid as part of a directory or filename then just drop out
                     return null;
                 }
+                catch (DirectoryNotFoundException)
+                {
+                    //If the starting directory doesn't exist (for example its on a drive which has been removed) then just drop out
+                    return null;
+                }
                 if (possibleDirectories.Length > 0)
                 {
                     foreach (string tail in possibleDirectories)
