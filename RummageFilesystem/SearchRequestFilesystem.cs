@@ -427,6 +427,8 @@ namespace RummageFilesystem
             }
             #endregion
 
+            filesScanned = 0;
+
             if (SearchContainers.Count == 0 || SearchStrings.Count == 0)
             {
                 return 0;
