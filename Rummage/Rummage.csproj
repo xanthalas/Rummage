@@ -43,6 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,6 +68,7 @@
     <Compile Include="SearchHistory.xaml.cs">
       <DependentUpon>SearchHistory.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ShellContextMenu.cs" />
     <Compile Include="Snarl\M_RESULT.cs" />
     <Compile Include="Snarl\SnarlConnector.cs" />
     <Compile Include="Snarl\SnarlException.cs" />

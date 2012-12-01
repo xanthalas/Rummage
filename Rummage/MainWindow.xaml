@@ -202,7 +202,7 @@
                             <RowDefinition Height="0.5*"  />
                         </Grid.RowDefinitions>
                         <GridSplitter Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="True" Height="5" />
-                        <ListView x:Name="listViewMatches" Grid.Column="0" Grid.Row="0" SelectionChanged="listViewMatches_SelectionChanged" MouseDoubleClick="listViewMatches_MouseDoubleClick" TabIndex="12" >
+                        <ListView x:Name="listViewMatches" Grid.Column="0" Grid.Row="0" SelectionChanged="listViewMatches_SelectionChanged" MouseDoubleClick="listViewMatches_MouseDoubleClick" TabIndex="12" ContextMenuOpening="listViewMatches_ContextMenuOpening" >
                             <ListView.View>
                                 <GridView>
                                     <GridViewColumn Width="500" Header="File" DisplayMemberBinding="{Binding ItemKey}" />

@@ -1236,5 +1236,28 @@ namespace Rummage
             }
         }
 
+        private void listViewMatches_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (listViewMatches.SelectedItems.Count > 0)
+            {
+                MatchingItem matchingItem = listViewMatches.SelectedItem as MatchingItem;
+
+                if (matchingItem != null)
+                {
+                    if (File.Exists(matchingItem.ItemKey))
+                    {
+                        FileInfo[] singleFile = new FileInfo[1];
+                        singleFile[0] = new FileInfo(matchingItem.ItemKey);
+                        ShellContextMenu shellContextMenu = new ShellContextMenu();
+                        
+                        System.Drawing.Point pt = new System.Drawing.Point(Convert.ToInt32(Mouse.GetPosition(this).X), Convert.ToInt32(Mouse.GetPosition(this).Y));
+
+                        shellContextMenu.ShowContextMenu(singleFile, pt);
+                    }
+                }
+            }
+            
+        }
+
     }
 }
