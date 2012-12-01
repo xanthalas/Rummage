@@ -14,11 +14,11 @@
         </Style>
     </UserControl.Resources>
     <DockPanel>
-        <DockPanel Name="topPanel" MinHeight="5" MinWidth="80" DockPanel.Dock="Top">
+        <DockPanel Name="topPanel" DockPanel.Dock="Top">
             <Label DockPanel.Dock="Left" Name="filterLabel">Filter:</Label>
             <TextBox Name="filter" TextChanged="filter_TextChanged" PreviewKeyDown="filter_PreviewKeyDown"></TextBox>
         </DockPanel>
-        <ListView Name="list" MinHeight="50" MinWidth="80"  ItemContainerStyle="{StaticResource itemstyle}" ItemsSource="{Binding}" SelectionChanged="list_SelectionChanged">
+        <ListView Name="list" ItemContainerStyle="{StaticResource itemstyle}" ItemsSource="{Binding}" SelectionChanged="list_SelectionChanged">
 
         </ListView>
     </DockPanel>

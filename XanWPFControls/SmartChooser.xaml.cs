@@ -34,6 +34,8 @@ namespace XanWPFControls
             defaultForegroundBrush = filterLabel.Foreground;
 
             baseItems = new ObservableCollection<string>();
+
+            SetFocusToFilter();
         }
 
         /// <summary>
@@ -87,6 +89,12 @@ namespace XanWPFControls
                 sw.WriteLine(line);
 
                 line = Newtonsoft.Json.JsonConvert.SerializeObject(MaximumEntries);
+                sw.WriteLine(line);
+
+                line = Newtonsoft.Json.JsonConvert.SerializeObject(this.MinWidth);
+                sw.WriteLine(line);
+
+                line = Newtonsoft.Json.JsonConvert.SerializeObject(this.MinHeight);
                 sw.WriteLine(line);
 
                 line = Newtonsoft.Json.JsonConvert.SerializeObject(baseItems);
@@ -147,7 +155,19 @@ namespace XanWPFControls
                     MaximumEntries = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(line);
                 }
 
-                line = reader.ReadLine();           //Line 3 (list contents)
+                line = reader.ReadLine();           //Line 3 (Control Width)
+
+                if (line != null)
+                {
+                    this.MinWidth = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(line);
+                }
+
+                line = reader.ReadLine();           //Line 4 (Control height)
+                if (line != null)
+                {
+                    this.MinHeight = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(line);
+                }
+                line = reader.ReadLine();           //Line 5 (list contents)
 
                 if (line != null)
                 {

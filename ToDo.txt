@@ -5,12 +5,10 @@ High
 ----
 
 Right-click menu on matching file view
-Tab-completion for directory pane
 
 
 Medium
 ------
-Implement CTRL+Up/Down to jump to prev/next match in file pane
 Tabbed display to allow multiple searches (ideally simultaneously)
 
 
@@ -21,6 +19,9 @@ Low
 Right-click menu on Include/Exclude includes common filter patterns which user can add
 Highlight the "Include Items" and "Exclude Items" tabs in some way to indicate when there are filters present.
 persistence of searches
+Mention included code in About screen:
+    Snarl
+    http://www.codeproject.com/Articles/22012/Explorer-Shell-Context-Menu
 
 
 
@@ -33,3 +34,5 @@ Snarl integration
 Modify the search so the prepare is not called for subsequent searches when only the search strings have changed
 Add pop-up history box which will show previous search paths and previous search strings which the user can click on to select for the new search
 Remove the watermark under the search boxes when it is going to be covered by the text to ensure the text is easily readable.
+Implement CTRL+Up/Down to jump to prev/next match in file pane
+Tab-completion for directory pane
