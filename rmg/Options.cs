@@ -45,7 +45,7 @@ namespace rmg
         public bool ShowHelp = false;
 
         [Option("o", "output", Required = false, HelpText = "Format of output.")]
-        public string OutputFormat = "{MatchItem}:{MatchLineNumber} {MatchLine}";
+        public string OutputFormat = "{MatchItem} : {MatchLineNumber} {MatchLine}";
 
     }
 }

@@ -4,7 +4,6 @@ Rummage - To Do
 High
 ----
 
-Right-click menu on matching file view
 
 
 Medium
@@ -36,3 +35,4 @@ Add pop-up history box which will show previous search paths and previous search
 Remove the watermark under the search boxes when it is going to be covered by the text to ensure the text is easily readable.
 Implement CTRL+Up/Down to jump to prev/next match in file pane
 Tab-completion for directory pane
+Right-click menu on matching file view

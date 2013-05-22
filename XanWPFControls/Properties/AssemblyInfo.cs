@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("XansWPFControls")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Capita")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("XansWPFControls")]
-[assembly: AssemblyCopyright("Copyright © Capita 2012")]
+[assembly: AssemblyCopyright("Copyright © Xanthalas 2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
