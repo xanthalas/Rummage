@@ -65,25 +65,48 @@ namespace Rummage
             }
         }
 
+        /// <summary>
+        /// Show the dialog
+        /// </summary>
+        /// <returns></returns>
         public new bool? ShowDialog()
         {
             this.chooser.Focus();
             this.chooser.SetFocusToFilter();
+
             return base.ShowDialog();
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
-            if (chooser != null && chooser.SelectedItem != null && chooser.SelectedItem.Length > 0)
+            if (chooser != null)
             {
-                SelectedItem = chooser.SelectedItem;
-                this.chooser.Focus();
-                this.chooser.SetFocusToFilter();
-                this.Hide();
+                if (chooser.SelectedItem != null && chooser.SelectedItem.Length > 0)
+                {
+                    SelectedItem = chooser.SelectedItem;
+                    this.chooser.Focus();
+                    this.chooser.SetFocusToFilter();
+                    this.Hide();
+                }
+                else
+                {
+                    if (chooser.IsEmpty)
+                    {
+                        cancel();
+                    }
+                }
             }
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            cancel();
+        }
+
+        /// <summary>
+        /// Cancel out of the dialog and close it.
+        /// </summary>
+        private void cancel()
         {
             this.SelectedItem = string.Empty;
             this.chooser.Focus();

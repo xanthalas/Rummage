@@ -139,39 +139,50 @@ namespace XanWPFControls
             }
             using (StreamReader reader = new StreamReader(inputFile))
             {
-                string line;
-
-                line = reader.ReadLine();           //Line 1 (Control name)
-
-                if (line != null)
+                try
                 {
-                    fullyQualifiedSaveName = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(line);
+                    string line;
+
+                    line = reader.ReadLine();           //Line 1 (Control name)
+
+                    if (line != null)
+                    {
+                        fullyQualifiedSaveName = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(line);
+                    }
+
+                    line = reader.ReadLine();           //Line 2 (Maximum entries)
+
+                    if (line != null)
+                    {
+                        MaximumEntries = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(line);
+                    }
+
+                    line = reader.ReadLine();           //Line 3 (Control Width)
+
+                    if (line != null)
+                    {
+                        this.MinWidth = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(line);
+                    }
+
+                    line = reader.ReadLine();           //Line 4 (Control height)
+                    if (line != null)
+                    {
+                        this.MinHeight = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(line);
+                    }
+                    line = reader.ReadLine();           //Line 5 (list contents)
+
+                    if (line != null)
+                    {
+                        baseItems = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<string>>(line);
+                    }
                 }
-
-                line = reader.ReadLine();           //Line 2 (Maximum entries)
-
-                if (line != null)
+                catch (Newtonsoft.Json.JsonReaderException)
                 {
-                    MaximumEntries = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(line);
+                    return false;
                 }
-
-                line = reader.ReadLine();           //Line 3 (Control Width)
-
-                if (line != null)
+                catch (IOException)
                 {
-                    this.MinWidth = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(line);
-                }
-
-                line = reader.ReadLine();           //Line 4 (Control height)
-                if (line != null)
-                {
-                    this.MinHeight = Newtonsoft.Json.JsonConvert.DeserializeObject<int>(line);
-                }
-                line = reader.ReadLine();           //Line 5 (list contents)
-
-                if (line != null)
-                {
-                    baseItems = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<string>>(line);
+                    return false;
                 }
             }
 
@@ -211,6 +222,11 @@ namespace XanWPFControls
         {
             filter.Focus();
         }
+
+        /// <summary>
+        /// Indicates whether this chooser is empty or contains items
+        /// </summary>
+        public bool IsEmpty { get { return baseItems.Count == 0; } } 
 
 
         /// <summary>
