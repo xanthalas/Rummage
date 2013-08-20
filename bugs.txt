@@ -6,3 +6,6 @@ Fixed
 0001: Incorrectly specified regex in file filter box (and possibly other filter boxes) causes crash.
 0002: Changing the search location and then running a new search doesn't remove the previous search location so both old and new get searched.
 0003: If the folder or search history files are corrupt it crashes the program.
+0004: If you cancel a search during the "Determining which files to search" phase and then start a new search with the same folder(s)
+      but different "search for" criteria it will go straight to searching the files it has found so far and won't restart from the beginning.
+

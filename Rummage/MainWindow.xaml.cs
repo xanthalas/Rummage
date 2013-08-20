@@ -1037,11 +1037,26 @@ namespace Rummage
 
                 if (selectedItem != null)
                 {
-                    string arguments = @"""" + selectedItem.ItemKey + @"""";
-                    StartEditor(arguments);
+                    StartEditor(buildArguments(selectedItem.ItemKey, 1));
                 }
             }
 
+        }
+
+        /// <summary>
+        /// Combine the selected file with the arguments for the editor
+        /// </summary>
+        /// <param name="itemPath">File to open</param>
+        /// <param name="lineNumber">Line number to jump to</param>
+        /// <returns></returns>
+        private string buildArguments(string itemPath, int lineNumber)
+        {
+            string arguments = @"""" + itemPath + @"""";
+            if (editorArguments.Length > 0)
+            {
+                arguments = editorArguments + lineNumber + " " + arguments;
+            }
+            return arguments;
         }
 
         private void StartEditor(string arguments)
@@ -1159,20 +1174,12 @@ namespace Rummage
                     var match = listViewMatchesForSelection.SelectedItem as RummageCore.Match;
                     if (match != null)
                     {
-                        int lineNumber = match.MatchLineNumber;
-
                         if (selectedItem != null)
                         {
-                            string arguments = @"""" + selectedItem.ItemKey + @"""";
-                            if (editorArguments.Length > 0)
-                            {
-                                arguments = arguments + " " + editorArguments + lineNumber.ToString();
-                            }
-                            StartEditor(arguments);
+                            StartEditor(buildArguments(selectedItem.ItemKey, match.MatchLineNumber));
                         }
-
                     }
-            }
+                }
             }
         }
 
