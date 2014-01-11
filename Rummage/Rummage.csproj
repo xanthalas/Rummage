@@ -68,6 +68,9 @@
     <Compile Include="HistoryPopup.xaml.cs">
       <DependentUpon>HistoryPopup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RegexHelpWindow.xaml.cs">
+      <DependentUpon>RegexHelpWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SearchHistory.xaml.cs">
       <DependentUpon>SearchHistory.xaml</DependentUpon>
     </Compile>
@@ -98,6 +101,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="RegexHelpWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RummageAbout.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

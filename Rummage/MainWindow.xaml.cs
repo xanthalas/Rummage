@@ -113,15 +113,6 @@ namespace Rummage
 
             createHistoryWindows();
 
-            try
-            {
-                regexHelpDocument.Navigate(Path.Combine(Environment.CurrentDirectory, "regexhelp.html"));
-            }
-            catch (Exception)
-            {
-                //Do nothing.
-            }
-
 //            loadTheme("XXX");
         }
 
@@ -1266,5 +1257,10 @@ namespace Rummage
             
         }
 
+        private void MainMenuHelpRegex_OnClick(object sender, RoutedEventArgs e)
+        {
+            var doc = new RegexHelpWindow();
+            doc.Show();
+        }
     }
 }
