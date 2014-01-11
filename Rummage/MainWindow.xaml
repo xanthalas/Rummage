@@ -90,7 +90,7 @@
                     <Border Grid.Column="0" Grid.Row="1" BorderBrush="Black" BorderThickness="0,0,1,0">
                         <TextBox Name="textBoxSearchStrings" Grid.Row="1" Grid.Column="0" MaxHeight="90" Text="" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextChanged="textBoxSearchStrings_TextChanged" TabIndex="0" Opacity="0.8" />
                     </Border>
-                    <Button Name="btnSearchHistory" Grid.Row="1" Grid.Column="0" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="right" Click="btnSearchHistory_Click">=</Button>
+                    <Button Name="btnSearchHistory" Grid.Row="1" Grid.Column="0" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="right" Click="btnSearchHistory_Click" ToolTip="Search History...">=</Button>
                     <!-- Column 2 (Where to search) -->
 					<Label Name="lblSearchHere"  Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" FontWeight="Bold">Search where ...</Label>
                     <Border Grid.Column="1" Grid.Row="0" BorderBrush="Black" BorderThickness="0,0,0,1">
@@ -107,7 +107,7 @@
                     </Border>
                     <!--<TextBox Name="textBoxFolders"  Grid.Row="1" Grid.Column="1" MaxHeight="90" Text="" AcceptsReturn="True" TextChanged="textBoxFolders_TextChanged" VerticalScrollBarVisibility="Auto" TabIndex="1" Opacity="0.8"/>-->
                     <xwc:DirectoryChooser Name="dirChooser" Grid.Row="1" Grid.Column="1" MaxHeight="90" TextChanged="dirChooser_TextChanged"  TabIndex="1" Opacity="0.8"></xwc:DirectoryChooser>
-                        <Button Name="btnFoldersHistory" Grid.Row="1" Grid.Column="1" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="right" Click="btnFoldersHistory_Click">=</Button>
+                        <Button Name="btnFoldersHistory" Grid.Row="1" Grid.Column="1" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="right" Click="btnFoldersHistory_Click" ToolTip="Folder History...">=</Button>
                     
                     <Border Grid.Column="0" Grid.Row="2" BorderBrush="Gray" BorderThickness="0,1,0,0" />
                     <Border Grid.Column="1" Grid.Row="2" BorderBrush="Gray" BorderThickness="0,1,0,0" />
@@ -177,7 +177,7 @@
                         </Grid>
 
                     </TabItem>
-                    <TabItem  Name="tabItemRegexHelp">
+                    <TabItem  Name="tabItemRegexHelp" Visibility="Hidden">
                         <TabItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <Label Name="labelRegexHelpTabHeader">Regex Help</Label>
