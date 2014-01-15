@@ -21,11 +21,21 @@ namespace Rummage
         public RummageAbout()
         {
             InitializeComponent();
+
+            this.PreviewKeyDown += new KeyEventHandler(HandleEsc);
         }
 
         private void close_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
+        }
+
+        private void HandleEsc(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape || e.Key == Key.Enter || e.Key == Key.Space)
+            {
+                Close();
+            }
         }
     }
 }
