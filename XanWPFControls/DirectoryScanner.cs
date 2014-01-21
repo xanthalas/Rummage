@@ -37,9 +37,11 @@ namespace XanWPFControls
 
                 try
                 {
-                    string directoryToSearch = (completeDirectory.Length == 2 ? completeDirectory + "\\" : completeDirectory);
+                    string directoryToSearch = (completeDirectory.Length == 2
+                                                    ? completeDirectory + "\\"
+                                                    : completeDirectory);
                     possibleDirectories = Directory.GetDirectories(directoryToSearch, partialPath + "*",
-                                                                        SearchOption.TopDirectoryOnly);
+                                                                   SearchOption.TopDirectoryOnly);
                 }
                 catch (ArgumentException)
                 {
@@ -51,6 +53,12 @@ namespace XanWPFControls
                     //If the starting directory doesn't exist (for example its on a drive which has been removed) then just drop out
                     return null;
                 }
+                catch (NotSupportedException)
+                {
+                    //If the directory in is some weird format which we don't understand then just drop out
+                    return null;
+                }
+
                 if (possibleDirectories.Length > 0)
                 {
                     foreach (string tail in possibleDirectories)
