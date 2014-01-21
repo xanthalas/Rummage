@@ -78,7 +78,9 @@
                     </Grid.ColumnDefinitions>
 					<Menu Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left">
 						<MenuItem Header="File">
-                            <!--<MenuItem Name="MainMenuFileSearchHistory"  Header="Search History" Click="MainMenuFileSearchHistory_Click"></MenuItem>-->
+                            <MenuItem Name="SaveSearchRequest" Header="Save Search Request" Click="SaveSearchRequest_OnClick"></MenuItem>
+                            <MenuItem Name="SaveSearchRequestAs" Header="Save Search Request As ..." Click="SaveSearchRequestAs_OnClick"></MenuItem>
+                            <MenuItem Name="LoadSearchRequest" Header="Load Search Request" Click="LoadSearchRequest_OnClick"></MenuItem>
                             <MenuItem Header="Exit" Click="MenuItem_Click"></MenuItem>
 						</MenuItem>
                         <MenuItem Header="Help">
@@ -107,7 +109,7 @@
                         </Grid>
                     </Border>
                     <!--<TextBox Name="textBoxFolders"  Grid.Row="1" Grid.Column="1" MaxHeight="90" Text="" AcceptsReturn="True" TextChanged="textBoxFolders_TextChanged" VerticalScrollBarVisibility="Auto" TabIndex="1" Opacity="0.8"/>-->
-                    <xwc:DirectoryChooser Name="dirChooser" Grid.Row="1" Grid.Column="1" MaxHeight="90" TextChanged="dirChooser_TextChanged"  TabIndex="1" Opacity="0.8"></xwc:DirectoryChooser>
+                    <xwc:DirectoryChooser Name="dirChooser" Grid.Row="1" Grid.Column="1" MaxHeight="90" TextChanged="dirChooser_TextChanged"  TabIndex="1" IsTabStop="True" Opacity="0.8" ></xwc:DirectoryChooser>
                         <Button Name="btnFoldersHistory" Grid.Row="1" Grid.Column="1" Width="20" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="right" Click="btnFoldersHistory_Click" ToolTip="Folder History...">=</Button>
                     
                     <Border Grid.Column="0" Grid.Row="2" BorderBrush="Gray" BorderThickness="0,1,0,0" />
@@ -115,7 +117,7 @@
                     <CheckBox Name="chkRecurse" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="True" Margin="10,0,0,0" TabIndex="4" Checked="chkRecurse_Checked">Search sub-folders</CheckBox>
                         <CheckBox Name="chkBinaries" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" IsChecked="False" Margin="0,0,30,0" TabIndex="5" Checked="chkBinaries_Checked">Search binaries</CheckBox>
                         <CheckBox Name="chkCaseSensitive" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" TabIndex="6" Checked="chkCaseSensitive_Checked">Case-sensitive search</CheckBox>
-                        <Button Name="btnStart" Click="btnStart_Click" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Width="150" Margin="0,0,10,0" TabIndex="3" IsDefault="True">
+                        <Button Name="btnStart" Click="btnStart_Click" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Width="150" Margin="0,0,10,0" TabIndex="2" IsDefault="True">
                         	<Button.Background>
                         		<LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
                         			<GradientStop Color="#FFF3F3F3" Offset="0"/>

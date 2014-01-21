@@ -8,6 +8,7 @@ using System.Threading;
 using System.Data.Linq;
 using System.Data.Linq.Mapping;
 using RummageCore;
+using Newtonsoft.Json;
 
 namespace RummageFilesystem
 {
@@ -345,6 +346,56 @@ namespace RummageFilesystem
             }
         }
 
+        /// <summary>
+        /// Save the search request to the file with the url specified
+        /// </summary>
+        /// <param name="url">The url of the file to save the request to. </param>
+        /// <returns>True if the save was successful, otherwise False</returns>
+        public bool SaveSearchRequest(string url)
+        {
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(url))
+                {
+                    string line = Newtonsoft.Json.JsonConvert.SerializeObject(this);
+                    sw.WriteLine(line);
+
+                    sw.Close();
+                }
+
+            }
+            catch (Exception exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Load a search request from the file with the url specified
+        /// </summary>
+        /// <param name="url">The url of the file containing the request to load</param>
+        /// <returns>True if the save was successful, otherwise False</returns>
+        public ISearchRequest LoadSearchRequest(string url)
+        {
+            SearchRequestFilesystem searchRequest = new SearchRequestFilesystem();
+
+            using (StreamReader reader = new StreamReader(url))
+            {
+                string line;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Trim().Length > 0)
+                    {
+                        searchRequest = Newtonsoft.Json.JsonConvert.DeserializeObject<SearchRequestFilesystem>(line);
+                    }
+                }
+            }
+
+            return searchRequest;
+        }
         #endregion
 
         /// <summary>
@@ -383,6 +434,7 @@ namespace RummageFilesystem
         public bool IsPrepared
         {
             get { return _isPrepared; }
+            set { _isPrepared = value; }
         }
 
         /// <summary>
@@ -681,6 +733,11 @@ namespace RummageFilesystem
                 {
                     return null;
                 }
+            }
+
+            set 
+            {
+                _urlToSearch = value;
             }
         }
 

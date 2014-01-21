@@ -151,5 +151,18 @@ namespace RummageCore
         /// </summary>
         void SetRecurse(bool recurse);
 
+        /// <summary>
+        /// Save the search request to the url specified
+        /// </summary>
+        /// <param name="url">The url to save the request to. </param>
+        /// <returns>True if the save was successful, otherwise False</returns>
+        bool SaveSearchRequest(string url);
+
+        /// <summary>
+        /// Load a search request from the url specified
+        /// </summary>
+        /// <param name="url">The url of the request to load</param>
+        /// <returns>A loaded ISearchRequest object</returns>
+        ISearchRequest LoadSearchRequest(string url);
     }
 }

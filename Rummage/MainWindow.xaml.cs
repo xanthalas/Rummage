@@ -33,6 +33,16 @@ namespace Rummage
         private const string INI_FILE = "Rummage.ini";
 
         /// <summary>
+        /// The default file extension to use for saving search requests
+        /// </summary>
+        private const string DEFAULT_REQUEST_EXTENSION = "rmgreq";
+
+        /// <summary>
+        /// The text to show in the "Save as Type" dropdown of the Save dialog
+        /// </summary>
+        private const string DEFAULT_REQUEST_FILTER = "Rummage Search Request (*.rmgreq)|*.rmgreq|All files (*.*)|*.*";
+
+        /// <summary>
         /// Used to indicate to the running tasks that a cancellation has been requested
         /// </summary>
         private CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -94,6 +104,8 @@ namespace Rummage
         private string editor = "notepad.exe";
 
         private string editorArguments = string.Empty;
+
+        private string searchRequestUrl = string.Empty;
 
         /// <summary>
         /// Main entry point to the program
@@ -1261,6 +1273,102 @@ namespace Rummage
         {
             var doc = new RegexHelpWindow();
             doc.Show();
+        }
+
+        private void SaveSearchRequest_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (searchRequestUrl.Length == 0)
+            {
+                SaveSearchRequestAs_OnClick(sender, e);
+            }
+            else
+            {
+                searchRequest.SaveSearchRequest(searchRequestUrl);
+            }
+        }
+
+        private void SaveSearchRequestAs_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (searchRequest == null || ! searchRequest.IsPrepared)
+            {
+                System.Windows.MessageBox.Show("Please run the search before saving it", "Rummage - cannot save Search Request");
+                return;
+            }
+
+            SaveFileDialog saveDialog = new SaveFileDialog();
+            saveDialog.AddExtension = true;
+            saveDialog.CheckPathExists = true;
+            saveDialog.DefaultExt = DEFAULT_REQUEST_EXTENSION;
+            saveDialog.Filter = DEFAULT_REQUEST_FILTER;
+            saveDialog.OverwritePrompt = true;
+
+            if (saveDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                bool result = searchRequest.SaveSearchRequest(saveDialog.FileName);
+                
+                updateStatus((result ? "Search request saved" : "Save failed"));
+            }
+        }
+
+        private void LoadSearchRequest_OnClick(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog opendialog = new OpenFileDialog();
+            opendialog.DefaultExt = DEFAULT_REQUEST_EXTENSION;
+            opendialog.Filter = DEFAULT_REQUEST_FILTER;
+            opendialog.CheckFileExists = true;
+            opendialog.Multiselect = false;
+
+            if (opendialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                if (searchRequest == null)
+                {
+                    searchRequest = new SearchRequestFilesystem();
+                }
+                searchRequest = searchRequest.LoadSearchRequest(opendialog.FileName);
+
+                if (searchRequest != null)
+                {
+                    searchRequestUrl = opendialog.FileName;
+                    populateScreenFromSearchRequest(searchRequest);
+                }
+            }
+        }
+
+        private void populateScreenFromSearchRequest(ISearchRequest loadSearchRequest)
+        {
+            loadUIContainer(textBoxSearchStrings, loadSearchRequest.SearchStrings);
+            loadUIContainer(dirChooser.InternalTextBox, loadSearchRequest.SearchContainers);
+            loadUIContainer(textBoxIncludeFiles, loadSearchRequest.IncludeItemStrings);
+            loadUIContainer(textBoxIncludeFolders, loadSearchRequest.IncludeContainerStrings);
+            loadUIContainer(textBoxExcludeFiles, loadSearchRequest.ExcludeItemStrings);
+            loadUIContainer(textBoxExcludeFolders, loadSearchRequest.ExcludeContainerStrings);
+            chkBinaries.IsChecked = loadSearchRequest.SearchBinaries;
+            chkCaseSensitive.IsChecked = loadSearchRequest.CaseSensitive;
+            chkRecurse.IsChecked = loadSearchRequest.Recurse;
+
+            //Mark all the change tracking variables as false
+            _searchStringsChanged = false;
+            _foldersChanged = false;
+            _includeFilesChanged = false;
+            _includeFoldersChanged = false;
+            _excludeFilesChanged = false;
+            _excludeFoldersChanged = false;
+
+        }
+
+        /// <summary>
+        /// Moves the strings from a List to a textbox control
+        /// </summary>
+        /// <param name="container">The TextBox container to load</param>
+        /// <param name="source">The source List</param>
+        private void loadUIContainer(System.Windows.Controls.TextBox container, List<string> source)
+        {
+            container.Clear();
+
+            foreach (var str in source)
+            {
+                container.Text += str + Environment.NewLine;
+            }   
         }
     }
 }
