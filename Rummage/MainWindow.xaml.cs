@@ -1370,5 +1370,29 @@ namespace Rummage
                 container.Text += str + Environment.NewLine;
             }   
         }
+
+        /// <summary>
+        /// Copies the selected filenames to the clipboard
+        /// </summary>
+        /// <param name="sender">The menu item which triggered this call</param>
+        /// <param name="e">Standard event args</param>
+        private void EditCopyFilenames_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (listViewMatches.SelectedItems.Count == 0)
+            {
+                return;
+            }
+
+            StringBuilder filenames = new StringBuilder();
+            foreach (MatchingItem item in listViewMatches.SelectedItems)
+            {
+                filenames.AppendLine(item.ItemKey);
+            }
+
+            if (filenames.Length > 0)
+            {
+                System.Windows.Clipboard.SetText(filenames.ToString());
+            }
+        }
     }
 }
