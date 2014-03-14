@@ -1329,12 +1329,29 @@ namespace Rummage
                 if (searchRequest != null)
                 {
                     searchRequestUrl = opendialog.FileName;
-                    populateScreenFromSearchRequest(searchRequest);
+                    populateScreenFromSearchRequest(searchRequest, searchRequestUrl);
                 }
             }
         }
 
-        private void populateScreenFromSearchRequest(ISearchRequest loadSearchRequest)
+        /// <summary>
+        /// Get the date this request was saved so we can work out how old it is
+        /// </summary>
+        /// <param name="filename">The search request file</param>
+        /// <returns>The last write date</returns>
+        private DateTime getSearchRequestSavedDate(string filename)
+        {
+            FileInfo fi = new FileInfo(filename);
+
+            return fi.LastWriteTime;
+        }
+
+        /// <summary>
+        /// Update the screen based on the contents of the Search Request which has just been loaded
+        /// </summary>
+        /// <param name="loadSearchRequest"></param>
+        /// <param name="filename"></param>
+        private void populateScreenFromSearchRequest(ISearchRequest loadSearchRequest, string filename)
         {
             loadUIContainer(textBoxSearchStrings, loadSearchRequest.SearchStrings);
             loadUIContainer(dirChooser.InternalTextBox, loadSearchRequest.SearchContainers);
@@ -1345,6 +1362,32 @@ namespace Rummage
             chkBinaries.IsChecked = loadSearchRequest.SearchBinaries;
             chkCaseSensitive.IsChecked = loadSearchRequest.CaseSensitive;
             chkRecurse.IsChecked = loadSearchRequest.Recurse;
+
+            DateTime searchRequestLastSaved = getSearchRequestSavedDate(searchRequestUrl);
+
+            int daysOld = (DateTime.Now - searchRequestLastSaved).Days;
+
+            string filenameOnly = Path.GetFileNameWithoutExtension(filename);
+
+            string age;
+
+            switch (daysOld)
+            {
+                case 0:
+                    age = "(today)";
+                    updateStatus(string.Format("Loaded. This search request is new today (0 days old).", daysOld));
+                    break;
+                case 1:
+                    age = "(1 day old)";
+                    updateStatus(string.Format("Loaded. This search request is 1 day old.", daysOld));
+                    break;
+                default:
+                    age = string.Format("({0} days old)", daysOld);
+                    updateStatus(string.Format("Loaded. This search request is {0} days old.", daysOld));
+                    break;
+            }
+
+            this.Title = string.Format("Rummage - {0} {1}", filenameOnly, age);
 
             //Mark all the change tracking variables as false
             _searchStringsChanged = false;
