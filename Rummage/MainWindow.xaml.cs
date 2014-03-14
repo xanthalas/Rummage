@@ -1434,7 +1434,7 @@ namespace Rummage
 
             if (filenames.Length > 0)
             {
-                System.Windows.Clipboard.SetText(filenames.ToString());
+                System.Windows.Clipboard.SetText(filenames.ToString().TrimEnd());
             }
         }
 
