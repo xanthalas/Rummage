@@ -78,6 +78,7 @@
                     </Grid.ColumnDefinitions>
 					<Menu Grid.Column="0" Grid.Row="0" HorizontalAlignment="Left">
 						<MenuItem Header="File">
+                            <MenuItem Name="NewSearchRequest" Header="New Search Request" Click="NewSearchRequest_OnClick"></MenuItem>
                             <MenuItem Name="SaveSearchRequest" Header="Save Search Request" Click="SaveSearchRequest_OnClick"></MenuItem>
                             <MenuItem Name="SaveSearchRequestAs" Header="Save Search Request As ..." Click="SaveSearchRequestAs_OnClick"></MenuItem>
                             <MenuItem Name="LoadSearchRequest" Header="Load Search Request" Click="LoadSearchRequest_OnClick"></MenuItem>

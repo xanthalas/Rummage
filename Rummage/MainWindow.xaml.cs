@@ -1437,5 +1437,42 @@ namespace Rummage
                 System.Windows.Clipboard.SetText(filenames.ToString());
             }
         }
+
+        /// <summary>
+        /// Clears everything out ready to perform a new search
+        /// </summary>
+        /// <param name="sender">Component triggering this event</param>
+        /// <param name="e">Standard event args</param>
+        private void NewSearchRequest_OnClick(object sender, RoutedEventArgs e)
+        {
+            matchingLinesForCurrentSelection.Clear();
+            matches.Clear();
+            searchRequest = new SearchRequestFilesystem();
+
+            resetUI();
+        }
+
+        /// <summary>
+        /// Clears the UI completely 
+        /// </summary>
+        private void resetUI()
+        {
+            textBoxSearchStrings.Clear();
+            dirChooser.InternalTextBox.Clear();
+            textBoxIncludeFiles.Clear();
+            textBoxIncludeFolders.Clear();
+            textBoxExcludeFiles.Clear();
+            textBoxExcludeFolders.Clear();
+            textBoxExcludeFolders.Text += ".svn" + Environment.NewLine;
+            chkBinaries.IsChecked = false;
+            chkCaseSensitive.IsChecked = false;
+            chkRecurse.IsChecked = true;
+            flowResults.Blocks.Clear();
+
+            updateStatus("Ready.");
+            searchingX.Text = string.Empty;
+            searchingOfY.Text = string.Empty;
+            runningProgress.Value = 0;
+        }
     }
 }
