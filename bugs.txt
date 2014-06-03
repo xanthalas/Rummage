@@ -1,5 +1,7 @@
 Open
 ----
+0006: When the Search is completed the "Progress bar" should change to say "Done" or similar
+0007: When saving a previously-loaded search the title bar should update to show that it is now current
 
 Fixed
 -----
@@ -8,4 +10,5 @@ Fixed
 0003: If the folder or search history files are corrupt it crashes the program.
 0004: If you cancel a search during the "Determining which files to search" phase and then start a new search with the same folder(s)
       but different "search for" criteria it will go straight to searching the files it has found so far and won't restart from the beginning.
+0005: Creating a new search doesn't reset the title in the title bar
 

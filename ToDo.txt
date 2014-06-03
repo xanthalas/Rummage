@@ -37,3 +37,4 @@ Remove the watermark under the search boxes when it is going to be covered by th
 Implement CTRL+Up/Down to jump to prev/next match in file pane
 Tab-completion for directory pane
 Right-click menu on matching file view
+Add ability to copy filename from search results.

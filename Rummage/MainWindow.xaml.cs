@@ -1469,6 +1469,7 @@ namespace Rummage
             chkRecurse.IsChecked = true;
             flowResults.Blocks.Clear();
 
+            this.Title = "Rummage";
             updateStatus("Ready.");
             searchingX.Text = string.Empty;
             searchingOfY.Text = string.Empty;
