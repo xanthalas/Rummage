@@ -424,8 +424,8 @@ namespace Rummage
  
                 string result = String.Format("Search complete. {0} {4} found in {1} {5} out of {2} files searched ({3} seconds)",
                                               search.Matches.Count, matches.Count, searchRequest.Urls.Count, String.Format("{0:0.00}", elapsed.TotalSeconds), matchWord, fileWord);
-                searchingX.Text = "Searching file " + searchRequest.Urls.Count.ToString() + " ";
-                searchingOfY.Text = "of " + searchRequest.Urls.Count.ToString();
+                searchingX.Text = string.Empty;
+                searchingOfY.Text = string.Empty;
                 updateDocument(flowResults, result);
                 updateStatus(result);
 
@@ -1306,6 +1306,11 @@ namespace Rummage
             {
                 bool result = searchRequest.SaveSearchRequest(saveDialog.FileName);
                 
+                if (result)
+                {
+                    setWindowTitle(saveDialog.FileName);
+                }
+
                 updateStatus((result ? "Search request saved" : "Save failed"));
             }
         }
@@ -1363,7 +1368,25 @@ namespace Rummage
             chkCaseSensitive.IsChecked = loadSearchRequest.CaseSensitive;
             chkRecurse.IsChecked = loadSearchRequest.Recurse;
 
-            DateTime searchRequestLastSaved = getSearchRequestSavedDate(searchRequestUrl);
+            setWindowTitle(filename);
+
+            //Mark all the change tracking variables as false
+            _searchStringsChanged = false;
+            _foldersChanged = false;
+            _includeFilesChanged = false;
+            _includeFoldersChanged = false;
+            _excludeFilesChanged = false;
+            _excludeFoldersChanged = false;
+
+        }
+
+        /// <summary>
+        /// Sets the window title based on the name and age of the saved Search Request
+        /// </summary>
+        /// <param name="filename">The filename for the saved Search Request</param>
+        private void setWindowTitle(string filename)
+        {
+            DateTime searchRequestLastSaved = getSearchRequestSavedDate(filename);
 
             int daysOld = (DateTime.Now - searchRequestLastSaved).Days;
 
@@ -1388,15 +1411,6 @@ namespace Rummage
             }
 
             this.Title = string.Format("Rummage - {0} {1}", filenameOnly, age);
-
-            //Mark all the change tracking variables as false
-            _searchStringsChanged = false;
-            _foldersChanged = false;
-            _includeFilesChanged = false;
-            _includeFoldersChanged = false;
-            _excludeFilesChanged = false;
-            _excludeFoldersChanged = false;
-
         }
 
         /// <summary>
