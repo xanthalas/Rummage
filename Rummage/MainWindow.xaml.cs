@@ -386,7 +386,7 @@ namespace Rummage
             {
                 request.Prepare();                
             }
-            string displayString = string.Format("Searching {0} files...", searchRequest.Urls.Count);
+            string displayString = string.Format("Searching {0} {1} ...", searchRequest.Urls.Count, searchRequest.Urls.Count == 1 ? "file" : "files");
             updateDocument(flowResults, displayString);
             updateStatus(displayString);
             if (!cancellingSearch)
@@ -421,9 +421,20 @@ namespace Rummage
 
                 string matchWord = search.Matches.Count == 1 ? "match" : "matches";
                 string fileWord = matches.Count == 1 ? "file" : "files";
- 
-                string result = String.Format("Search complete. {0} {4} found in {1} {5} out of {2} files searched ({3} seconds)",
-                                              search.Matches.Count, matches.Count, searchRequest.Urls.Count, String.Format("{0:0.00}", elapsed.TotalSeconds), matchWord, fileWord);
+                string searchedFilesWord = searchRequest.Urls.Count == 1 ? "file" : "files";
+
+                string result;
+
+                if (search.Matches.Count == 0)
+                {
+                    result = String.Format("Search complete. No matches found. {0} {1} searched ({2} seconds)",
+                                                  searchRequest.Urls.Count, searchedFilesWord, String.Format("{0:0.00}", elapsed.TotalSeconds));
+                }
+                else
+                {
+                    result = String.Format("Search complete. {0} {4} found in {1} {5} out of {2} {6} searched ({3} seconds)",
+                                                  search.Matches.Count, matches.Count, searchRequest.Urls.Count, String.Format("{0:0.00}", elapsed.TotalSeconds), matchWord, fileWord, searchedFilesWord);
+                }
                 searchingX.Text = string.Empty;
                 searchingOfY.Text = string.Empty;
                 updateDocument(flowResults, result);
@@ -1377,7 +1388,6 @@ namespace Rummage
             _includeFoldersChanged = false;
             _excludeFilesChanged = false;
             _excludeFoldersChanged = false;
-
         }
 
         /// <summary>
@@ -1393,24 +1403,32 @@ namespace Rummage
             string filenameOnly = Path.GetFileNameWithoutExtension(filename);
 
             string age;
+            string ageDescription;
 
             switch (daysOld)
             {
                 case 0:
                     age = "(today)";
-                    updateStatus(string.Format("Loaded. This search request is new today (0 days old).", daysOld));
+                    ageDescription = string.Format("This search request is new today (0 days old)", daysOld);
                     break;
                 case 1:
                     age = "(1 day old)";
-                    updateStatus(string.Format("Loaded. This search request is 1 day old.", daysOld));
+                    ageDescription = string.Format("This search request is 1 day old", daysOld);
                     break;
                 default:
                     age = string.Format("({0} days old)", daysOld);
-                    updateStatus(string.Format("Loaded. This search request is {0} days old.", daysOld));
+                    ageDescription = string.Format("This search request is {0} days old", daysOld);
                     break;
             }
 
+            updateStatus("Loaded. " + ageDescription + ".");
+
             this.Title = string.Format("Rummage - {0} {1}", filenameOnly, age);
+
+            //Write details of what has been loaded to the text pane
+            updateDocument(flowResults, string.Format("Loaded Search Request: {0}", filenameOnly));
+            updateDocument(flowResults, string.Format("    {0} and will search {1} {2}", ageDescription, searchRequest.Urls.Count, searchRequest.Urls.Count == 1 ? "file." : "files."));
+
         }
 
         /// <summary>
