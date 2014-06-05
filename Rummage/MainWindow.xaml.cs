@@ -1093,7 +1093,11 @@ namespace Rummage
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                dirChooser.InternalTextBox.Text += "\n" + fbd.SelectedPath;
+                if (dirChooser.InternalTextBox.Text.Length > 1)
+                {
+                    dirChooser.InternalTextBox.Text += "\n";
+                }
+                dirChooser.InternalTextBox.Text += fbd.SelectedPath;
             }
         }
 
