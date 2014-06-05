@@ -19,13 +19,14 @@ using RummageCore;
 using RummageFilesystem;
 using Snarl;
 using Application = System.Windows.Application;
+using MahApps.Metro.Controls;
 
 namespace Rummage
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         /// <summary>
         /// The name of the ini file
