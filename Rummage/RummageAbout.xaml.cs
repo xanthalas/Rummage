@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -36,6 +37,14 @@ namespace Rummage
             {
                 Close();
             }
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            if (sender.GetType() != typeof(Hyperlink))
+                return;
+            string link = ((Hyperlink)sender).NavigateUri.ToString();
+            Process.Start(link);
         }
     }
 }

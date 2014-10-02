@@ -11,6 +11,9 @@
     			<Label HorizontalAlignment="Center">Rummage v 0.2 (Alpha release)</Label>
 				<Label HorizontalAlignment="Center">Copyright (c) 2014 Xanthalas</Label>
                 <Label HorizontalAlignment="Center">Released under the GNU Public license</Label>
+                <Label>
+                    <Hyperlink NavigateUri="https://github.com/xanthalas/Rummage" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/xanthalas/Rummage</Hyperlink>
+                </Label>
 			</StackPanel>  	
 		</ed:Callout>
     </Grid>
