@@ -167,7 +167,7 @@ namespace Rummage
                     {
                         sw.WriteLine("#This is the ini file for the Rummage search tool.");
                         sw.WriteLine(@"editor=notepad.exe");
-                        sw.WriteLine(@"editorargs=+");
+                        sw.WriteLine(@"editorargs=");
                         sw.Close();
                     }
                 }
