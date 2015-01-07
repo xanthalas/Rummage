@@ -22,6 +22,7 @@ persistence of searches
 Mention included code in About screen:
     Snarl
     http://www.codeproject.com/Articles/22012/Explorer-Shell-Context-Menu
+Option to remove leading spaces from search results in bottom grid
 
 
 
