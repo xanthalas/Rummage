@@ -549,7 +549,33 @@ namespace Rummage
                 return false;
             }
 
+            var invalidregex = RummageHelper.AreRegexesValid(textBoxIncludeFiles.Text);
+            if (invalidregex.Length > 0)
+            {
+                updateStatus("Cannot search - the following regex in the \"Include Files\" filter is invalid: " + invalidregex);
+                return false;
+            }
 
+            invalidregex = RummageHelper.AreRegexesValid(textBoxIncludeFolders.Text);
+            if (invalidregex.Length > 0)
+            {
+                updateStatus("Cannot search - the following regex in the \"Include Folders\" filter is invalid: " + invalidregex);
+                return false;
+            }
+
+            invalidregex = RummageHelper.AreRegexesValid(textBoxExcludeFiles.Text);
+            if (invalidregex.Length > 0)
+            {
+                updateStatus("Cannot search - the following regex in the \"Exclude Files\" filter is invalid: " + invalidregex);
+                return false;
+            }
+
+            invalidregex = RummageHelper.AreRegexesValid(textBoxExcludeFolders.Text);
+            if (invalidregex.Length > 0)
+            {
+                updateStatus("Cannot search - the following regex in the \"Exclude Folders\" filter is invalid: " + invalidregex);
+                return false;
+            }
             return true;
         }
 
@@ -645,24 +671,9 @@ namespace Rummage
             }
 
             bool result = true;
-            string invalidRegex = string.Empty;
 
-            for (int index = 0; index < textBoxSearchStrings.LineCount; index++)
-            {
-                string line = textBoxSearchStrings.GetLineText(index).Trim();
-                if (line.Length > 0)
-                {
-                    try
-                    {
-                        Regex rx = new Regex(line);
-                    }
-                    catch (ArgumentException)
-                    {
-                        invalidRegex = line;
-                        break;
-                    }
-                }
-            }
+            string invalidRegex = RummageHelper.AreRegexesValid(textBoxSearchStrings.Text);
+
 
             if (invalidRegex.Length > 0)
             {
@@ -684,6 +695,7 @@ namespace Rummage
 
             return result;
         }
+
 
         private void enableDisableSearchButton()
         {

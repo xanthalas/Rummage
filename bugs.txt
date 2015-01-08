@@ -4,7 +4,6 @@ Open
 0007: Load a saved search request. Tick the "Case-sensitive" option and start the search. It rescans all the folders before searching. Case-sensitive 
       might be a red-herring but it definitely shouldn't be re-reading the files.
 0008: In the "Search where" box the program will crash if you enter the path to a DVD drive which is empty
-0009: Adding an invalid regex into the "Files" filter causes the program to crash
 
 Fixed
 -----
@@ -15,4 +14,5 @@ Fixed
       but different "search for" criteria it will go straight to searching the files it has found so far and won't restart from the beginning.
 0005: Creating a new search doesn't reset the title in the title bar
 0006: When the Search is completed the "Progress bar" should change to say "Done" or similar
+0009: Adding an invalid regex into the "Files" filter causes the program to crash
 
