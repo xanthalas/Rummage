@@ -1,60 +1,348 @@
+
 <html>
+    <style>
+        body {
+          background-color: white ;
+        }
+        H1 {
+          color: #0000ff;
+        }
+        H4 {
+          color: #0000ff;
+        }
+        table {
+          border-collapse: collapse;
+          border: 1px solid;
+          table-layout: auto;
+        }
+        thead, th {
+          background-color: #b0cee7;
+        }
+        tbody tr:nth-child(even) {
+          background-color: #f2e8df;
+        }
+        td {
+          padding: 10px;
+        }
+    </style>
     <head>
         <title>Regular Expression Help</title>
         <link rel="stylesheet" href="regexhelp.css" type="text/css"/>	
     </head>
     <body>
-        <div class="CSSTableGenerator">
-        <h1>Regular Expression Help</h1>
-        <H4>Character Escapes</h4>
-        <table>
-            <thead><td>&nbsp;Chars</td><td>Description</td></thead>
-            <tr><td>\a</td><td>Matches a bell character, \u0007.</td></tr>
-            <tr><td>\b</td><td>In a character class, matches a backspace, \u0008.</td></tr>
-            <tr><td>\t</td><td>Matches a tab, \u0009.</td></tr>
-            <tr><td>\r</td><td>Matches a carriage return, \u000D. (\r is not equivalent to the newline character, \n.)</td></tr>
-            <tr><td>\v</td><td>Matches a vertical tab, \u000B.</td></tr>
-            <tr><td>\f</td><td>Matches a form feed, \u000C.</td></tr>
-            <tr><td>\n</td><td>Matches a new line, \u000A.</td></tr>
-            <tr><td>\e</td><td>Matches an escape, \u001B.</td></tr>
-            <tr><td>\ nnn</td><td>Uses octal representation to specify a character (nnn consists of up to three digits).</td></tr>
-            <tr><td>\x nn</td><td>Uses hexadecimal representation to specify a character (nn consists of exactly two digits).</td></tr>
-            <tr><td>\c</td><td> X</td></tr>
-            <tr><td>\c x</td><td>Matches the ASCII control character that is specified by X or x, where X or x is the letter of the control character.</td></tr>
-            <tr><td>\u nnnn</td><td>Matches a Unicode character by using hexadecimal representation (exactly four digits, as represented bynnnn).</td></tr>
-            <tr><td>\</td><td>When followed by a character that is not recognized as an escaped character in this and other tables in this topic, matches that character. For example, \* is the same as \x2A. This allows the regular expression engine to disambiguate language elements (such as * or ?) and character literals (represented by \* or \?).</td></tr>
-        </table>
-        <h4>Character classes</h4>
-
-        <table border="1">
-            <thead><td>&nbsp;Chars</td><td>Description</td></thead>
-            <tr><td>[character_group]</td><td>Matches any single character in character_group. By default, the match is case-sensitive.</td></tr>
-            <tr><td>[^character_group]</td><td>Negation: Matches any single character that is not in character_group. By default, characters incharacter_group are case-sensitive.</td></tr>
-            <tr><td>[ first - last ]</td><td>Character range: Matches any single character in the range from first to last.</td></tr>
-            <tr><td>.</td><td>Wildcard: Matches any single character except \n.</td></tr>
-            <tr><td>\p{ name }</td><td>	Matches any single character in the Unicode general category or named block specified byname.</td></tr>
-            <tr><td>\P{ name }</td><td>	Matches any single character that is not in the Unicode general category or named block specified by name.</td></tr>
-            <tr><td>\w</td><td>Matches any word character.</td></tr>
-            <tr><td>\W</td><td>Matches any non-word character.</td></tr>
-            <tr><td>\s</td><td>Matches any white-space character.</td></tr>
-            <tr><td>\S</td><td>Matches any non-white-space character.</td></tr>
-            <tr><td>\d</td><td>Matches any decimal digit.</td></tr>
-            <tr><td>\D</td><td>Matches any character that is not a decimal digit.</td></tr>
-        </table>
-
-        <h4>Anchors</h4>
-
-        <table border="1">
-            <thead><td>&nbsp;Assertion</td><td>Description</td></thead>
-            <tr><td>^</td><td>The match must start at the beginning of the string or line.</td></tr>
-            <tr><td>$</td><td>The match must occur at the end of the string or before \n at the end of the line or string.</td></tr>
-            <tr><td>\A</td><td>The match must occur at the start of the string.</td></tr>
-            <tr><td>\Z</td><td>The match must occur at the end of the string or before \n at the end of the string.</td></tr>
-            <tr><td>\z</td><td>The match must occur at the end of the string.</td></tr>
-            <tr><td>\G</td><td>The match must occur at the point where the previous match ended.</td></tr>
-            <tr><td>\b</td><td>The match must occur on a boundary between a \w (alphanumeric) and a \W(nonalphanumeric) character.</td></tr>
-            <tr><td>\B</td><td>The match must not occur on a \b boundary.</td></tr>
-        </table>
-        </div>
+	<H1>
+		Regular Expression Help
+	</H1>
+	<H4>
+		Character Escapes
+	</H4>
+	<table>
+		<thead>
+			<td width="150">
+				Chars
+			</td>
+			<td>
+				Description
+			</td>
+		</thead>
+		<tr>
+			<td>
+				\a
+			</td>
+			<td>
+				Matches a bell character, \u0007.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\b
+			</td>
+			<td>
+				In a character class, matches a backspace, \u0008.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\t
+			</td>
+			<td>
+				Matches a tab, \u0009.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\r
+			</td>
+			<td>
+				Matches a carriage return, \u000D. (\r is not equivalent to the newline character, \n.)
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\v
+			</td>
+			<td>
+				Matches a vertical tab, \u000B.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\f
+			</td>
+			<td>
+				Matches a form feed, \u000C.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\n
+			</td>
+			<td>
+				Matches a new line, \u000A.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\e
+			</td>
+			<td>
+				Matches an escape, \u001B.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\ nnn
+			</td>
+			<td>
+				Uses octal representation to specify a character (nnn consists of up to three digits).
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\x nn
+			</td>
+			<td>
+				Uses hexadecimal representation to specify a character (nn consists of exactly two digits).
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\c
+			</td>
+			<td>
+				X
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\c x
+			</td>
+			<td>
+				Matches the ASCII control character that is specified by X or x, where X or x is the letter of the control character.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\u nnnn
+			</td>
+			<td>
+				Matches a Unicode character by using hexadecimal representation (exactly four digits, as represented bynnnn).
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\
+			</td>
+			<td>
+				When followed by a character that is not recognized as an escaped character in this and other tables in this topic, matches that character. For example, \* is the same as \x2A. This allows the regular expression engine to disambiguate language elements (such as * or ?) and character literals (represented by \* or \?).
+			</td>
+		</tr>
+	</table>
+	<H4>
+		Character classes
+	</H4>
+	<table>
+		<thead>
+			<td width="150">
+				Chars
+			</td>
+			<td>
+				Description
+			</td>
+		</thead>
+		<tr>
+			<td>
+				[character_group]
+			</td>
+			<td>
+				Matches any single character in character_group. By default, the match is case-sensitive.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				[^character_group]
+			</td>
+			<td>
+				Negation: Matches any single character that is not in character_group. By default, characters in character_group are case-sensitive.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				[ first - last ]
+			</td>
+			<td>
+				Character range: Matches any single character in the range from first to last.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				.
+			</td>
+			<td>
+				Wildcard: Matches any single character except \n.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\p{ name }
+			</td>
+			<td>
+				Matches any single character in the Unicode general category or named block specified byname.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\P{ name }
+			</td>
+			<td>
+				Matches any single character that is not in the Unicode general category or named block specified by name.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\w
+			</td>
+			<td>
+				Matches any word character.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\W
+			</td>
+			<td>
+				Matches any non-word character.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\s
+			</td>
+			<td>
+				Matches any white-space character.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\S
+			</td>
+			<td>
+				Matches any non-white-space character.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\d
+			</td>
+			<td>
+				Matches any decimal digit.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\D
+			</td>
+			<td>
+				Matches any character that is not a decimal digit.
+			</td>
+		</tr>
+	</table>
+	<h4>
+		Anchors
+	</h4>
+	<table >
+		<thead>
+			<td width="150">
+				&nbsp;Assertion
+			</td>
+			<td>
+				Description
+			</td>
+		</thead>
+		<tr>
+			<td>
+				^
+			</td>
+			<td>
+				The match must start at the beginning of the string or line.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				$
+			</td>
+			<td>
+				The match must occur at the end of the string or before \n at the end of the line or string.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\A
+			</td>
+			<td>
+				The match must occur at the start of the string.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\Z
+			</td>
+			<td>
+				The match must occur at the end of the string or before \n at the end of the string.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\z
+			</td>
+			<td>
+				The match must occur at the end of the string.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\G
+			</td>
+			<td>
+				The match must occur at the point where the previous match ended.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\b
+			</td>
+			<td>
+				The match must occur on a boundary between a \w (alphanumeric) and a \W(nonalphanumeric) character.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				\B
+			</td>
+			<td>
+				The match must not occur on a \b boundary.
+			</td>
+		</tr>
+	</table>
     </body>
 </html>
