@@ -23,6 +23,7 @@ Mention included code in About screen:
     Snarl
     http://www.codeproject.com/Articles/22012/Explorer-Shell-Context-Menu
 Option to remove leading spaces from search results in bottom grid
+Draw a border around the main window as when it is white over another white App you can't see it properly.
 
 
 

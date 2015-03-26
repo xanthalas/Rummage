@@ -4,6 +4,7 @@ Open
 0007: Load a saved search request. Tick the "Case-sensitive" option and start the search. It rescans all the folders before searching. Case-sensitive 
       might be a red-herring but it definitely shouldn't be re-reading the files.
 0008: In the "Search where" box the program will crash if you enter the path to a DVD drive which is empty
+0010: Load a saved search request which had some matches (say 63). Change the search to look for something which won't match and run the search. The message shown will still show "... 63 matches found in 0 files..."
 
 Fixed
 -----
