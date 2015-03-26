@@ -4,7 +4,7 @@
         xmlns:xwc="clr-namespace:XanWPFControls;assembly=XanWPFControls"
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip" KeyDown="Window_KeyDown">
+        Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip" KeyDown="Window_KeyDown" BorderThickness="1" BorderBrush="LightGray"> 
     <DockPanel  Name="dockPanelMain">
         <StatusBar Height="22" Name="statusBarMain" DockPanel.Dock="Bottom">
             <StatusBar.ItemsPanel>
@@ -22,11 +22,11 @@
                     </Grid>
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
-            <StatusBarItem>
+            <StatusBarItem Grid.Column="0" Grid.ColumnSpan="4">
                 <TextBlock Name="textBlockCurrentStatus" DockPanel.Dock="Left" MinWidth="400">Ready.</TextBlock>
             </StatusBarItem>
             <StatusBarItem Grid.Column="1">
-                <ProgressBar Name="runningProgress" MinWidth="200" Height="22" DockPanel.Dock="Right"></ProgressBar>
+                <ProgressBar Name="runningProgress" MinWidth="200" Height="22" DockPanel.Dock="Right" Visibility="Hidden"></ProgressBar>
             </StatusBarItem>
             <StatusBarItem Grid.Column="2" HorizontalAlignment="Right">
                 <TextBlock Name="searchingX" HorizontalAlignment="Right"></TextBlock>

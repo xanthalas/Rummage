@@ -115,6 +115,7 @@ namespace Rummage
         public MainWindow()
         {
             InitializeComponent();
+
             Snarl.SnarlConnector.RegisterConfig((IntPtr)snarlHandle, "Rummage", WindowsMessage.WM_NULL);
 
             normalBorderBrush = dirChooser.InternalTextBox.BorderBrush;
@@ -215,6 +216,7 @@ namespace Rummage
             
             listViewMatches.ItemsSource = matches;
             listViewMatchesForSelection.ItemsSource = matchingLinesForCurrentSelection;
+            runningProgress.Visibility = System.Windows.Visibility.Visible;
 
             #region Build search strings and search folders
             if (searchRequest == null)
@@ -460,6 +462,7 @@ namespace Rummage
                 }
                 Int32 nReturnId = SnarlConnector.ShowMessage("Rummage - search complete", snarlResult, 10, "", (IntPtr) 0, 0);
             }
+            runningProgress.Visibility = System.Windows.Visibility.Hidden;
             btnStart.Content = "_Start Search";
             searchRunning = false;
             cancellingSearch = false;
