@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Linq;
+using System.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -420,6 +421,9 @@ namespace Rummage
                 DateTime endTime = DateTime.Now;
                 TimeSpan elapsed = endTime.Subtract(startTime);
 
+                var successCount = (from m in search.Matches where m.Successful != null && m.Successful select m).Count();
+                var failCount = search.Matches.Count - successCount;
+
                 string matchWord = search.Matches.Count == 1 ? "match" : "matches";
                 string fileWord = matches.Count == 1 ? "file" : "files";
                 string searchedFilesWord = searchRequest.Urls.Count == 1 ? "file" : "files";
@@ -433,15 +437,27 @@ namespace Rummage
                 }
                 else
                 {
-                    result = String.Format("Search complete. {0} {4} found in {1} {5} out of {2} {6} searched ({3} seconds)",
-                                                  search.Matches.Count, matches.Count, searchRequest.Urls.Count, String.Format("{0:0.00}", elapsed.TotalSeconds), matchWord, fileWord, searchedFilesWord);
+                    if (failCount == 0)
+                    {
+                        result = String.Format("Search complete. {0} {4} found in {1} {5} out of {2} {6} searched ({3} seconds)",
+                                                      search.Matches.Count, matches.Count, searchRequest.Urls.Count, String.Format("{0:0.00}", elapsed.TotalSeconds), matchWord, fileWord, searchedFilesWord);
+                    }
+                    else
+                    {
+                        result = String.Format("Search complete. {0} {4} found in {1} {5} out of {2} {6} searched ({3} seconds). {7} files could not be searched",
+                                                      successCount, matches.Count, searchRequest.Urls.Count - failCount, String.Format("{0:0.00}", elapsed.TotalSeconds), matchWord, fileWord, searchedFilesWord, failCount);
+                    }
                 }
                 searchingX.Text = string.Empty;
                 searchingOfY.Text = string.Empty;
                 updateDocument(flowResults, result);
                 updateStatus(result);
 
-                string snarlResult = string.Format("\n    {0} {1} found", search.Matches.Count, matchWord);
+                string snarlResult = string.Format("\n    {0} {1} found", successCount, matchWord);
+                if (failCount > 0)
+                {
+                    snarlResult = snarlResult + String.Format("\n    {0} files couldn't be searched", failCount); 
+                }
                 Int32 nReturnId = SnarlConnector.ShowMessage("Rummage - search complete", snarlResult, 10, "", (IntPtr) 0, 0);
             }
             btnStart.Content = "_Start Search";
@@ -1002,8 +1018,7 @@ namespace Rummage
                     }
                     else
                     {
-                        updateDocument(flowResults,
-                                       string.Format("Couldn't search {0}:{1}", match.MatchItem, match.ErrorMessage));
+                        updateDocument(flowResults, match.ErrorMessage);
                     }
                 }
             }
