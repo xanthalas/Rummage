@@ -145,7 +145,8 @@ namespace RummageFilesystem
                 RummageCore.Match failedMatch = new RummageCore.Match("", "", 0, url);
                 failedMatch.Successful = false;
                 failedMatch.ErrorMessage = String.Format("File {0} cannot be searched as it no longer exists.", url);
-                matchesInThisFile.Add(failedMatch);                
+                //matchesInThisFile.Add(failedMatch);  
+                matchesInThisFile.AddWithNullcheck(failedMatch);
             }
             else
             {
@@ -163,7 +164,8 @@ namespace RummageFilesystem
                             var result = searchLine(line, regexes);
                             if (result != null)
                             {
-                                matchesInThisFile.Add(new RummageCore.Match(result.ToString(), line, lineNumber, url));
+                                //matchesInThisFile.Add(new RummageCore.Match(result.ToString(), line, lineNumber, url));
+                                matchesInThisFile.AddWithNullcheck(new RummageCore.Match(result.ToString(), line, lineNumber, url));
                             }
                         }
                     }
@@ -173,7 +175,8 @@ namespace RummageFilesystem
                     RummageCore.Match failedMatch = new RummageCore.Match("", "", 0, url);
                     failedMatch.Successful = false;
                     failedMatch.ErrorMessage = ioe.Message;
-                    matchesInThisFile.Add(failedMatch);
+                    //matchesInThisFile.Add(failedMatch);
+                    matchesInThisFile.AddWithNullcheck(failedMatch);
                 }
             }
             return matchesInThisFile;
@@ -285,5 +288,23 @@ namespace RummageFilesystem
             return 0;
         }
 
+    }
+
+    /// <summary>
+    /// Added in order to help trap an issue with matches occasionally being set to Null.
+    /// </summary>
+    public static class ListTExtensions
+    {
+        public static void AddWithNullcheck<T>(this List<T> set, T item) where T : class
+        {
+            if (item == null)
+            {
+                throw new NullReferenceException("Attempting to add null item");
+            }
+            else
+            {
+                set.Add(item);
+            }
+        }
     }
 }

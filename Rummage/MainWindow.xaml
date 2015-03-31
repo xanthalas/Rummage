@@ -4,7 +4,8 @@
         xmlns:xwc="clr-namespace:XanWPFControls;assembly=XanWPFControls"
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip" KeyDown="Window_KeyDown" BorderThickness="1" BorderBrush="LightGray"> 
+        Title="Rummage" Height="500" Width="1000" ResizeMode="CanResizeWithGrip" KeyDown="Window_KeyDown" BorderThickness="1" BorderBrush="LightGray">
+    
     <DockPanel  Name="dockPanelMain">
         <StatusBar Height="22" Name="statusBarMain" DockPanel.Dock="Bottom">
             <StatusBar.ItemsPanel>
@@ -193,7 +194,7 @@
                     <CheckBox Name="chkRecurse" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="True" Margin="10,0,0,0" TabIndex="4" Checked="chkRecurse_Checked">Search sub-folders</CheckBox>
                         <CheckBox Name="chkBinaries" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right" IsChecked="False" Margin="0,0,30,0" TabIndex="5" Checked="chkBinaries_Checked">Search binaries</CheckBox>
                         <CheckBox Name="chkCaseSensitive" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" TabIndex="6" Checked="chkCaseSensitive_Checked">Case-sensitive search</CheckBox>
-                    <Button Name="btnStart" Click="btnStart_Click" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Width="150" Margin="0,0,1,0" TabIndex="2" IsDefault="True" Style="{DynamicResource SquareButtonStyle}">
+                    <Button Name="btnStart" Click="btnStart_Click" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Width="150" Margin="0,0,1,0" TabIndex="2" IsDefault="True" Style="{DynamicResource SquareButtonStyle}" Command="ApplicationCommands.Find" ToolTip="Start Search (F5)">
                         	<!--<Button.Background>
                         		<LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
                         			<GradientStop Color="#FFF3F3F3" Offset="0"/>

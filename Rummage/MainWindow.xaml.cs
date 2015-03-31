@@ -109,6 +109,8 @@ namespace Rummage
 
         private string searchRequestUrl = string.Empty;
 
+        public static RoutedCommand DoSearchRoutedCommand = new RoutedCommand();
+
         /// <summary>
         /// Main entry point to the program
         /// </summary>
@@ -128,7 +130,25 @@ namespace Rummage
 
             createHistoryWindows();
 
+            wireUpCommands();
+
 //            loadTheme("XXX");
+        }
+
+        private void wireUpCommands()
+        {
+            // Create the binding.
+            CommandBinding binding = new CommandBinding(ApplicationCommands.Find);
+
+            // Attach the event handler.
+            binding.Executed += ExecutedDoSearchCommand;
+            binding.CanExecute += CanExecuteDoSearchCommand;
+
+            KeyGesture doSearchKeyGesture = new KeyGesture(Key.F5, ModifierKeys.None);
+            ApplicationCommands.Find.InputGestures.Add(doSearchKeyGesture);
+
+            // Register the binding.
+            this.CommandBindings.Add(binding);
         }
 
         /// <summary>
@@ -1541,6 +1561,26 @@ namespace Rummage
             searchingX.Text = string.Empty;
             searchingOfY.Text = string.Empty;
             runningProgress.Value = 0;
+        }
+
+        /// <summary>
+        /// Initiate the Search when the command is executed
+        /// </summary>
+        /// <param name="sender">Control which sends this command</param>
+        /// <param name="e">Event arguments</param>
+        private void ExecutedDoSearchCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            doSearch();
+        }
+
+        /// <summary>
+        /// Used by routed command to indicate whether Search can be initiated
+        /// </summary>
+        /// <param name="sender">Standard sender</param>
+        /// <param name="e">Event Args for this event</param>
+        private void CanExecuteDoSearchCommand(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = checkSearchesAreValid() && checkFoldersExist() && textBoxSearchStrings.Text.Trim().Length > 0 && dirChooser.InternalTextBox.Text.Trim().Length > 0;
         }
     }
 }

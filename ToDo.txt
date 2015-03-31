@@ -4,7 +4,6 @@ Rummage - To Do
 High
 ----
 
-Implement proper keyboard handling for menu routes.
 
 
 Medium
@@ -23,7 +22,6 @@ Mention included code in About screen:
     Snarl
     http://www.codeproject.com/Articles/22012/Explorer-Shell-Context-Menu
 Option to remove leading spaces from search results in bottom grid
-Draw a border around the main window as when it is white over another white App you can't see it properly.
 
 
 
@@ -40,3 +38,5 @@ Implement CTRL+Up/Down to jump to prev/next match in file pane
 Tab-completion for directory pane
 Right-click menu on matching file view
 Add ability to copy filename from search results.
+Draw a border around the main window as when it is white over another white App you can't see it properly.
+Implement proper keyboard handling for menu routes.
