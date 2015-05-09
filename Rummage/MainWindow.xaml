@@ -158,6 +158,7 @@
 						</MenuItem>
                         <MenuItem Header="Edit">
                             <MenuItem Name="EditCopyFilenames" Header="Copy Selected Filenames" Click="EditCopyFilenames_OnClick"></MenuItem>
+                            <MenuItem Name="EditSettings" Header="Settings" Click="EditSettings_Click"></MenuItem>
                         </MenuItem>
                         <MenuItem Header="Help">
                             <MenuItem Name="MainMenuHelpRegex" Header="Regex Help" Click="MainMenuHelpRegex_OnClick"></MenuItem>

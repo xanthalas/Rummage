@@ -1,0 +1,30 @@
+﻿<Window  x:Class="Rummage.SettingScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        Title="Settings" Height="400" Width="500" BorderThickness="1" BorderBrush="LightGray" WindowStyle="ToolWindow" Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border BorderThickness="0,0,0,1" BorderBrush="LightGray">
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Border BorderThickness="0,0,1,0" BorderBrush="LightGray">
+                <StackPanel Grid.Column="0" Name="settingButtons"></StackPanel>
+            </Border>
+            <StackPanel Name="DetailPanel" Grid.Column="1" Margin="4,4,0,0">
+                <Label Name="SettingLabel" Content="" FontWeight="Bold"/>
+            </StackPanel>
+        </Grid>
+        </Border>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+            <Button x:Name="buttonOk" Width="100" BorderThickness="0" Margin="6" Click="ButtonOk_Click">save</Button>
+            <Button x:Name="buttonCancel" Width="100" BorderThickness="0" Margin="6" Click="ButtonCancel_Click" IsCancel="True">Cancel</Button>
+        </StackPanel>
+    </Grid>
+</Window>

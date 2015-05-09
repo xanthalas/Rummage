@@ -45,6 +45,11 @@ namespace Rummage
         private const string DEFAULT_REQUEST_FILTER = "Rummage Search Request (*.rmgreq)|*.rmgreq|All files (*.*)|*.*";
 
         /// <summary>
+        /// The name of the settings file
+        /// </summary>
+        public const string SETTINGS_FILE = "Rummage_Settings.prf";
+
+        /// <summary>
         /// Used to indicate to the running tasks that a cancellation has been requested
         /// </summary>
         private CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -109,6 +114,8 @@ namespace Rummage
 
         private string searchRequestUrl = string.Empty;
 
+        private Settings settings;
+
         public static RoutedCommand DoSearchRoutedCommand = new RoutedCommand();
 
         /// <summary>
@@ -132,9 +139,10 @@ namespace Rummage
 
             wireUpCommands();
 
+            resetUI();
 //            loadTheme("XXX");
         }
-
+        
         private void wireUpCommands()
         {
             // Create the binding.
@@ -178,50 +186,12 @@ namespace Rummage
         /// </summary>
         private void readIniFile()
         {
-            string iniFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), INI_FILE);
+            Setting.AllowSerialize = true;
+            string settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.DoNotVerify), SETTINGS_FILE);
+            settings = Settings.LoadSettings(settingsPath);
 
-            if (!File.Exists(iniFile))
-            {
-                //If it doesn't exist then we'll create it
-                try
-                {
-                    using (StreamWriter sw = new StreamWriter(iniFile))
-                    {
-                        sw.WriteLine("#This is the ini file for the Rummage search tool.");
-                        sw.WriteLine(@"editor=notepad.exe");
-                        sw.WriteLine(@"editorargs=");
-                        sw.Close();
-                    }
-                }
-                catch (IOException)
-                {
-                    //If it doesn't exist and we can't create it then we'll manage without
-                    return;
-                }
-            }
-
-            using (StreamReader reader = new StreamReader(iniFile))
-            {
-                string line;
-                string setting = string.Empty;
-
-                while ((line = reader.ReadLine()) != null)
-                {
-
-                    if (line.Length > 7 && line.Substring(0, 7) == "editor=")
-                    {
-                        editor = line.Substring(7);
-                    }
-
-                    if (line.Length > 11 && line.Substring(0, 11) == "editorargs=")
-                    {
-                        editorArguments = line.Substring(11);
-                    }
-                    
-                }
-
-                reader.Close();
-            }
+            editor = settings.GetSettingByName("Editor").ValueAsText;
+            editorArguments = settings.GetSettingByName("Editor Args").ValueAsText;
         }
 
         /// <summary>
@@ -1547,13 +1517,16 @@ namespace Rummage
             textBoxSearchStrings.Clear();
             dirChooser.InternalTextBox.Clear();
             textBoxIncludeFiles.Clear();
+            textBoxIncludeFiles.Text = turnCollectionIntoString("Include Files");
             textBoxIncludeFolders.Clear();
+            textBoxIncludeFolders.Text = turnCollectionIntoString("Include Folders");
             textBoxExcludeFiles.Clear();
+            textBoxExcludeFiles.Text = turnCollectionIntoString("Exclude Files");
             textBoxExcludeFolders.Clear();
-            textBoxExcludeFolders.Text += ".svn" + Environment.NewLine;
-            chkBinaries.IsChecked = false;
-            chkCaseSensitive.IsChecked = false;
-            chkRecurse.IsChecked = true;
+            textBoxExcludeFolders.Text = turnCollectionIntoString("Exclude Folders");
+            chkBinaries.IsChecked = settings.GetSettingByName("Search Binaries").ValueAsBoolean;
+            chkCaseSensitive.IsChecked = settings.GetSettingByName("Case Sensitive").ValueAsBoolean;
+            chkRecurse.IsChecked = settings.GetSettingByName("Sub Folders").ValueAsBoolean;
             flowResults.Blocks.Clear();
 
             this.Title = "Rummage";
@@ -1561,6 +1534,23 @@ namespace Rummage
             searchingX.Text = string.Empty;
             searchingOfY.Text = string.Empty;
             runningProgress.Value = 0;
+        }
+
+        private string turnCollectionIntoString(string settingName)
+        {
+            List<string> collection = settings.GetSettingByName(settingName).ValueAsCollection;
+            string returnValue;
+
+            if (collection.Count == 0)
+            {
+                returnValue = string.Empty;
+            }
+            else
+            {
+                returnValue = collection.Aggregate((current, next) => current + Environment.NewLine + next);
+            }
+
+            return returnValue;
         }
 
         /// <summary>
@@ -1582,5 +1572,16 @@ namespace Rummage
         {
             e.CanExecute = checkSearchesAreValid() && checkFoldersExist() && textBoxSearchStrings.Text.Trim().Length > 0 && dirChooser.InternalTextBox.Text.Trim().Length > 0;
         }
+
+        private void EditSettings_Click(object sender, RoutedEventArgs e)
+        {
+            var settingsScreen = new SettingScreen(settings);
+
+            settingsScreen.WindowStyle = System.Windows.WindowStyle.ToolWindow;
+            settingsScreen.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            settingsScreen.ShowDialog();
+            settings = settingsScreen.settings;
+        }
     }
 }
+

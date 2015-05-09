@@ -9,6 +9,8 @@ High
 Medium
 ------
 Tabbed display to allow multiple searches (ideally simultaneously)
+Pop up a preview window for matches
+
 
 
 
@@ -22,7 +24,7 @@ Mention included code in About screen:
     Snarl
     http://www.codeproject.com/Articles/22012/Explorer-Shell-Context-Menu
 Option to remove leading spaces from search results in bottom grid
-
+Collect some statistics on the number of files searched, matches found, etc.
 
 
 

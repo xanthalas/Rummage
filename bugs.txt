@@ -4,6 +4,7 @@ Open
 0007: Load a saved search request. Tick the "Case-sensitive" option and start the search. It rescans all the folders before searching. Case-sensitive 
       might be a red-herring but it definitely shouldn't be re-reading the files.
 0008: In the "Search where" box the program will crash if you enter the path to a DVD drive which is empty
+0011: Tab order is not right. This isn't easy to fix as the custom controls seem to mess it up.
 
 Fixed
 -----

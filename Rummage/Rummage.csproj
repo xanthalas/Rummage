@@ -80,6 +80,9 @@
     <Compile Include="SearchHistory.xaml.cs">
       <DependentUpon>SearchHistory.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SettingScreen.xaml.cs">
+      <DependentUpon>SettingScreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ShellContextMenu.cs" />
     <Compile Include="Snarl\M_RESULT.cs" />
     <Compile Include="Snarl\SnarlConnector.cs" />
@@ -116,6 +119,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SearchHistory.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SettingScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
