@@ -124,7 +124,6 @@ namespace RummageCore
                 case SettingType.collection:
                     if (value is List<string>)
                     {
-                        //collection = (List<string>)value;
                         collection = new List<string>();
                         foreach(var item in (List<string>)value)
                         {
@@ -135,23 +134,12 @@ namespace RummageCore
 
                     if (value is List<string> || value is Newtonsoft.Json.Linq.JArray)
                     {
-                        //collection = (List<string>)value;
                         collection = new List<string>();
                         foreach (var item in (Newtonsoft.Json.Linq.JArray)value)
                         {
-                            //Strip off the leading and trailing \" characters added by the serializer
-                            string stringToAdd = item.ToString();
-                            if (stringToAdd.Substring(0,1) == "\"")
-                            {
-                                stringToAdd = stringToAdd.Substring(1);
-                            }
-                            
-                            if (stringToAdd.Substring(stringToAdd.Length -1, 1) == "\"")
-                            {
-                                stringToAdd = stringToAdd.Substring(0, stringToAdd.Length - 1);
-                            }
-                            collection.Add(stringToAdd);
+                            string stringToAdd = ((Newtonsoft.Json.Linq.JValue)item).Value as string;
 
+                            collection.Add(stringToAdd);
                         }
                         break;
                     }
