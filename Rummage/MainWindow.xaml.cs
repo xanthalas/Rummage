@@ -50,6 +50,11 @@ namespace Rummage
         public const string SETTINGS_FILE = "Rummage_Settings.prf";
 
         /// <summary>
+        /// Default preferences file to use when running Rummage for the first time
+        /// </summary>
+        public const string DEFAULT_SETTINGS_FILE = "DefaultPrefs";
+
+        /// <summary>
         /// Used to indicate to the running tasks that a cancellation has been requested
         /// </summary>
         private CancellationTokenSource tokenSource = new CancellationTokenSource();
@@ -188,10 +193,11 @@ namespace Rummage
         {
             Setting.AllowSerialize = true;
             string settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.DoNotVerify), SETTINGS_FILE);
+            if (!File.Exists(settingsPath))
+            {
+                File.Copy(Path.Combine(Environment.CurrentDirectory, DEFAULT_SETTINGS_FILE), settingsPath);
+            }
             settings = Settings.LoadSettings(settingsPath);
-
-            editor = settings.GetSettingByName("Editor").ValueAsText;
-            editorArguments = settings.GetSettingByName("Editor Args").ValueAsText;
         }
 
         /// <summary>
@@ -1096,6 +1102,15 @@ namespace Rummage
 
         private void StartEditor(string arguments)
         {
+
+            editor = settings.GetSettingByName("Editor").ValueAsText;
+            editorArguments = settings.GetSettingByName("Editor Args").ValueAsText;
+
+            if (editor.Trim().Length == 0)
+            {
+                editor = "notepad.exe";
+            }
+
             ProcessStartInfo procStartInfo = new ProcessStartInfo(editor);
             procStartInfo.Arguments = arguments;
 
