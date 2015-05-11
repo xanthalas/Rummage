@@ -205,6 +205,8 @@ namespace Rummage
         /// </summary>
         private void doSearch()
         {
+            searchRunning = true;
+
             startTime = DateTime.Now;
             flowResults.Blocks.Clear();
             matches = new System.Collections.ObjectModel.ObservableCollection<MatchingItem>();
@@ -328,7 +330,7 @@ namespace Rummage
             search = new SearchFilesystem();
             search.ItemSearched += new ItemSearchedEventHandler(search_ItemSearched);
 
-            searchRunning = true;
+
             setChangedStatus(false);        //Reset the changed status now that the search is about to run
             performSearchOnSeparateThread(search, searchRequest);
 
@@ -909,68 +911,6 @@ namespace Rummage
         #endregion
 
         #region Event Handlers
-
-        /// <summary>
-        /// Starts of Stops the search
-        /// </summary>
-        /// <param name="sender">Standard sender object</param>
-        /// <param name="e">Not used</param>
-        private void btnStart_Click(object sender, RoutedEventArgs e)
-        {
-            if (!searchRunning)
-            {
-                if (checkParms())
-                {
-                    btnStart.Content = "_Cancel Search";
-                    cancellingSearch = false;
-                    doSearch();
-                }
-            }
-            else
-            {
-                updateDocument(flowResults, "Search cancelled.");
-                cancelRunningSearch();
-            }
-        }
-
-        /// <summary>
-        /// Sends cancel messages to the search process to stop it running
-        /// </summary>
-        private void cancelRunningSearch()
-        {
-            if (searchRequest != null)
-            {
-                searchRequest.CancelRequest();
-            }
-            if (search != null)
-            {
-                search.CancelSearch();
-            }
-
-            cancellingSearch = true;
-            btnStart.Content = "_Start Search";
-            updateProgressBar(0, 0, string.Empty, string.Empty, false);
-        }
-
-
-        private void updateHistoryPopups()
-        {
-            foreach (var searchString in searchRequest.SearchStrings)
-            {
-                searchHistoryWindow.AddItemToList(searchString);
-            }
-
-            searchHistoryWindow.SaveList();
-
-            foreach (var containerString in searchRequest.SearchContainers)
-            {
-                folderHistoryWindow.AddItemToList(containerString);
-            }
-
-            folderHistoryWindow.SaveList();
-
-        }
-
         /// <summary>
         /// When the selected item changes reload the bottom display with the matches from the selected item
         /// </summary>
@@ -1022,7 +962,7 @@ namespace Rummage
                 }
             }
         }
- 
+
         /// <summary>
         /// Whenever the text changes we'll check whether the entered folders exist
         /// </summary>
@@ -1085,41 +1025,6 @@ namespace Rummage
         }
 
         /// <summary>
-        /// Combine the selected file with the arguments for the editor
-        /// </summary>
-        /// <param name="itemPath">File to open</param>
-        /// <param name="lineNumber">Line number to jump to</param>
-        /// <returns></returns>
-        private string buildArguments(string itemPath, int lineNumber)
-        {
-            string arguments = @"""" + itemPath + @"""";
-            if (editorArguments.Length > 0)
-            {
-                arguments = editorArguments + lineNumber + " " + arguments;
-            }
-            return arguments;
-        }
-
-        private void StartEditor(string arguments)
-        {
-
-            editor = settings.GetSettingByName("Editor").ValueAsText;
-            editorArguments = settings.GetSettingByName("Editor Args").ValueAsText;
-
-            if (editor.Trim().Length == 0)
-            {
-                editor = "notepad.exe";
-            }
-
-            ProcessStartInfo procStartInfo = new ProcessStartInfo(editor);
-            procStartInfo.Arguments = arguments;
-
-            procStartInfo.CreateNoWindow = true;
-            procStartInfo.UseShellExecute = true;
-            Process.Start(procStartInfo);
-        }
-
-        /// <summary>
         /// Open a Folder-Browse dialog and add the user's selection to the Folders box
         /// </summary>
         /// <param name="sender">Standard sender object</param>
@@ -1146,10 +1051,10 @@ namespace Rummage
         private void MainMenuHelpAbout_Click(object sender, RoutedEventArgs e)
         {
             RummageAbout about = new RummageAbout
-                                     {
-                                         Owner = this,
-                                         WindowStartupLocation = WindowStartupLocation.CenterOwner
-                                     };
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
 
             about.ShowDialog();
         }
@@ -1188,11 +1093,10 @@ namespace Rummage
         {
             _excludeFoldersChanged = true;
         }
-        #endregion
 
         private void MainMenuFileSearchHistory_Click(object sender, RoutedEventArgs e)
         {
-            
+
 
         }
 
@@ -1251,6 +1155,256 @@ namespace Rummage
             }
         }
 
+        private void listViewMatches_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (listViewMatches.SelectedItems.Count > 0)
+            {
+                MatchingItem matchingItem = listViewMatches.SelectedItem as MatchingItem;
+
+                if (matchingItem != null)
+                {
+                    if (File.Exists(matchingItem.ItemKey))
+                    {
+                        FileInfo[] singleFile = new FileInfo[1];
+                        singleFile[0] = new FileInfo(matchingItem.ItemKey);
+                        ShellContextMenu shellContextMenu = new ShellContextMenu();
+
+                        System.Drawing.Point pt = new System.Drawing.Point(Convert.ToInt32(Mouse.GetPosition(this).X), Convert.ToInt32(Mouse.GetPosition(this).Y));
+
+                        shellContextMenu.ShowContextMenu(singleFile, pt);
+                    }
+                }
+            }
+
+        }
+
+        private void MainMenuHelpRegex_OnClick(object sender, RoutedEventArgs e)
+        {
+            var doc = new RegexHelpWindow();
+            doc.Show();
+        }
+
+        private void SaveSearchRequest_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (searchRequestUrl.Length == 0)
+            {
+                SaveSearchRequestAs_OnClick(sender, e);
+            }
+            else
+            {
+                searchRequest.SaveSearchRequest(searchRequestUrl);
+            }
+        }
+
+        private void SaveSearchRequestAs_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (searchRequest == null || !searchRequest.IsPrepared)
+            {
+                System.Windows.MessageBox.Show("Please run the search before saving it", "Rummage - cannot save Search Request");
+                return;
+            }
+
+            SaveFileDialog saveDialog = new SaveFileDialog();
+            saveDialog.AddExtension = true;
+            saveDialog.CheckPathExists = true;
+            saveDialog.DefaultExt = DEFAULT_REQUEST_EXTENSION;
+            saveDialog.Filter = DEFAULT_REQUEST_FILTER;
+            saveDialog.OverwritePrompt = true;
+
+            if (saveDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                bool result = searchRequest.SaveSearchRequest(saveDialog.FileName);
+
+                if (result)
+                {
+                    setWindowTitle(saveDialog.FileName);
+                }
+
+                updateStatus((result ? "Search request saved" : "Save failed"));
+            }
+        }
+
+        private void LoadSearchRequest_OnClick(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog opendialog = new OpenFileDialog();
+            opendialog.DefaultExt = DEFAULT_REQUEST_EXTENSION;
+            opendialog.Filter = DEFAULT_REQUEST_FILTER;
+            opendialog.CheckFileExists = true;
+            opendialog.Multiselect = false;
+
+            if (opendialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                if (searchRequest == null)
+                {
+                    searchRequest = new SearchRequestFilesystem();
+                }
+                searchRequest = searchRequest.LoadSearchRequest(opendialog.FileName);
+
+                if (searchRequest != null)
+                {
+                    searchRequestUrl = opendialog.FileName;
+                    populateScreenFromSearchRequest(searchRequest, searchRequestUrl);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Copies the selected filenames to the clipboard
+        /// </summary>
+        /// <param name="sender">The menu item which triggered this call</param>
+        /// <param name="e">Standard event args</param>
+        private void EditCopyFilenames_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (listViewMatches.SelectedItems.Count == 0)
+            {
+                return;
+            }
+
+            StringBuilder filenames = new StringBuilder();
+            foreach (MatchingItem item in listViewMatches.SelectedItems)
+            {
+                filenames.AppendLine(item.ItemKey);
+            }
+
+            if (filenames.Length > 0)
+            {
+                System.Windows.Clipboard.SetText(filenames.ToString().TrimEnd());
+            }
+        }
+
+        /// <summary>
+        /// Clears everything out ready to perform a new search
+        /// </summary>
+        /// <param name="sender">Component triggering this event</param>
+        /// <param name="e">Standard event args</param>
+        private void NewSearchRequest_OnClick(object sender, RoutedEventArgs e)
+        {
+            matchingLinesForCurrentSelection.Clear();
+            matches.Clear();
+            searchRequest = new SearchRequestFilesystem();
+
+            resetUI();
+        }
+
+        /// <summary>
+        /// Initiate the Search when the command is executed
+        /// </summary>
+        /// <param name="sender">Control which sends this command</param>
+        /// <param name="e">Event arguments</param>
+        private void ExecutedDoSearchCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (!searchRunning)
+            {
+                if (checkParms())
+                {
+                    btnStart.Content = "_Cancel Search";
+                    cancellingSearch = false;
+                    doSearch();
+                }
+            }
+            else
+            {
+                updateDocument(flowResults, "Search cancelled.");
+                cancelRunningSearch();
+            }
+        }
+
+        /// <summary>
+        /// Used by routed command to indicate whether Search can be initiated
+        /// </summary>
+        /// <param name="sender">Standard sender</param>
+        /// <param name="e">Event Args for this event</param>
+        private void CanExecuteDoSearchCommand(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = checkSearchesAreValid() && checkFoldersExist() && textBoxSearchStrings.Text.Trim().Length > 0 && dirChooser.InternalTextBox.Text.Trim().Length > 0;
+        }
+
+        private void EditSettings_Click(object sender, RoutedEventArgs e)
+        {
+            var settingsScreen = new SettingScreen(settings);
+
+            settingsScreen.WindowStyle = System.Windows.WindowStyle.ToolWindow;
+            settingsScreen.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            settingsScreen.ShowDialog();
+            settings = settingsScreen.settings;
+        }
+
+        #endregion
+        /// <summary>
+        /// Sends cancel messages to the search process to stop it running
+        /// </summary>
+        private void cancelRunningSearch()
+        {
+            if (searchRequest != null)
+            {
+                searchRequest.CancelRequest();
+            }
+            if (search != null)
+            {
+                search.CancelSearch();
+            }
+
+            cancellingSearch = true;
+            btnStart.Content = "_Start Search";
+            updateProgressBar(0, 0, string.Empty, string.Empty, false);
+        }
+
+
+        private void updateHistoryPopups()
+        {
+            foreach (var searchString in searchRequest.SearchStrings)
+            {
+                searchHistoryWindow.AddItemToList(searchString);
+            }
+
+            searchHistoryWindow.SaveList();
+
+            foreach (var containerString in searchRequest.SearchContainers)
+            {
+                folderHistoryWindow.AddItemToList(containerString);
+            }
+
+            folderHistoryWindow.SaveList();
+
+        }
+
+
+        /// <summary>
+        /// Combine the selected file with the arguments for the editor
+        /// </summary>
+        /// <param name="itemPath">File to open</param>
+        /// <param name="lineNumber">Line number to jump to</param>
+        /// <returns></returns>
+        private string buildArguments(string itemPath, int lineNumber)
+        {
+            string arguments = @"""" + itemPath + @"""";
+            if (editorArguments.Length > 0)
+            {
+                arguments = editorArguments + lineNumber + " " + arguments;
+            }
+            return arguments;
+        }
+
+        private void StartEditor(string arguments)
+        {
+
+            editor = settings.GetSettingByName("Editor").ValueAsText;
+            editorArguments = settings.GetSettingByName("Editor Args").ValueAsText;
+
+            if (editor.Trim().Length == 0)
+            {
+                editor = "notepad.exe";
+            }
+
+            ProcessStartInfo procStartInfo = new ProcessStartInfo(editor);
+            procStartInfo.Arguments = arguments;
+
+            procStartInfo.CreateNoWindow = true;
+            procStartInfo.UseShellExecute = true;
+            Process.Start(procStartInfo);
+        }
+
+
 
         /// <summary>
         /// Move the selection up/down the list of matches
@@ -1297,98 +1451,6 @@ namespace Rummage
             }
         }
 
-        private void listViewMatches_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            if (listViewMatches.SelectedItems.Count > 0)
-            {
-                MatchingItem matchingItem = listViewMatches.SelectedItem as MatchingItem;
-
-                if (matchingItem != null)
-                {
-                    if (File.Exists(matchingItem.ItemKey))
-                    {
-                        FileInfo[] singleFile = new FileInfo[1];
-                        singleFile[0] = new FileInfo(matchingItem.ItemKey);
-                        ShellContextMenu shellContextMenu = new ShellContextMenu();
-                        
-                        System.Drawing.Point pt = new System.Drawing.Point(Convert.ToInt32(Mouse.GetPosition(this).X), Convert.ToInt32(Mouse.GetPosition(this).Y));
-
-                        shellContextMenu.ShowContextMenu(singleFile, pt);
-                    }
-                }
-            }
-            
-        }
-
-        private void MainMenuHelpRegex_OnClick(object sender, RoutedEventArgs e)
-        {
-            var doc = new RegexHelpWindow();
-            doc.Show();
-        }
-
-        private void SaveSearchRequest_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (searchRequestUrl.Length == 0)
-            {
-                SaveSearchRequestAs_OnClick(sender, e);
-            }
-            else
-            {
-                searchRequest.SaveSearchRequest(searchRequestUrl);
-            }
-        }
-
-        private void SaveSearchRequestAs_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (searchRequest == null || ! searchRequest.IsPrepared)
-            {
-                System.Windows.MessageBox.Show("Please run the search before saving it", "Rummage - cannot save Search Request");
-                return;
-            }
-
-            SaveFileDialog saveDialog = new SaveFileDialog();
-            saveDialog.AddExtension = true;
-            saveDialog.CheckPathExists = true;
-            saveDialog.DefaultExt = DEFAULT_REQUEST_EXTENSION;
-            saveDialog.Filter = DEFAULT_REQUEST_FILTER;
-            saveDialog.OverwritePrompt = true;
-
-            if (saveDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                bool result = searchRequest.SaveSearchRequest(saveDialog.FileName);
-                
-                if (result)
-                {
-                    setWindowTitle(saveDialog.FileName);
-                }
-
-                updateStatus((result ? "Search request saved" : "Save failed"));
-            }
-        }
-
-        private void LoadSearchRequest_OnClick(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog opendialog = new OpenFileDialog();
-            opendialog.DefaultExt = DEFAULT_REQUEST_EXTENSION;
-            opendialog.Filter = DEFAULT_REQUEST_FILTER;
-            opendialog.CheckFileExists = true;
-            opendialog.Multiselect = false;
-
-            if (opendialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                if (searchRequest == null)
-                {
-                    searchRequest = new SearchRequestFilesystem();
-                }
-                searchRequest = searchRequest.LoadSearchRequest(opendialog.FileName);
-
-                if (searchRequest != null)
-                {
-                    searchRequestUrl = opendialog.FileName;
-                    populateScreenFromSearchRequest(searchRequest, searchRequestUrl);
-                }
-            }
-        }
 
         /// <summary>
         /// Get the date this request was saved so we can work out how old it is
@@ -1486,43 +1548,6 @@ namespace Rummage
             }   
         }
 
-        /// <summary>
-        /// Copies the selected filenames to the clipboard
-        /// </summary>
-        /// <param name="sender">The menu item which triggered this call</param>
-        /// <param name="e">Standard event args</param>
-        private void EditCopyFilenames_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (listViewMatches.SelectedItems.Count == 0)
-            {
-                return;
-            }
-
-            StringBuilder filenames = new StringBuilder();
-            foreach (MatchingItem item in listViewMatches.SelectedItems)
-            {
-                filenames.AppendLine(item.ItemKey);
-            }
-
-            if (filenames.Length > 0)
-            {
-                System.Windows.Clipboard.SetText(filenames.ToString().TrimEnd());
-            }
-        }
-
-        /// <summary>
-        /// Clears everything out ready to perform a new search
-        /// </summary>
-        /// <param name="sender">Component triggering this event</param>
-        /// <param name="e">Standard event args</param>
-        private void NewSearchRequest_OnClick(object sender, RoutedEventArgs e)
-        {
-            matchingLinesForCurrentSelection.Clear();
-            matches.Clear();
-            searchRequest = new SearchRequestFilesystem();
-
-            resetUI();
-        }
 
         /// <summary>
         /// Clears the UI completely 
@@ -1568,35 +1593,6 @@ namespace Rummage
             return returnValue;
         }
 
-        /// <summary>
-        /// Initiate the Search when the command is executed
-        /// </summary>
-        /// <param name="sender">Control which sends this command</param>
-        /// <param name="e">Event arguments</param>
-        private void ExecutedDoSearchCommand(object sender, ExecutedRoutedEventArgs e)
-        {
-            doSearch();
-        }
-
-        /// <summary>
-        /// Used by routed command to indicate whether Search can be initiated
-        /// </summary>
-        /// <param name="sender">Standard sender</param>
-        /// <param name="e">Event Args for this event</param>
-        private void CanExecuteDoSearchCommand(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = checkSearchesAreValid() && checkFoldersExist() && textBoxSearchStrings.Text.Trim().Length > 0 && dirChooser.InternalTextBox.Text.Trim().Length > 0;
-        }
-
-        private void EditSettings_Click(object sender, RoutedEventArgs e)
-        {
-            var settingsScreen = new SettingScreen(settings);
-
-            settingsScreen.WindowStyle = System.Windows.WindowStyle.ToolWindow;
-            settingsScreen.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-            settingsScreen.ShowDialog();
-            settings = settingsScreen.settings;
-        }
     }
 }
 

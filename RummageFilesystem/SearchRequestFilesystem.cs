@@ -29,6 +29,7 @@ namespace RummageFilesystem
                                                                        @".*\.mpeg$", @".*\.mp4$", @".*\.mov$",
                                                                        @".*\.avi$", @".*\.zip$", @".*\.7z$", @".*\.msi$"
                                                                    };
+
         #region Member variables
 
         /// <summary>
@@ -216,6 +217,11 @@ namespace RummageFilesystem
         /// Keeps tracked of the number of files which have been scanned
         /// </summary>
         private int filesScanned;
+
+        /// <summary>
+        /// Indicates whether we've already added the set of binary filenames to ignore
+        /// </summary>
+        private bool binaryExclusionFilesAdded = false;
 
         /// <summary>
         /// Event raised when notifying progress
@@ -414,6 +420,7 @@ namespace RummageFilesystem
             CaseSensitive = false;
             SearchHidden = false;
             Recurse = false;        //Don't recurse unless told to
+            binaryExclusionFilesAdded = false;
 
             _urlToSearch = new List<string>();
 
@@ -443,6 +450,7 @@ namespace RummageFilesystem
         /// <returns>The number of files which will be searched if Search() is run using this request</returns>
         public int Prepare()
         {
+
             #region Logging information
             if (log.IsDebugEnabled)
             {
@@ -492,9 +500,10 @@ namespace RummageFilesystem
             //files which we know are binary. Obviously files which the user deliberately renames to have a binary-type
             //extension will be skipped.
 
-            if (!SearchBinaries)
+            if (!SearchBinaries && !binaryExclusionFilesAdded)
             {
                 ExcludeItemStrings.AddRange(KNOWN_BINARY_FILENAME_REGEXES);
+                binaryExclusionFilesAdded = true;
             }
 
             cancellationToken = this.cancellationTokenSource.Token;
