@@ -26,6 +26,10 @@ namespace rmg
 
         private static bool _helpShown = false;
 
+        private static bool _cygwinFormat = false;
+
+        private static bool _quotes = false;
+
         static void Main(string[] args)
         {
             ISearchRequest searchRequest = new SearchRequestFilesystem();
@@ -135,13 +139,35 @@ namespace rmg
         {
             StringBuilder builder = new StringBuilder();
             builder.Append(_outputFormat);
-            builder.Replace("{MatchItem}", match.MatchItem);
+            builder.Replace("{MatchItem}", formatMatchItem(match.MatchItem));
             builder.Replace("{MatchLineNumber}", match.MatchLineNumber.ToString());
             builder.Replace("{MatchLine}", match.MatchLine);
             builder.Replace("{MatchString}", match.MatchString);
 
             return builder.ToString();
         }
+
+        /// <summary>
+        /// Format the matchItem (the full path and filename)
+        /// </summary>
+        /// <param name="matchItem"></param>
+        /// <returns></returns>
+        private static string formatMatchItem(string matchItem)
+        {
+            if (_cygwinFormat)
+            {
+                var driveLetter = matchItem.Substring(0, 1).ToLower();
+                matchItem = matchItem.Substring(2);
+                matchItem = "/cygdrive/" + driveLetter + matchItem.Replace(@"\", @"/");
+            }
+
+            if (_quotes)
+            {
+                matchItem = "\"" + matchItem + "\"";
+            }
+            return matchItem;
+        }
+
 
         /// <summary>
         /// Parse the options passed in.
@@ -230,6 +256,8 @@ namespace rmg
                 _verbose = options.Verbose;
                 _outputFormat = options.OutputFormat;
                 _confirmSearch = options.ConfirmSearch;
+                _cygwinFormat = options.CygwinFormat;
+                _quotes = options.Quotes;
 
                 return true;
             }

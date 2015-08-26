@@ -47,5 +47,11 @@ namespace rmg
         [Option("o", "output", Required = false, HelpText = "Format of output.")]
         public string OutputFormat = "{MatchItem} : {MatchLineNumber} {MatchLine}";
 
+        [Option("g", "cygwin", Required = false, HelpText = "Output filenames in Cygwin format")]
+        public bool CygwinFormat = false;
+
+        [Option("q", "quotes", Required = false, HelpText = "Output filenames surrounded by quotes")]
+        public bool Quotes = false;
+
     }
 }
