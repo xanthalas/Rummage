@@ -421,8 +421,10 @@ namespace Rummage
                 DateTime endTime = DateTime.Now;
                 TimeSpan elapsed = endTime.Subtract(startTime);
 
-                var successCount = (from m in search.Matches where m.Successful != null && m.Successful select m).Count();
-                var failCount = search.Matches.Count - successCount;
+                var successCount = (from m in search.Matches where m != null && m.Successful != null && m.Successful select m).Count();
+                //var failedSearches = (from m in search.Matches where (m == null) || (m != null && m.Successful != null && !m.Successful) select m);
+
+                var failCount = (from m in search.Matches where (m == null) || (m != null && m.Successful != null && !m.Successful) select m).Count();
 
                 string matchWord = search.Matches.Count == 1 ? "match" : "matches";
                 string fileWord = matches.Count == 1 ? "file" : "files";
@@ -607,6 +609,10 @@ namespace Rummage
             textBlockCurrentStatus.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (Action)(() =>
                 {
+                    if (match == null)
+                    {
+                        int matchNull = 0;
+                    }
                     if (matches.Contains(mi))
                     {
                         int index = matches.IndexOf(mi);
@@ -1268,7 +1274,14 @@ namespace Rummage
 
             if (filenames.Length > 0)
             {
-                System.Windows.Clipboard.SetText(filenames.ToString().TrimEnd());
+                try
+                {
+                    System.Windows.Clipboard.SetDataObject(filenames.ToString().TrimEnd());
+                }
+                catch (Exception)
+                {
+                    System.Windows.MessageBox.Show("Sorry an error occurred while attempting to copy the filenames to the clipboard.", "Rummage Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
         }
 

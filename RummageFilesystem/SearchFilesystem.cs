@@ -174,7 +174,15 @@ namespace RummageFilesystem
                 {
                     RummageCore.Match failedMatch = new RummageCore.Match("", "", 0, url);
                     failedMatch.Successful = false;
-                    failedMatch.ErrorMessage = ioe.Message;
+                    failedMatch.ErrorMessage = string.Format("Error: Couldn't search file {0}. Reason: {1} ", url, ioe.Message);
+                    //matchesInThisFile.Add(failedMatch);
+                    matchesInThisFile.AddWithNullcheck(failedMatch);
+                }
+                catch (Exception ex)
+                {
+                    RummageCore.Match failedMatch = new RummageCore.Match("", "", 0, url);
+                    failedMatch.Successful = false;
+                    failedMatch.ErrorMessage = string.Format("Error: Couldn't search file {0}. Reason: {1} ", url, ex.Message);
                     //matchesInThisFile.Add(failedMatch);
                     matchesInThisFile.AddWithNullcheck(failedMatch);
                 }
